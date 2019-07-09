@@ -117,81 +117,80 @@ export default {
         },
         // 模块管理
         {
-          path: '/qn',
-          name: 'qn',
+          path: '/module',
+          name: 'module',
           icon: 'file',
           routes:[{
-            path: '/qn/question',
-            name: 'question',
+            path: '/module/bangDan',
+            name: 'bangDan',
             icon: 'right',
-            component: './qn/Question',
+            component: './module/BangDan',
           },{
-            path: '/qn/questionNaire',
-            name: 'questionNaire',
+            path: '/module/recommend',
+            name: 'recommend',
             icon: 'right',
-            component: './qn/QuestionNaire',
+            component: './module/Recommend',
+          },{
+            path: '/module/setting',
+            name: 'setting',
+            icon: 'right',
+            component: './module/Setting',
+          },{
+            path: '/module/admin',
+            name: 'admin',
+            icon: 'right',
+            component: './module/Admin',
+          },{
+            path: '/module/news',
+            name: 'news',
+            icon: 'right',
+            component: './module/News',
+          },{
+            path: '/module/authentication',
+            name: 'authentication',
+            icon: 'right',
+            component: './module/Authentication',
           }]
         },
+        // 角色管理
         {
-          path: '/survey',
-          name: 'survey',
+          path: '/roles',
+          name: 'roles',
           icon: 'star',
           routes:[{
-            path: '/survey/create',
-            name: 'create',
+            path: '/roles/privilege',
+            name: 'privilege',
             icon: 'right',
-            component: './survey/Create',
+            component: './roles/Privilege',
           },{
-            path: '/survey/monitor',
-            name: 'monitor',
+            path: '/roles/role',
+            name: 'role',
             icon: 'right',
-            component: './survey/Monitor',
+            component: './roles/Role',
           }]
         },
+        // 用户管理
         {
-          path: '/statistics',
-          name: 'statistics',
+          path: '/users',
+          name: 'users',
           icon: 'stock',
           routes:[{
-            path: '/statistics/checkSurvey',
-            name: 'checkSurvey',
+            path: '/users/user',
+            name: 'user',
             icon: 'right',
-            component: './statistics/CheckSurvey',
-          },{
-            path: '/statistics/allSurvey',
-            name: 'allSurvey',
-            icon: 'right',
-            component: './statistics/AllSurvey',
-          },{
-            path: '/statistics/clazzSurvey',
-            name: 'clazzSurvey',
-            icon: 'right',
-            component: './statistics/ClazzSurvey',
-          },{
-            path: '/statistics/teacherSurvey',
-            name: 'teacherSurvey',
-            icon: 'right',
-            component: './statistics/TeacherSurvey',
+            component: './users/User',
           }]
-        },{
-          path: '/personal',
-          name: 'personal',
+        }
+        // 学校管理
+        ,{
+          path: '/schools',
+          name: 'schools',
           icon: 'user',
           routes:[{
-            path: '/personal/mySurvey',
-            name: 'mySurvey',
+            path: '/schools/School',
+            name: 'school',
             icon: 'right',
-            component: './personal/MySurvey',
-          },{
-            path: '/personal/mySurveyStatistic',
-            name: 'mySurveyStatistic',
-            icon: 'right',
-            component: './personal/MySurveyStatistic',
-          },{
-            path: '/personal/myInfo',
-            name: 'myInfo',
-            icon: 'right',
-            component: './personal/MyInfo',
+            component: './schools/School',
           }]
         },
         {

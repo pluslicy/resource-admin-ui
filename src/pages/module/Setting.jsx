@@ -1,14 +1,14 @@
 import React from 'react';
 
-class Create extends React.Component {
+class Setting extends React.Component {
  
   render(){
     return (
       <div>
-        <p>创建课调</p>
+        <p>系统设置</p>
       </div>
     )
   }
 }
 
-export default Create;
+export default Setting;

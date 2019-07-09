@@ -1,14 +1,14 @@
 import React from 'react';
 
-class MyInfo extends React.Component {
+class Role extends React.Component {
  
   render(){
     return (
       <div>
-        <p>个人信息</p>
+        <p>角色管理</p>
       </div>
     )
   }
 }
 
-export default MyInfo;
+export default Role;

@@ -1,14 +1,14 @@
 import React from 'react';
 
-class MySurvey extends React.Component {
+class News extends React.Component {
  
   render(){
     return (
       <div>
-        <p>我的课调</p>
+        <p>最新状态</p>
       </div>
     )
   }
 }
 
-export default MySurvey;
+export default News;
