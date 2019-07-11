@@ -107,12 +107,34 @@ export default {
             path: '/resource/check',
             name: 'check',
             icon: 'right',
-            component: './resource/Check',
+            routes:[{
+              path: '/resource/Check/video',
+              name: 'video',
+              icon: 'right',
+              component: './resource/Check/Video',
+            },
+            {
+              path: '/resource/Check/word',
+              name: 'word',
+              icon: 'right',
+              component: './resource/Check/Word',
+            }]
           },{
             path: '/resource/comment',
             name: 'comment',
             icon: 'right',
-            component: './resource/Comment',
+            routes:[{
+              path: '/resource/comment/comment',
+              name: 'comment',
+              icon: 'right',
+              component: './resource/comment/comment',
+            },
+            {
+              path: '/resource/comment/restore',
+              name: 'restore',
+              icon: 'right',
+              component: './resource/comment/restore',
+            }]
           }]
         },
         // 模块管理
