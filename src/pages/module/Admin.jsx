@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from './module.less'
-import { Menu, Icon,Button,Table,Dropdown,Modal,Transfer, Tree,From,Checkbox } from 'antd';
+import { Menu, Icon,Button,Table,Dropdown,Modal,Transfer, Tree,From,Checkbox,Input,Radio} from 'antd';
+
+const { Search } = Input;
 
 const { TreeNode } = Tree;
 
@@ -96,7 +98,10 @@ class Admin extends React.Component {
       visible: false,
       visible1: false,
       visible2: false,
+      visible3: false,
+      visible4: false,
       targetKeys: [],
+      value: 1,
       form:{},
     }
   }
@@ -114,7 +119,13 @@ class Admin extends React.Component {
     });
   };
   handleOk = e => {
-    console.log(e);
+    e.preventDefault();
+    this.state.form.validateFields((err, values) => {
+      if (!err) {
+        console.log('Received values of form: ', values);
+        //this.props.dispatch(saveOrUpdateCourse(values));
+      }
+    });
     this.setState({
       visible: false,
     });
@@ -143,11 +154,13 @@ class Admin extends React.Component {
     this.setState({
       visible1: false,
     });
+    alert(2)
   };
   // 添加账号模态框
   showModal2 = () => {
     this.setState({
       visible2: true,
+      visible:false
     });
   };
   handleOk2= e => {
@@ -170,6 +183,54 @@ class Admin extends React.Component {
       }
     });
   };
+  //性别单选按钮
+  onChange = e => {
+    console.log('radio checked', e.target.value);
+    this.setState({
+      value: e.target.value,
+    });
+  };
+  // 用户授权模态框
+  showModal3 = () => {
+    this.setState({
+      visible3: true,
+      visible:false
+    });
+  };
+  handleOk3= e => {
+    console.log(e);
+    this.setState({
+      visible3: false,
+    });
+  };
+  handleCancel3 = e => {
+    console.log(e);
+    this.setState({
+      visible3: false,
+    });
+  };
+ 
+  // 用户授权OK模态框
+  showModal4 = () => {
+    this.setState({
+      visible4: true,
+      visible3:false,
+      visible2:false
+    });
+  };
+  handleOk4= e => {
+    console.log(e);
+    this.setState({
+      visible4: false,
+    });
+  };
+  handleCancel4 = e => {
+    console.log(e);
+    this.setState({
+      visible4: false,
+    });
+  };
+ 
 
   //穿梭框
   onChange = targetKeys => {
@@ -240,6 +301,11 @@ class Admin extends React.Component {
         name: record.name,
       }),
     };
+    const columns1 = [
+      { title: '作者', dataIndex: '' },
+      { title: '性别', dataIndex: '' },
+      { title: '联系方式', dataIndex: '' },
+    ];
     //下拉菜单
     const menu = (
       <Menu>
@@ -263,65 +329,16 @@ class Admin extends React.Component {
           {/* 添加按钮 */}
           <Button type="primary" icon="plus" onClick={this.showModal}>添加</Button><br/><br/>
           <Modal
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          footer={[
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            footer={[
             // 定义右下角按钮的地方
             <Button key="back" onClick={this.handleCancel}>取消</Button>,
           ]}
         >
           <Button style={{margin:50,marginLeft:110}} onClick={this.showModal2}>添加账号</Button>
-          <Modal
-            visible={this.state.visible2}
-            onOk={this.handleOk2}
-            onCancel={this.handleCancel2}
-            footer={[
-            <Button key="submit" type="primary" onClick={this.handleOk2} style={{width:200,height:30}}>
-              OK
-            </Button>,
-          ]}
-        >
-          {/* <Form onSubmit={this.handleSubmit} className="login-form">
-            <Form.Item>
-              {getFieldDecorator('username', {
-                rules: [{ required: true, message: 'Please input your username!' }],
-              })(
-                <Input
-                  prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                  placeholder="Username"
-                />,
-              )}
-            </Form.Item>
-            <Form.Item>
-              {getFieldDecorator('password', {
-                rules: [{ required: true, message: 'Please input your Password!' }],
-              })(
-                <Input
-                  prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                  type="password"
-                  placeholder="Password"
-                />,
-              )}
-            </Form.Item>
-            <Form.Item>
-              {getFieldDecorator('remember', {
-                valuePropName: 'checked',
-                initialValue: true,
-              })(<Checkbox>Remember me</Checkbox>)}
-              <a className="login-form-forgot" href="">
-                Forgot password
-              </a>
-              <Button type="primary" htmlType="submit" className="login-form-button">
-                Log in
-              </Button>
-              Or <a href="">register now!</a>
-            </Form.Item>
-          </Form> */}
-          为该管理员配置权限<br/><br/>
-          <TreeTransfer dataSource={treeData} targetKeys={targetKeys} onChange={this.onChange} />
-        </Modal>
-          <Button>用户授权</Button>
+          <Button onClick={this.showModal3}>用户授权</Button>
         </Modal>
 
           {/* 表格 */}
@@ -338,7 +355,74 @@ class Admin extends React.Component {
           <Button type="danger">冻结</Button>&nbsp;&nbsp;
           <Button type="dashed" style={{backgroundColor:'gray'}}>删除</Button>&nbsp;&nbsp;
 
-        </div>        
+        </div>  
+        <Modal
+            visible={this.state.visible2}
+            onOk={this.handleOk2}
+            onCancel={this.handleCancel2}
+            footer={[
+            <Button key="submit" type="primary" onClick={this.handleOk2} style={{width:200,height:30}}>
+              OK
+            </Button>,
+          ]}
+        >
+          <Input placeholder="输入用户名" /><br/><br/>
+          <Input placeholder="输入密码" /><br/><br/>
+          <Radio.Group onChange={this.onChange} value={this.state.value}>
+            <Radio value={1}>男</Radio>
+            <Radio value={2}>女</Radio>
+          </Radio.Group><br/><br/>
+
+          为该管理员配置权限<br/><br/>
+          <TreeTransfer dataSource={treeData} targetKeys={targetKeys} onChange={this.onChange} />
+        </Modal>
+
+        <Modal
+            visible={this.state.visible3}
+            onOk={this.handleOk3}
+            onCancel={this.handleCancel3}
+            width="900px"
+            height="500px"
+            footer={[
+            <Button key="submit" type="primary" onClick={this.showModal4} style={{width:200,height:30}}>
+              OK
+            </Button>,]}
+        >
+          请选择一位用户<br /><br />
+          <Search
+            placeholder="input search text"
+            onSearch={value => console.log(value)}
+            style={{ width: 200 }}
+          /><br /><br />
+          <Table 
+            bordered
+            size='small'
+            // scroll={{ x: 1000 }}
+            rowSelection={{rowSelection,columnTitle:'#',fixed:'left'}} 
+            columns={columns1} 
+            dataSource={data} />,
+        </Modal>  
+
+        <Modal
+              visible={this.state.visible4}
+              onOk={this.handleOk4}
+              onCancel={this.handleCancel4}
+              width="600px"
+              height="400px"
+              footer={[
+            <Button key="submit" type="primary" onClick={this.handleOk4} style={{width:200,height:30}}>
+              OK
+            </Button>,
+          ]}
+        >
+          您选择的账号为:<br/><br/>
+          姓名：<br/><br/>
+          性别：<br/><br/>
+          联系方式：<br/><br/><br/>
+          为该管理员配置权限<br/><br/>
+          <TreeTransfer dataSource={treeData} targetKeys={targetKeys} onChange={this.onChange} />
+          </Modal> 
+
       </div>
     )
   }

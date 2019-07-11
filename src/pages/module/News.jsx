@@ -54,7 +54,7 @@ class News extends React.Component {
         render: () => {
           return (
             <div>
-               <span onClick={this.showModal}> 更换</span>
+               <a onClick={this.showModal}> 更换</a>
                <Modal
                 visible={this.state.visible}
                 onOk={this.handleOk}
@@ -65,6 +65,7 @@ class News extends React.Component {
                   </Button>,
                 ]}
               >
+                
               </Modal>
             </div>
           );
@@ -99,6 +100,7 @@ class News extends React.Component {
           columns={columns} 
           dataSource={data} />,
         </div>
+        
       </div>
     )
   }
