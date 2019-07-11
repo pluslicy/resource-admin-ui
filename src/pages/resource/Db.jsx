@@ -191,14 +191,14 @@ class Db extends React.Component {
     const dateFormat = 'YYYY-MM-DD';
     return (
       <div className={styles.content}>
-          <div className="left-div" style={{flex:"2",display:"flex",flexDirection:"column",justifyContent:"space-around"}}>
+          <div className="left-div" >
   
       <Menu
         onClick={this.handleClick}
-        style={{ width: 256 }}
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
         mode="inline"
+        style={{minHeight:"500px",marginTop:"1em"}}
       >
         <SubMenu
           key="sub1"
