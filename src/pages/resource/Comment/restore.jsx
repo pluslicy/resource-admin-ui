@@ -1,14 +1,85 @@
 import React from 'react';
 import styles from './comment.less';
-import { Button, Table, Icon, DatePicker,Input } from 'antd';
+import moment from 'moment';
+import { Button, Table, DatePicker,Input,Modal,Comment, Icon, Tooltip, Avatar} from 'antd';
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
+const tsIcon = require('../video.png');
 class Check extends React.Component {
- onChange=(date, dateString)=> {
-  console.log(date, dateString);
-}
-
+	constructor(props){
+		super(props);
+		this.state={
+			visible:false,
+			restore:{},
+			likes: 0,
+			dislikes: 0,
+			action: null,
+		}
+	}
+	like = () => {
+		this.setState({
+		  likes: 1,
+		  dislikes: 0,
+		  action: 'liked',
+		});
+	  };
+	
+	  dislike = () => {
+		this.setState({
+		  likes: 0,
+		  dislikes: 1,
+		  action: 'disliked',
+		});
+	  };
+	onChange=(date, dateString)=> {
+	console.log(date, dateString);
+	}
+	handleCancel = e => {
+		console.log(e);
+		this.setState({
+		visible: false,
+		});
+	};
+  handleOk = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };
+  showModal = (record) => {
+    this.setState({
+	  visible: true,
+	  restore:record
+	});
+	
+  };
   render(){
+	const { likes, dislikes, action } = this.state;
+
+    const actions = [
+      <span>
+        <Tooltip title="Like">
+          <Icon
+            type="like"
+            theme={action === 'liked' ? 'filled' : 'outlined'}
+            onClick={this.like}
+          />
+        </Tooltip>
+        <span style={{ paddingLeft: 8, cursor: 'auto' }}>{likes}</span>
+      </span>,
+      <span>
+        <Tooltip title="Dislike">
+          <Icon
+            type="dislike"
+            theme={action === 'disliked' ? 'filled' : 'outlined'}
+            onClick={this.dislike}
+          />
+        </Tooltip>
+        <span style={{ paddingLeft: 8, cursor: 'auto' }}>{dislikes}</span>
+      </span>,
+     
+    ];
+
   	const rowSelection = {
 		  onChange: (selectedRowKeys, selectedRows) => {
 		    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -20,57 +91,33 @@ class Check extends React.Component {
 		};
   	const columns = [
 		  {
-		    title: '名称',
+		    title: '内容',
 		    dataIndex: 'key',
 		    align: 'center',
 		   
 		  },
 		  {
-		    title: '作者',
+		    title: '来自',
 		    align: 'center',
 		    dataIndex: 'author',
 		  },
 		  {
-		    title: '方向',
+		    title: '被回复作品',
 		    align: 'center',
-		    dataIndex: 'address',
+			dataIndex: 'address',
+			render:(text,record)=>{
+				return (
+					<div>
+					<span>{text}</span>
+					<Icon style={{marginLeft:"3px"}} type="link" onClick={this.showModal.bind(this,record)}></Icon></div>
+				)
+			}
 		  },
 		   {
-		    title: '技术',
+		    title: '时间',
 		    align: 'center',
-		    dataIndex: 'jishu',
-		  },
-		   {
-		    align: 'center',
-		    title: '类型',
-		    dataIndex: 'type',
-		  },
-		   {
-		    title: '权限',
-		    align: 'center',
-		    dataIndex: 'quanxian',
-		  },
-		   {
-		    title: '日期',
-		    align: 'center',
-		    dataIndex: 'data',
-		  },
-		   {
-		    title: '描述',
-		    align: 'center',
-		    dataIndex: 'dec',
-		  },
-		  {
-		    title: '查看',
-		    align: 'center',
-		    dataIndex: '',
-		    render: (text, record) => {
-	        	return (
-	            <div>
-	              <Icon type="eye" />
-	            </div>
-	          );
-	        },
+			dataIndex: 'jishu',
+			
 		  },
 		  {
 		    title: '状态',
@@ -88,45 +135,29 @@ class Check extends React.Component {
 		];
 		const data = [
 		  {
-		    key: '1',
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
+		    address: 'PHP手册',
+		    jishu:'2019-01-02',
 		  },
 		  {
-		    key: '2',
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
+		    address: 'PHP手册',
+		    jishu:'2019-01-02',
 		  },
 		  {
-		    key: '3',
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
+		    address: 'PHP手册',
+		    jishu:'2019-01-02',
 		  },
 		  {
-		    key: '4',
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
-		  }
+		    address: 'java手册',
+		    jishu:'2019-01-02',
+		  },
 		  
 		];
 
@@ -136,7 +167,8 @@ class Check extends React.Component {
         <RangePicker onChange={this.onChange} style={{ width: 300}} />
         <Search
 	      onSearch={value => console.log(value)}
-	      style={{ width: 200 }}
+		  style={{ width: 200 }}
+		  placeholder="请输入搜索内容"
 	    />
 
 		</div>
@@ -146,6 +178,35 @@ class Check extends React.Component {
 		<div className={styles.content_bottom}>
 			<Button size="small" type="primary">一键通过</Button>
 		</div>
+		<Modal
+		  
+          visible={this.state.visible}
+          onOk={this.handleOk}
+		  onCancel={this.handleCancel}
+		  width="580px"
+        >
+		<img src={tsIcon} alt=""/>
+		<Comment
+				actions={actions}
+				author={<a>{this.state.restore.author}</a>}
+				avatar={
+				<Avatar
+					src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+					alt={this.state.restore.author}
+				/>
+				}
+				content={
+				<p>
+					{this.state.restore.key}
+				</p>
+				}
+				datetime={
+				<Tooltip title={this.state.restore.jishu}>
+					<span>{this.state.restore.jishu}</span>
+				</Tooltip>
+				}
+			/>
+        </Modal>
       </div>
     )
   }
