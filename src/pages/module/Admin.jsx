@@ -175,14 +175,6 @@ class Admin extends React.Component {
       visible2: false,
     });
   };
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
-    });
-  };
   //性别单选按钮
   onChange = e => {
     console.log('radio checked', e.target.value);
@@ -246,9 +238,10 @@ class Admin extends React.Component {
     const { targetKeys } = this.state;  
     // 表格
     const columns = [
-      { title: '用户名', dataIndex: '' },
-      { title: '姓名', dataIndex: '' },
+      { title: '用户名', align: 'center', dataIndex: '' },
+      { title: '姓名', align: 'center', dataIndex: '' },
       { title: '权限',
+        align: 'center',
        dataIndex: '',
        render:()=>{
          return(
@@ -272,9 +265,10 @@ class Admin extends React.Component {
          )
        }
       },
-      { title: '联系方式', dataIndex: '' },
+      { title: '联系方式', align: 'center', dataIndex: '' },
       { 
         title: '状态',
+        align: 'center',
         fixed:'right',
         width:100,
         render: () => {
@@ -302,9 +296,9 @@ class Admin extends React.Component {
       }),
     };
     const columns1 = [
-      { title: '作者', dataIndex: '' },
-      { title: '性别', dataIndex: '' },
-      { title: '联系方式', dataIndex: '' },
+      { title: '作者', align: 'center', dataIndex: '' },
+      { title: '性别', align: 'center', dataIndex: '' },
+      { title: '联系方式', align: 'center', dataIndex: '' },
     ];
     //下拉菜单
     const menu = (
