@@ -19,6 +19,7 @@ class Role extends React.Component {
     console.log(e);
     this.setState({
       visible: false,
+      visibles:false,
     });
   };
 
@@ -26,15 +27,15 @@ class Role extends React.Component {
     console.log(e);
     this.setState({
       visible: false,
+      visibles:false,
     });
   };
   //新加权限
   plusHandle = (record) =>{
     this.setState({
-      form: record,
+      visibles: true,
     });
-    this.props.dispatch({ type: 'role/changeVisible', payload: true});
-  }
+  };
 
   //添加
   AddHandle = () =>{
@@ -56,6 +57,7 @@ class Role extends React.Component {
           return(
           <div>
             <Icon type="plus" onClick={this.plusHandle} style={{color:'blue' }} />
+      
           </div>
           )}
       },
@@ -129,17 +131,22 @@ class Role extends React.Component {
           visible={this.state.visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}>
-            <Input placeholder="输入角色名称" />
+            <Input placeholder="输入角色名称"  style={{width:400}}/>
             <br></br>
+            <br></br>
+            权限管理
+            <br></br>
+            <br></br>      
             <Button>浏览</Button>&nbsp;
             <Button type="primary">评论</Button>&nbsp;
             <Button>上传</Button>&nbsp;
             <Button type="primary">权限</Button>
             <br></br>
+            <br></br>
             <Button type="primary">权限</Button>&nbsp;
             <Button type="primary">权限</Button>&nbsp;
-            <Button>V</Button>&nbsp;
-            <Button>V</Button>
+            <Button style={{width:63}}>V</Button>&nbsp;
+            <Button style={{width:63}}>V</Button>
         </Modal>
         </div>
        
@@ -153,6 +160,25 @@ class Role extends React.Component {
               // dataSource={this.props.role.role}
               dataSource={data}
               />
+        </div>
+        {/* 权限新增模态框 */}
+        <div>
+        <Modal
+          title={"为该角色配置权限"}
+          visible={this.state.visibles}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          >
+            <Button>浏览</Button>&nbsp;
+            <Button type="primary">评论</Button>&nbsp;
+            <Button>上传</Button>&nbsp;
+            <Button type="primary">权限</Button>
+            <br></br>
+            <br></br>
+            <Button type="primary">权限</Button>&nbsp;
+            <Button type="primary">权限</Button>&nbsp;
+           
+        </Modal>
         </div>
         <div className="btn1">
             <Button type="primary">启用</Button>&nbsp;
