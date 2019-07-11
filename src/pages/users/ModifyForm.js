@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Input,Button,Radio} from 'antd';
-class AddForm extends React.Component {
+class AddUserForm extends React.Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     getFieldDecorator('id');
@@ -10,18 +10,12 @@ class AddForm extends React.Component {
           <Form.Item>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: '请输入班级名称!' }],
-            })(<Input style={{marginBottom:'1em'}} placeholder='输入用户名' />)}
+            })(<Input style={{marginBottom:'1em'}} placeholder='张三' />)}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: '请输入班级名称!' }],
-            })(<Input style={{marginBottom:'1em'}} placeholder='输入密码' />)}
-          </Form.Item>
-          
-          <Form.Item>
-            {getFieldDecorator('name', {
-              rules: [{ required: true, message: '请输入班级名称!' }],
-            })(<Input style={{marginBottom:'1em'}} placeholder='输入联系方式' />)}
+            })(<Input style={{marginBottom:'1em'}} placeholder='1919093883' />)}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator('description')(
@@ -65,4 +59,4 @@ const mapPropsToFields = props => {
 
 export default Form.create({
   mapPropsToFields,
-})(AddForm);
+})(AddUserForm);
