@@ -1,23 +1,93 @@
 import React from 'react';
 import styles from './video.less';
-import { Button, Table, Icon, DatePicker,Input } from 'antd';
+import { Button, Table, Icon, DatePicker,Input,Modal,Form } from 'antd';
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
-const { Search } = Input;
+const { Search,TextArea } = Input;
 class Check extends React.Component {
- onChange=(date, dateString)=> {
-  console.log(date, dateString);
-}
-
+	 constructor(props) {
+	    super(props);
+	    this.state = {
+	       visible: false,
+	       visible2: false,
+	       form:{},
+	       selectedRowKeys: [],
+	    };
+	  }
+	 onChange=(date, dateString)=> {
+	  console.log(date, dateString);
+	}
+	// 一件通过
+	passAll=()=>{
+		alert(this.state.selectedRowKeys)
+	}
+	// 改变多选框
+	onSelectChange = (selectedRowKeys, e) => {
+	    this.setState({
+	      selectedRowKeys: selectedRowKeys,
+	    });
+	  };
+	// 弹出拒绝理由
+	reject=()=>{
+		 this.setState({
+      visible: true,
+    });
+	}
+	// 弹出详细视频
+	showVideo=()=>{
+		 this.setState({
+      visible2: true,
+    });
+	}
+	// 关闭并提交拒绝理由
+  handleOk = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };
+	// 关闭拒绝理由
+  handleCancel = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };
+  // 关闭并提交视频
+  handleOk2 = e => {
+    console.log(e);
+    this.setState({
+      visible2: false,
+    });
+  };
+	// 关闭视频模态框
+  handleCancel2 = e => {
+    console.log(e);
+    this.setState({
+      visible2: false,
+    });
+  };
+	handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFieldsAndScroll((err, values) => {
+      if (!err) {
+        console.log('Received values of form: ', values);
+      }
+    });
+  };
+  // 双向绑定form
+  changeForm=(e)=>{
+  	this.setState=({
+  		form:e.target.value
+  	})
+  }
   render(){
+  	const { selectedRowKeys } = this.state;
   	const rowSelection = {
-		  onChange: (selectedRowKeys, selectedRows) => {
-		    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-		  },
-		  getCheckboxProps: record => ({
-		    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-		    name: record.name,
-		  }),
-		};
+      selectedRowKeys,
+      onChange: this.onSelectChange,
+      hideDefaultSelections: true,
+    };
+		 
   	const columns = [
 		  {
 		    title: '名称',
@@ -67,7 +137,7 @@ class Check extends React.Component {
 		    render: (text, record) => {
 	        	return (
 	            <div>
-	              <Icon type="eye" />
+	              <Icon type="eye" onClick={this.showVideo} />
 	            </div>
 	          );
 	        },
@@ -80,7 +150,7 @@ class Check extends React.Component {
 	        	return (
 	            <div>
 	              <Icon className={styles.iconPass} title="通过" type="check-circle" />
-	              <Icon className={styles.iconStop} title="拒绝" type="stop" />
+	              <Icon className={styles.iconStop} title="拒绝" onClick={this.reject} type="stop" />
 	            </div>
 	          );
 	        },
@@ -144,8 +214,33 @@ class Check extends React.Component {
 			<Table pagination={false} size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
 		</div>
 		<div className={styles.content_bottom}>
-			<Button size="small" type="primary">一键通过</Button>
+			<Button size="small" type="primary" onClick={this.passAll}>一键通过</Button>
 		</div>
+		<Modal
+          title="拒绝的理由"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+        >
+       
+           <Form onSubmit={this.handleSubmit} className="login-form">
+	            <Form.Item label="">	          
+		         <TextArea autosize={{ minRows: 6, maxRows: 10 }} onChange={this.changeForm} />
+	        	</Form.Item>
+           </Form>
+        </Modal>
+
+        <Modal
+       	  width={'900px'}
+          visible={this.state.visible2}
+          onOk={this.handleOk2}
+          onCancel={this.handleCancel2}
+        >
+          <video width="100%" height="100%" controls>
+			    <source src="D:/a.mp4" type="video/mp4" />
+		  </video>
+
+        </Modal>
       </div>
     )
   }
