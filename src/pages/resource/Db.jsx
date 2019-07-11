@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Menu, Icon,DatePicker,Input,Table,Select,Dropdown,Checkbox,Modal,Button } from 'antd';
+import { Menu, Icon,DatePicker,Input,Table,Select,Dropdown,Checkbox,Modal,Button,Cascader} from 'antd';
 import styles from './db.less';
+
 import DbForm from './DbForm';
 import moment from 'moment'
 
@@ -16,7 +17,8 @@ class Db extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      visible:false
+      visible:false,
+      visible1:false
     }
   }
   saveorForm=(form)=>{
@@ -27,6 +29,11 @@ class Db extends React.Component {
   showModal=()=>{
     this.setState({
       visible: true,
+    });
+  }
+  showModal1=()=>{
+    this.setState({
+      visible1: true,
     });
   }
   handleOk = e => {
@@ -42,7 +49,19 @@ class Db extends React.Component {
       visible:false
     })
 };
-
+handleOk = e => {
+  // 提交表单
+ 
+  this.setState({
+    visible1:false
+  })
+};
+handleCancel1 = e => {
+  console.log(e);
+  this.setState({
+    visible1: false,
+  });
+};
   handleCancel = e => {
     console.log(e);
     this.setState({
@@ -54,6 +73,12 @@ class Db extends React.Component {
   }
   componentWillMount() {
    
+  }
+  casonChange(value) {
+    console.log(value);
+  }
+  casonChange1(value) {
+    console.log(value);
   }
   handleClick = e => {
     console.log('click ', e);
@@ -77,6 +102,40 @@ class Db extends React.Component {
         <Menu.Item key="3">3rd menu item</Menu.Item>
       </Menu>
     );
+    const options = [
+      {
+        value: 'zhejiang',
+        label: 'Zhejiang',
+        children: [
+          {
+            value: 'hangzhou',
+            label: 'Hangzhou',
+            children: [
+              {
+                value: 'xihu',
+                label: 'West Lake',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        value: 'jiangsu',
+        label: 'Jiangsu',
+        children: [
+          {
+            value: 'nanjing',
+            label: 'Nanjing',
+            children: [
+              {
+                value: 'zhonghuamen',
+                label: 'Zhong Hua Men',
+              },
+            ],
+          },
+        ],
+      },
+    ];
     const columns = [
       {
         title: '名称',
@@ -89,36 +148,15 @@ class Db extends React.Component {
       },
       {
         title: '方向',
-        dataIndex:'fangx',
-        render: (text, record) => (
-          <Dropdown overlay={menu}  trigger={['click']}>
-              <a className="ant-dropdown-link" href="#">
-                方向 <Icon type="down" />
-              </a>
-          </Dropdown>
-        ),
+        dataIndex:'fangx'
       },
       {
         title: '技术',
-        dataIndex:'jishu',
-        render: (text, record) => (
-          <Dropdown overlay={menu} trigger={['click']}>
-              <a className="ant-dropdown-link" href="#">
-                技术 <Icon type="down" />
-              </a>
-          </Dropdown>
-        ),
+        dataIndex:'jishu'
       },
       {
         title: '类型',
-        dataIndex:'leix',
-        render: (text, record) => (
-          <Dropdown overlay={menu} trigger={['click']}>
-              <a className="ant-dropdown-link" href="#">
-                类型 <Icon type="down" />
-              </a>
-          </Dropdown>
-        ),
+        dataIndex:'leix'
       },
       {
         title: '权限',
@@ -292,7 +330,31 @@ class Db extends React.Component {
           <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange}>按时间</Checkbox></span>
           <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange}>按热度</Checkbox></span>
           </div>
-          <Table style={{marginLeft:"2em"}} scroll={{x:1000}} rowSelection={{rowSelection,columnTitle:"#",fixed:"left"}} columns={columns} dataSource={dataSource} />
+          <Table style={{marginLeft:"2em"}} scroll={{x:1000}} 
+          pagination={{
+            onChange: page => {
+              console.log(page);
+              let p = page - 1;
+              console.log(p);
+            },
+            pageSize: 1,
+            total:100,
+            hideOnSinglePage: false,
+            itemRender: (current, type, originalElement) => {
+              if (type === 'prev') {
+                return <Button>上一页</Button>;
+              }
+              if (type === 'next') {
+                return <Button>下一页</Button>;
+              }
+              return originalElement;
+            },
+          }}
+          rowSelection={{rowSelection,columnTitle:"#",fixed:"left"}} columns={columns} dataSource={dataSource} />
+          <Button type="primary" style={{marginLeft:"2em"}}>启用</Button>
+          <Button type="danger" style={{marginLeft:"1em"}}>冻结</Button>
+          <Button style={{backgroundColor:'gray',marginLeft:"1em"}}>删除</Button>
+          <Button type="primary" style={{marginLeft:"1em"}} onClick={this.showModal1}>调整</Button>
           </div>
           <Modal
           title="上传视频"
@@ -301,6 +363,18 @@ class Db extends React.Component {
           onCancel={this.handleCancel}
         >
           <DbForm ref={this.saveorForm}/>
+        </Modal>
+        <Modal
+          
+          title="请选择资源所在编目"
+          visible={this.state.visible1}
+          style={{display:"flex",justifyContent:"space-around"}}
+          footer={[
+            <Button onClick={this.handleOk} style={{marginRight:"40%"}}>确认</Button>
+          ]}
+        >
+          <Cascader options={options} onChange={this.casonChange} placeholder="请选择" />
+          <Cascader style={{marginLeft:"1em"}} onChange={this.casonChange1} placeholder="请选择" />
         </Modal>
       </div>
     );

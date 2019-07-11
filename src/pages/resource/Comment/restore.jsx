@@ -77,7 +77,7 @@ class Check extends React.Component {
         </Tooltip>
         <span style={{ paddingLeft: 8, cursor: 'auto' }}>{dislikes}</span>
       </span>,
-     
+	
     ];
 
   	const rowSelection = {
