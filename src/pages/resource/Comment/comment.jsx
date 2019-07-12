@@ -1,47 +1,108 @@
 import React from 'react';
 import styles from './comment.less';
-import { Button, Table, Icon, DatePicker,Input } from 'antd';
+import moment from 'moment';
+import { Button, Table, DatePicker,Input,Modal,Comment, Icon, Tooltip, Avatar} from 'antd';
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
+const tsIcon = require('../video.png');
 class Check extends React.Component {
- onChange=(date, dateString)=> {
-  console.log(date, dateString);
-}
-
+	constructor(props){
+		super(props);
+		this.state={
+			visible:false,
+			restore:{},
+			likes: 0,
+			dislikes: 0,
+			action: null,
+			selectedRowKeys:[]
+		}
+	}
+	like = () => {
+		this.setState({
+		  likes: 1,
+		  dislikes: 0,
+		  action: 'liked',
+		});
+	  };
+	
+	  dislike = () => {
+		this.setState({
+		  likes: 0,
+		  dislikes: 1,
+		  action: 'disliked',
+		});
+	  };
+	onChange=(date, dateString)=> {
+	console.log(date, dateString);
+	}
+	// 一件通过
+	passAll=()=>{
+		alert(this.state.selectedRowKeys)
+	}
+	handleCancel = e => {
+		console.log(e);
+		this.setState({
+		visible: false,
+		});
+	};
+  handleOk = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };
+  showModal = (record) => {
+    this.setState({
+	  visible: true,
+	  restore:record
+	});
+	
+  };
+  // 改变多选框
+	onSelectChange = (selectedRowKeys, e) => {
+	    this.setState({
+	      selectedRowKeys: selectedRowKeys,
+	    });
+	  };
   render(){
+	const { likes, dislikes, action,selectedRowKeys } = this.state;
   	const rowSelection = {
-		  onChange: (selectedRowKeys, selectedRows) => {
-		    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-		  },
-		  getCheckboxProps: record => ({
-		    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-		    name: record.name,
-		  }),
-		};
+      selectedRowKeys,
+      onChange: this.onSelectChange,
+      hideDefaultSelections: true,
+    };
+
+  
   	const columns = [
-		 {
+		  {
 		    title: '内容',
+		    dataIndex: 'key',
 		    align: 'center',
-		    dataIndex: 'address',
+		   
 		  },
 		  {
 		    title: '来自',
 		    align: 'center',
 		    dataIndex: 'author',
 		  },
-		  
-		   {
-		    title: '被评论作品',
-		    align: 'center',
-		    dataIndex: 'jishu',
-		  },
 		  {
+		    title: '被回复作品',
+		    align: 'center',
+			dataIndex: 'address',
+			render:(text,record)=>{
+				return (
+					<div>
+					<span>{text}</span>
+					<Icon style={{marginLeft:"3px"}} type="eye" onClick={this.showModal.bind(this,record)}></Icon></div>
+				)
+			}
+		  },
+		   {
 		    title: '时间',
 		    align: 'center',
-		    dataIndex: 'data',
+			dataIndex: 'jishu',
+			
 		  },
-		  
-		  
 		  {
 		    title: '状态',
 		    align: 'center',
@@ -58,45 +119,33 @@ class Check extends React.Component {
 		];
 		const data = [
 		  {
-		    key: '1',
+		  	id:1,
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
+		    address: 'PHP手册',
+		    jishu:'2019-01-02',
 		  },
 		  {
-		    key: '2',
+		  	id:2,
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
+		    address: 'PHP手册',
+		    jishu:'2019-01-02',
 		  },
 		  {
-		    key: '3',
+		  	id:3,
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
+		    address: 'PHP手册',
+		    jishu:'2019-01-02',
 		  },
 		  {
-		    key: '4',
+		  	id:4,
+		    key: '这是评论的内容',
 		    author:'John Brown',
-		    address: '昆山',
-		    jishu:'前端',
-		    type:'杰普教程',
-		    quanxian:'无',
-		    data:'2019.7.10',
-		    dec: '啦啦啦啦啦'
-		  }
+		    address: 'java手册',
+		    jishu:'2019-01-02',
+		  },
 		  
 		];
 
@@ -106,16 +155,47 @@ class Check extends React.Component {
         <RangePicker onChange={this.onChange} style={{ width: 300}} />
         <Search
 	      onSearch={value => console.log(value)}
-	      style={{ width: 200 }}
+		  style={{ width: 200 }}
+		  placeholder="请输入搜索内容"
 	    />
 
 		</div>
 		<div>
-			<Table pagination={false} size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
+			<Table rowKey="id" size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
 		</div>
 		<div className={styles.content_bottom}>
-			<Button size="small" type="primary">一键通过</Button>
+			<Button size="small" type="primary" onClick={this.passAll}>一键通过</Button>
 		</div>
+		<Modal
+		   width={'900px'}
+          visible={this.state.visible}
+          onOk={this.handleOk}
+		  onCancel={this.handleCancel}
+        >
+		<video width="100%" height="70%" controls>
+			    <source src="D:/a.mp4" type="video/mp4" />
+		  </video>
+		<Comment
+				
+				author={<a>{this.state.restore.author}</a>}
+				avatar={
+				<Avatar
+					src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+					alt={this.state.restore.author}
+				/>
+				}
+				content={
+				<p>
+					{this.state.restore.key}
+				</p>
+				}
+				datetime={
+				<Tooltip title={this.state.restore.jishu}>
+					<span>{this.state.restore.jishu}</span>
+				</Tooltip>
+				}
+			/>
+        </Modal>
       </div>
     )
   }

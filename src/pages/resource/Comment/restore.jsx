@@ -14,8 +14,15 @@ class Check extends React.Component {
 			likes: 0,
 			dislikes: 0,
 			action: null,
+			selectedRowKeys:[]
 		}
 	}
+	// 改变多选框
+	onSelectChange = (selectedRowKeys, e) => {
+	    this.setState({
+	      selectedRowKeys: selectedRowKeys,
+	    });
+	  };
 	like = () => {
 		this.setState({
 		  likes: 1,
@@ -31,6 +38,10 @@ class Check extends React.Component {
 		  action: 'disliked',
 		});
 	  };
+	  // 一件通过
+	passAll=()=>{
+		alert(this.state.selectedRowKeys)
+	}
 	onChange=(date, dateString)=> {
 	console.log(date, dateString);
 	}
@@ -54,41 +65,13 @@ class Check extends React.Component {
 	
   };
   render(){
-	const { likes, dislikes, action } = this.state;
-
-    const actions = [
-      <span>
-        <Tooltip title="Like">
-          <Icon
-            type="like"
-            theme={action === 'liked' ? 'filled' : 'outlined'}
-            onClick={this.like}
-          />
-        </Tooltip>
-        <span style={{ paddingLeft: 8, cursor: 'auto' }}>{likes}</span>
-      </span>,
-      <span>
-        <Tooltip title="Dislike">
-          <Icon
-            type="dislike"
-            theme={action === 'disliked' ? 'filled' : 'outlined'}
-            onClick={this.dislike}
-          />
-        </Tooltip>
-        <span style={{ paddingLeft: 8, cursor: 'auto' }}>{dislikes}</span>
-      </span>,
-     
-    ];
-
+	const { likes, dislikes, action,selectedRowKeys } = this.state;
   	const rowSelection = {
-		  onChange: (selectedRowKeys, selectedRows) => {
-		    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-		  },
-		  getCheckboxProps: record => ({
-		    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-		    name: record.name,
-		  }),
-		};
+      selectedRowKeys,
+      onChange: this.onSelectChange,
+      hideDefaultSelections: true,
+    };
+  	
   	const columns = [
 		  {
 		    title: '内容',
@@ -109,7 +92,7 @@ class Check extends React.Component {
 				return (
 					<div>
 					<span>{text}</span>
-					<Icon style={{marginLeft:"3px"}} type="link" onClick={this.showModal.bind(this,record)}></Icon></div>
+					<Icon style={{marginLeft:"3px"}} type="eye" onClick={this.showModal.bind(this,record)}></Icon></div>
 				)
 			}
 		  },
@@ -135,24 +118,28 @@ class Check extends React.Component {
 		];
 		const data = [
 		  {
+		  	id:1,
 		    key: '这是评论的内容',
 		    author:'John Brown',
 		    address: 'PHP手册',
 		    jishu:'2019-01-02',
 		  },
 		  {
+		  	id:2,
 		    key: '这是评论的内容',
 		    author:'John Brown',
 		    address: 'PHP手册',
 		    jishu:'2019-01-02',
 		  },
 		  {
+		  	id:3,
 		    key: '这是评论的内容',
 		    author:'John Brown',
 		    address: 'PHP手册',
 		    jishu:'2019-01-02',
 		  },
 		  {
+		  	id:4,
 		    key: '这是评论的内容',
 		    author:'John Brown',
 		    address: 'java手册',
@@ -173,21 +160,22 @@ class Check extends React.Component {
 
 		</div>
 		<div>
-			<Table pagination={false} size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
+			<Table rowKey="id"  size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
 		</div>
 		<div className={styles.content_bottom}>
-			<Button size="small" type="primary">一键通过</Button>
+			<Button size="small" type="primary" onClick={this.passAll}>一键通过</Button>
 		</div>
 		<Modal
-		  
+		   width={'900px'}
           visible={this.state.visible}
           onOk={this.handleOk}
 		  onCancel={this.handleCancel}
-		  width="580px"
         >
-		<img src={tsIcon} alt=""/>
+		<video width="100%" height="70%" controls>
+			    <source src="D:/a.mp4" type="video/mp4" />
+		  </video>
 		<Comment
-				actions={actions}
+				
 				author={<a>{this.state.restore.author}</a>}
 				avatar={
 				<Avatar

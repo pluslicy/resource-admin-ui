@@ -211,7 +211,7 @@ class Check extends React.Component {
 
 		</div>
 		<div>
-			<Table pagination={false} size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
+			<Table size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
 		</div>
 		<div className={styles.content_bottom}>
 			<Button size="small" type="primary" onClick={this.passAll}>一键通过</Button>

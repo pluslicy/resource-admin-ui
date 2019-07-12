@@ -146,12 +146,40 @@ export default {
             path: '/module/bangDan',
             name: 'bangDan',
             icon: 'right',
-            component: './module/BangDan',
+            routes:[{
+              path: '/module/bangDan/video',
+              name: 'video',
+              icon: 'right',
+              component: './module/bangDan/Video',
+            },
+            {
+              path: '/module/bangDan/word',
+              name: 'word',
+              icon: 'right',
+              component: './module/bangDan/Word',
+            }]
           },{
             path: '/module/recommend',
             name: 'recommend',
             icon: 'right',
-            component: './module/Recommend',
+             routes:[{
+              path: '/module/recommend/javaee',
+              name: 'javaee',
+              icon: 'right',
+              component: './module/recommend/javaee',
+            },
+            {
+              path: '/module/recommend/py',
+              name: 'py',
+              icon: 'right',
+              component: './module/recommend/Py',
+            },
+             {
+              path: '/module/recommend/ht',
+              name: 'ht',
+              icon: 'right',
+              component: './module/recommend/Ht',
+            }]
           },{
             path: '/module/setting',
             name: 'setting',

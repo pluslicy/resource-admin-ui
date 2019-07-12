@@ -4,20 +4,33 @@ import { Button, Table, Icon, DatePicker,Input } from 'antd';
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
 class Check extends React.Component {
+	 constructor(props) {
+	    super(props);
+	    this.state = {
+	       selectedRowKeys: [],
+	    };
+	  }
  onChange=(date, dateString)=> {
   console.log(date, dateString);
 }
+// 改变多选框
+	onSelectChange = (selectedRowKeys, e) => {
+	    this.setState({
+	      selectedRowKeys: selectedRowKeys,
+	    });
+	  };
+	  // 一件通过
+	passAll=()=>{
+		alert(this.state.selectedRowKeys)
+	}
 
   render(){
+  		const { selectedRowKeys } = this.state;
   	const rowSelection = {
-		  onChange: (selectedRowKeys, selectedRows) => {
-		    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-		  },
-		  getCheckboxProps: record => ({
-		    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-		    name: record.name,
-		  }),
-		};
+      selectedRowKeys,
+      onChange: this.onSelectChange,
+      hideDefaultSelections: true,
+    };
   	const columns = [
 		  {
 		    title: '名称',
@@ -141,10 +154,10 @@ class Check extends React.Component {
 
 		</div>
 		<div>
-			<Table pagination={false} size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
+			<Table  size="small" bordered rowSelection={rowSelection} columns={columns} dataSource={data} />
 		</div>
 		<div className={styles.content_bottom}>
-			<Button size="small" type="primary">一键通过</Button>
+			<Button size="small" type="primary" onClick={this.passAll}>一键通过</Button>
 		</div>
       </div>
     )
