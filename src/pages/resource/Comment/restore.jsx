@@ -65,10 +65,9 @@ class Check extends React.Component {
 	
   };
   render(){
-<<<<<<< HEAD
+
 	const { likes, dislikes, action,selectedRowKeys } = this.state;
-=======
-	const { likes, dislikes, action } = this.state;
+	// const { likes, dislikes, action } = this.state;
 
     const actions = [
       <span>
@@ -94,7 +93,7 @@ class Check extends React.Component {
 	
     ];
 
->>>>>>> 9a4181f09381ccc37b44c5c9cd4a0467490cdb91
+
   	const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
