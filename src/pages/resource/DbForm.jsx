@@ -3,15 +3,23 @@ import {
     Form,
     Input,
     Select,
-    Upload,Button,Icon,Progress
+    Upload,Button,Icon,Progress,Checkbox,Radio
   } from 'antd'
 import {connect} from 'dva'
 
 const Option = Select.Option;
+const children = [];
+for (let i = 10; i < 36; i++) {
+  children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
+}
+
 class DbForm extends React.Component{
 
     componentWillMount(){
       
+    }
+    handleChange(value) {
+      console.log(`selected ${value}`);
     }
     normFile = e => {
       console.log('Upload event:', e);
@@ -45,6 +53,7 @@ class DbForm extends React.Component{
                 }}
                 percent={99.9}
               />
+
             <Form.Item label="Upload" extra="请选择文件">
                   {getFieldDecorator('upload', {
                     valuePropName: 'fileList',
@@ -57,6 +66,19 @@ class DbForm extends React.Component{
                     </Upload>,
                   )}
                 </Form.Item>
+                <Form.Item  label="">
+                {getFieldDecorator('name', {
+                  rules: [{ required: true, message: 'Please input your realname!' }],
+                })(
+                  <Radio.Group
+                  style={{ marginBottom: '0.5em', marginLeft: '0.5em' }}
+                >
+                  <Radio value={1}>视频</Radio>
+                  <Radio value={2}>专辑</Radio>
+                  <span style={{marginLeft:"10em",color:"blue"}}>+为视频添加文档</span>
+                </Radio.Group>
+                )}
+              </Form.Item>
               <Form.Item  label="视频标题">
                 {getFieldDecorator('name', {
                   rules: [{ required: true, message: 'Please input your realname!' }],
@@ -64,7 +86,7 @@ class DbForm extends React.Component{
                   <Input placeholder="Name" />,
                 )}
               </Form.Item>
-              <Form.Item label="视频类型">
+              <Form.Item label="方向">
                     {
                         getFieldDecorator('teacherId',{})
                         (
@@ -77,14 +99,30 @@ class DbForm extends React.Component{
                             </Select>
                         )
                     }
-              </Form.Item> 
-              <Form.Item label="技术标签" extra="请为你的视频填写技术标签，使用空格隔开，不超过10个.">
+              </Form.Item>
+              <Form.Item label="技术" extra="请为你的视频填写技术标签，使用空格隔开，不超过10个.">
+                    {
+                        getFieldDecorator('teacherId',{})
+                        (
+                            <Select  placeholder="请选择教师" name='teacherId'  >
+                            {/* {
+                                this.props.teacherState.teachers.map((item)=>{
+                                    return <Option key={item.id} value={item.id}>{item.realname}</Option>
+                                })
+                            } */}
+                            </Select>
+                        )
+                    }
+              </Form.Item>  
+              <Form.Item label="标签" extra="您可以选择：html JS jQuery react VUE">
                 {getFieldDecorator('credit', {
                   rules: [{ required: true, message: 'Please input your Password!' }],
                 })(
                  
-                  <Input placeholder="Credit"
-                  />
+                  <Select mode="tags" style={{ width: '100%' }} onChange={this.handleChange} tokenSeparators={[',']}>
+                    {children}
+                  </Select>
+                  
                 )}
               </Form.Item>
               <Form.Item  label="视频描述">
