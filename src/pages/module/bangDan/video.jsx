@@ -166,7 +166,7 @@ class bangDan extends React.Component {
 					<div style={{ display: 'inline-block' }}>
 						<div style={{ width: '100%', height: '100%' }}>
 							自定义榜单(5项)
-              <br />
+					<br />
 							<Table
 								bordered
 								rowKey="id"
