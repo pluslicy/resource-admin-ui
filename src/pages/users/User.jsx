@@ -243,7 +243,7 @@ class User extends React.Component {
           <Button style={{position:'absolute',right:'5%'}} onClick={this.showImport}><Icon type="upload" />导入</Button>
         </div>
         <div>
-          <ul style={{ display:'inline-block'}}>
+          <ul style={{ display:'inline-block',lineHeight:'32px'}}>
             <li style={{ float:'left',marginRight:'2em'}}>
               <div style={{fontWeight:'bold'}}>角色</div>
             </li>
