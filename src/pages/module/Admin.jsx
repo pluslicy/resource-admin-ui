@@ -404,8 +404,8 @@ class Admin extends React.Component {
               width="600px"
               height="400px"
               footer={[
-            <Button key="submit" type="primary" onClick={this.handleOk4} style={{width:200,height:30}}>
-              OK
+            <Button key="submit" type="primary" onClick={this.handleOk4} style={{width:200,height:30,marginRight:100}}>
+              OK0
             </Button>,
           ]}
         >
