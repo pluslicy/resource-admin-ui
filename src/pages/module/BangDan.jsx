@@ -132,7 +132,7 @@ class BangDan extends React.Component {
 			<div style={{ padding: '1em', backgroundColor: '#ffffff', borderRadius: '5px' }}>
 				<a>
 					<span style={{ fontSize: '20px' }}>视频</span>
-				</a>{' '}
+				</a>
 				<a>
 					<span style={{ fontSize: '20px', marginLeft: '2em' }}>文档</span>
 				</a>

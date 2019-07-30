@@ -48,7 +48,7 @@ class Setting extends React.Component {
 					style={{
 						width: '55%',
 						height: '200px',
-						display: 'inline-block',
+						float:'left',
 						padding: '1em',
 						marginTop: '20px',
 						backgroundColor: '#ffffff',
@@ -66,11 +66,11 @@ class Setting extends React.Component {
 						</a>
 						<hr />
 						一级编目:
-            <span style={{ fontSize: '16px', marginLeft: '1em', color: 'blue' }}>技术方向</span>
+						<span style={{ fontSize: '16px', marginLeft: '1em', color: 'blue' }}>技术方向</span>
 						&nbsp;修改
-            <br />
+						<br />
 						二级编目:
-            <Input
+						<Input
 							style={{ width: '20%', marginLeft: '1em' }}
 							size="small"
 							placeholder="给你的编目起名"
@@ -81,10 +81,10 @@ class Setting extends React.Component {
 					style={{
 						width: '43%',
 						height: '200px',
-						display: 'inline-block',
+						float:'left',
 						padding: '1em',
 						marginTop: '20px',
-						marginLeft: '1em',
+						marginLeft: '2%',
 						backgroundColor: '#ffffff',
 						borderRadius: '5px',
 					}}
@@ -92,15 +92,9 @@ class Setting extends React.Component {
 					<div>
 						<span>编目应用设置</span>
 						<br />
-						<a>
-							<span style={{ fontSize: '20px' }}></span>
-						</a>
-						<a>
-							<span style={{ fontSize: '20px', marginLeft: '1em' }}></span>
-						</a>
 						<hr />
 						首页检索编目级别
-            <Input
+						<Input
 							style={{ width: '20%', marginLeft: '1em' }}
 							size="small"
 							placeholder="1~2"
@@ -109,7 +103,7 @@ class Setting extends React.Component {
 						&nbsp;级编目&nbsp;<a>设置</a>
 						<br />
 						用户上传编目级别
-            <Input
+						<Input
 							style={{ width: '20%', marginLeft: '1em' }}
 							size="small"
 							placeholder="1~2"

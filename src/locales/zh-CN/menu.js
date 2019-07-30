@@ -1,5 +1,5 @@
 export default {
-  'menu.welcome': '欢迎',
+  'menu.welcome': '首页',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.login': '登录',
@@ -67,6 +67,7 @@ export default {
   'menu.module.admin': '管理员设置',
   'menu.module.news': '最新状态',
   'menu.module.authentication': '认证审核',
+  'menu.module.lunbo': '轮播设置',
   'menu.roles': '角色权限',
   'menu.roles.privilege': '权限管理',
   'menu.roles.role': '角色管理',
@@ -74,4 +75,6 @@ export default {
   'menu.users.user': '普通用户',
   'menu.schools': '学校管理',
   'menu.schools.school': '学校管理',
+  'menu.catalog': '编目管理',
+  'menu.catalog.catalog': '编目管理',
 };

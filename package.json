@@ -2,6 +2,7 @@
   "name": "resource-admin-ui",
   "version": "1.0.0",
   "private": true,
+  "homepage": ".",
   "description": "An out-of-box UI solution for enterprise applications",
   "scripts": {
     "analyze": "cross-env ANALYZE=1 umi build",
