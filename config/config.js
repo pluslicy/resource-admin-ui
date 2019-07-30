@@ -200,6 +200,12 @@ export default {
             name: 'authentication',
             icon: 'right',
             component: './module/Authentication',
+          },
+          {
+            path: '/module/lunbo',
+            name: 'lunbo',
+            icon: 'right',
+            component: './module/Lunbo',
           }]
         },
         // 角色管理
@@ -230,9 +236,9 @@ export default {
             icon: 'right',
             component: './users/User',
           }]
-        }
+        },
         // 学校管理
-        ,{
+        {
           path: '/schools',
           name: 'schools',
           icon: 'user',
@@ -241,6 +247,18 @@ export default {
             name: 'school',
             icon: 'right',
             component: './schools/School',
+          }]
+        },
+        // 编目管理
+        {
+         path: '/catalog',
+          name: 'catalog',
+          icon: 'user',
+          routes:[{
+            path: '/catalog/Catalog',
+            name: 'catalog',
+            icon: 'right',
+            component: './catalog/Catalog',
           }]
         },
         {
