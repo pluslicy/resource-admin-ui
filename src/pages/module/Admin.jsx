@@ -328,7 +328,7 @@ class Admin extends React.Component {
             onCancel={this.handleCancel}
             footer={[
             // 定义右下角按钮的地方
-            <Button key="back" onClick={this.handleCancel}>取消</Button>,
+            <Button key="back"  onClick={this.handleCancel}>取消</Button>,
           ]}
         >
           <Button style={{margin:50,marginLeft:110}} onClick={this.showModal2}>添加账号</Button>
@@ -347,7 +347,7 @@ class Admin extends React.Component {
           {/* 启用,冻结,删除按钮 */}
           <Button >启用</Button>&nbsp;&nbsp;
           <Button type="danger">冻结</Button>&nbsp;&nbsp;
-          <Button type="dashed" style={{backgroundColor:'gray'}}>删除</Button>&nbsp;&nbsp;
+          <Button type="dashed" size="small" style={{backgroundColor:'gray'}}>删除</Button>&nbsp;&nbsp;
 
         </div>  
         <Modal
@@ -355,7 +355,7 @@ class Admin extends React.Component {
             onOk={this.handleOk2}
             onCancel={this.handleCancel2}
             footer={[
-            <Button key="submit" type="primary" onClick={this.handleOk2} style={{width:200,height:30}}>
+            <Button key="submit" type="primary" onClick={this.handleOk2}>
               OK
             </Button>,
           ]}
@@ -378,7 +378,7 @@ class Admin extends React.Component {
             width="900px"
             height="500px"
             footer={[
-            <Button key="submit" type="primary" onClick={this.showModal4} style={{width:200,height:30}}>
+            <Button key="submit" type="primary" onClick={this.showModal4}>
               OK
             </Button>,]}
         >
@@ -404,8 +404,8 @@ class Admin extends React.Component {
               width="600px"
               height="400px"
               footer={[
-            <Button key="submit" type="primary" onClick={this.handleOk4} style={{width:200,height:30,marginRight:100}}>
-              OK0
+            <Button key="submit" type="primary" onClick={this.handleOk4}>
+              OK
             </Button>,
           ]}
         >
