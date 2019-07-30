@@ -3,7 +3,7 @@ import {
     Form,
     Input,
     Select,
-    Upload,Button,Icon,Progress,Checkbox,Radio
+    Upload,Button,Icon,Checkbox,Radio
   } from 'antd'
 import {connect} from 'dva'
 
@@ -43,29 +43,12 @@ class DbForm extends React.Component{
 
         getFieldDecorator('id')
         return (
-            <div className="courseForm">
-            {/* {console.log(JSON.stringify(this.props))} */}
+            <div className="DbForm" style={{width:"800px",height:"550px",}}>
+            {/* <div></div> */}
+    
             <Form {...formItemLayout} className="login-form">
-            <Progress
-                strokeColor={{
-                  '0%': '#108ee9',
-                  '100%': '#87d068',
-                }}
-                percent={99.9}
-              />
-
-            <Form.Item label="Upload" extra="请选择文件">
-                  {getFieldDecorator('upload', {
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                  })(
-                    <Upload name="logo" action="/upload.do" listType="picture">
-                      <Button>
-                        <Icon type="upload" /> Click to upload
-                      </Button>
-                    </Upload>,
-                  )}
-                </Form.Item>
+            
+                
                 <Form.Item  label="">
                 {getFieldDecorator('name', {
                   rules: [{ required: true, message: 'Please input your realname!' }],
@@ -152,4 +135,4 @@ const mapPropsToFields = (props) =>{
   }
 export default Form.create({
     mapPropsToFields}
-)(connect(state=>state)(DbForm))
+)(DbForm)
