@@ -4,7 +4,11 @@ import { findAllCata } from '@/services/Db';
 const DbModel = {
   namespace: 'Db',
   state: {
-    catalist: {}
+    catalist: {
+      results:[{
+        cata_level_id:{cata_level_num:""}
+      }]
+    }
   },
   effects: {
     // 获取所有编目

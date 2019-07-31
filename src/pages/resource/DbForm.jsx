@@ -6,6 +6,8 @@ import {
     Upload,Button,Icon,Checkbox,Radio
   } from 'antd'
 import {connect} from 'dva'
+import styles from './db.less';
+
 
 const Option = Select.Option;
 const children = [];
@@ -43,7 +45,9 @@ class DbForm extends React.Component{
 
         getFieldDecorator('id')
         return (
-            <div className="DbForm" style={{width:"800px",height:"550px",}}>
+          
+            // <div className="DbForm" style={{width:"800px",height:"550px",}}>
+            <div className={styles.DbForm}>
             {/* <div></div> */}
     
             <Form {...formItemLayout} className="login-form">
@@ -115,10 +119,7 @@ class DbForm extends React.Component{
                   <Input placeholder="Description" />,
                 )}
               </Form.Item>
-
-             
             </Form>
-            
             </div>
         );
     }
