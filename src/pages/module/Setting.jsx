@@ -1,9 +1,12 @@
 import React from 'react';
 import { Button, Radio, Table, Input, Menu, Dropdown, Icon, Switch } from 'antd';
-
+import styles from './Setting.less';
 class Setting extends React.Component {
 	state = {
 		value: 1,
+		switch1_value: 0,
+		switch2_value: 0,
+		switch3_value: 0,
 	};
 
 	onChange = e => {
@@ -12,6 +15,66 @@ class Setting extends React.Component {
 			value: e.target.value,
 		});
 	};
+	changeSwitch1 = e => {
+		// document.getElementById('imgs1').setAttribute('style','background-image:url(https://gss0.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/8d5494eef01f3a29c3907a9c9725bc315c607c0c.jpg)')
+		if (this.state.switch1_value === 0) {
+			var oDiv = document.getElementById('switch1');
+			oDiv.removeChild(document.getElementById('img'));
+			var mytr = document.createElement("img");
+			mytr.id = 'img'
+			mytr.src = require('../../../images/setting/p1.png');
+			oDiv.appendChild(mytr);
+			this.setState({ switch1_value: 1 })
+		} else {
+			var oDiv = document.getElementById('switch1');
+			oDiv.removeChild(document.getElementById('img'));
+			var mytr = document.createElement("img");
+			mytr.id = 'img'
+			mytr.src = require('../../../images/setting/p0.png');
+			oDiv.appendChild(mytr);
+			this.setState({ switch1_value: 0 })
+		}
+	};
+
+	changeSwitch2 = e => {
+		if (this.state.switch2_value === 0) {
+			var oDiv = document.getElementById('switch2');
+			oDiv.removeChild(document.getElementById('img2'));
+			var mytr = document.createElement("img");
+			mytr.id = 'img2'
+			mytr.src = require('../../../images/setting/p1.png');
+			oDiv.appendChild(mytr);
+			this.setState({ switch2_value: 1 })
+		} else {
+			var oDiv = document.getElementById('switch2');
+			oDiv.removeChild(document.getElementById('img2'));
+			var mytr = document.createElement("img");
+			mytr.id = 'img2'
+			mytr.src = require('../../../images/setting/p0.png');
+			oDiv.appendChild(mytr);
+			this.setState({ switch2_value: 0 })
+		}
+	};
+	changeSwitch3 = e => {
+		if (this.state.switch3_value === 0) {
+			var oDiv = document.getElementById('switch3');
+			oDiv.removeChild(document.getElementById('img3'));
+			var mytr = document.createElement("img");
+			mytr.id = 'img3'
+			mytr.src = require('../../../images/setting/p1.png');
+			oDiv.appendChild(mytr);
+			this.setState({ switch3_value: 1 })
+		} else {
+			var oDiv = document.getElementById('switch3');
+			oDiv.removeChild(document.getElementById('img3'));
+			var mytr = document.createElement("img");
+			mytr.id = 'img3'
+			mytr.src = require('../../../images/setting/p0.png');
+			oDiv.appendChild(mytr);
+			this.setState({ switch3_value: 0 })
+		}
+	};
+
 	render() {
 		// 下拉菜单
 		const menu = (
@@ -29,41 +92,35 @@ class Setting extends React.Component {
 
 		return (
 			<div>
-				<div style={{ padding: '1em', backgroundColor: '#ffffff', borderRadius: '5px' }}>
+				<div className={styles.contain}>
 					<p>系统一键开关</p>
-					<div style={{ display: 'inline-block', marginLeft: '2em' }}>
-						<Switch defaultChecked />
-						<p>评论开关</p>
+					<div className={styles.switch_div} >
+						<div id={'switch1'} className={styles.imgs} onClick={() => { this.changeSwitch1() }}><img id={'img'} src={require('../../../images/setting/p0.png')} /></div>
+						<div ><p className={styles.imgsp}>评论开关</p></div>
 					</div>
-					<div style={{ display: 'inline-block', marginLeft: '2em' }}>
-						<Switch defaultChecked />
-						<p>上传开关</p>
+					<div className={styles.switch_div}>
+						<div id={'switch2'} className={styles.imgs} onClick={() => { this.changeSwitch2() }}><img id={'img2'} src={require('../../../images/setting/p0.png')} /></div>
+						<div className={styles.imgsp}><p>上传开关</p></div>
 					</div>
-					<div style={{ display: 'inline-block', marginLeft: '2em' }}>
-						<Switch defaultChecked />
-						<p>申请认证开关</p>
+					<div className={styles.switch_div}>
+						<div id={'switch3'} className={styles.imgs} onClick={() => { this.changeSwitch3() }}><img id={'img3'} src={require('../../../images/setting/p0.png')} /></div>
+						<div className={styles.imgsp}><p>申请认证开关</p></div>
 					</div>
 				</div>
 				<div
 					style={{
 						width: '55%',
 						height: '200px',
-						float:'left',
+						float: 'left',
 						padding: '1em',
 						marginTop: '20px',
 						backgroundColor: '#ffffff',
-						borderRadius: '5px',
 					}}
 				>
 					<div>
 						<span>编目设置</span>
 						<br />
-						<a>
-							<span style={{ fontSize: '20px' }}>视频库</span>
-						</a>
-						<a>
-							<span style={{ fontSize: '20px', marginLeft: '1em' }}>文档库</span>
-						</a>
+						<span style={{ fontSize: '20px' }}>资源库</span>
 						<hr />
 						一级编目:
 						<span style={{ fontSize: '16px', marginLeft: '1em', color: 'blue' }}>技术方向</span>
@@ -81,12 +138,11 @@ class Setting extends React.Component {
 					style={{
 						width: '43%',
 						height: '200px',
-						float:'left',
+						float: 'left',
 						padding: '1em',
 						marginTop: '20px',
 						marginLeft: '2%',
 						backgroundColor: '#ffffff',
-						borderRadius: '5px',
 					}}
 				>
 					<div>

@@ -152,7 +152,6 @@ class bangDan extends React.Component {
 						size="small"
 						columns={columns}
 						// dataSource={this.props.create.creates}
-						scroll={{ x: 1300 }}
 					/>
 				</div>
 				<Modal
@@ -165,8 +164,7 @@ class bangDan extends React.Component {
 				>
 					<div style={{ display: 'inline-block' }}>
 						<div style={{ width: '100%', height: '100%' }}>
-							自定义榜单(5项)
-              <br />
+							自定义榜单(5项)<br />
 							<Table
 								bordered
 								rowKey="id"

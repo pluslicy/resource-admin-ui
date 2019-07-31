@@ -152,7 +152,7 @@ class bangDan extends React.Component {
 						size="small"
 						columns={columns}
 						// dataSource={this.props.create.creates}
-						scroll={{ x: 1300 }}
+						// scroll={{ x: 1300 }}
 					/>
 				</div>
 				<Modal
