@@ -1,5 +1,7 @@
 import React from 'react';
 import styles from './video.less';
+import { connect } from 'dva';
+
 import { Button, Table, Icon, DatePicker, Input, Modal, Form, Divider } from 'antd';
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
@@ -13,10 +15,20 @@ class Check extends React.Component {
       visible2: false,
       form: {},
       selectedRowKeys: [],
+      date: '', 
     };
   }
+  componentWillMount(){
+    this.props.dispatch({type:'video/findAll'})
+  }
+  //日期选择器
   onChange = (date, dateString) => {
     console.log(date, dateString);
+    this.props.dispatch({type:'video/findAll',payload:dateString});
+    this.setState({
+      date: dateString,
+    });
+
   };
   // 一件通过
   passAll = () => {
@@ -40,12 +52,13 @@ class Check extends React.Component {
       visible2: true,
     });
   };
-  // 关闭并提交拒绝理由
+  // 确定并提交拒绝理由
   handleOk = e => {
     console.log(e);
     this.setState({
       visible: false,
     });
+    this.props.dispatch({ type: 'checkSurvey/fetchSaveSurvey'});
   };
   // 关闭拒绝理由
   handleCancel = e => {
@@ -54,6 +67,7 @@ class Check extends React.Component {
       visible: false,
     });
   };
+ 
   // 关闭并提交视频
   handleOk2 = e => {
     console.log(e);
@@ -91,50 +105,17 @@ class Check extends React.Component {
     };
 
     const columns = [
-      {
-        title: '名称',
-        dataIndex: 'key',
-        align: 'center',
-      },
-      {
-        title: '作者',
-        align: 'center',
-        dataIndex: 'author',
-      },
-      {
-        title: '方向',
-        align: 'center',
-        dataIndex: 'address',
-      },
-      {
-        title: '技术',
-        align: 'center',
-        dataIndex: 'jishu',
-      },
-      {
-        align: 'center',
-        title: '类型',
-        dataIndex: 'type',
-      },
-      {
-        title: '权限',
-        align: 'center',
-        dataIndex: 'quanxian',
-      },
-      {
-        title: '日期',
-        align: 'center',
-        dataIndex: 'data',
-      },
-      {
-        title: '描述',
-        align: 'center',
-        dataIndex: 'dec',
-      },
+      {title: '名称',align: 'center',dataIndex: 'vr_name'},
+      {title: '作者',align: 'center',dataIndex: 'va.user',},
+      {title: '方向',align: 'center',dataIndex: 'vr_cata_one',},
+      {title: '技术',align: 'center',dataIndex: 'vr_cata_two',},
+      {title: '类型',align: 'center',dataIndex: 'vr_owner',},
+      {title: '权限',align: 'center',dataIndex: 'vr_permission',},
+      {title: '日期',align: 'center',dataIndex: 'vr_created_time',},
+      {title: '描述',align: 'center',dataIndex: 'vr_audit_decs',},
       {
         title: '查看',
         align: 'center',
-        dataIndex: '',
         render: (text, record) => {
           return (
             <div>
@@ -147,31 +128,30 @@ class Check extends React.Component {
         title: '状态',
         align: 'center',
         dataIndex: '',
-        render: (text, record) => {
-          return (
-            // <div>
-            //   <Icon className={styles.iconPass} title="通过" type="check-circle" />
-            //   <Icon className={styles.iconStop} title="拒绝" onClick={this.reject} type="stop" />
-            // </div>
-            <span>
-              <a>通过</a>
-              <Divider type="vertical" />
-              <a style={{ color: 'red' }}>拒绝</a>
-            </span>
-          );
+        render: (record) => {
+      
+          if(record.vr_audit_status===3){
+            return (
+                <div>
+                   <span>已通过</span>
+                </div>
+              );
+          } else if(record.vr_audit_status===1){
+            return (
+                <div>
+                   <span>已拒绝</span>
+                </div>
+              );
+          } else {
+            return(
+              <span>
+                <a>通过</a>
+                <Divider type="vertical" />
+                <a style={{ color: 'red' }} onClick={this.reject}>拒绝</a>
+              </span>
+            )
+          }
         },
-      },
-    ];
-    const data = [
-      {
-        key: '1',
-        author: 'John Brown',
-        address: '昆山',
-        jishu: '前端',
-        type: '杰普教程',
-        quanxian: '无',
-        data: '2019.7.10',
-        dec: '啦啦啦啦啦',
       },
     ];
 
@@ -187,7 +167,7 @@ class Check extends React.Component {
             bordered
             rowSelection={{ rowSelection, columnTitle: '#' }}
             columns={columns}
-            dataSource={data}
+            dataSource={this.props.video.videos}
           />
         </div>
         <div className={styles.content_bottom}>
@@ -223,4 +203,6 @@ class Check extends React.Component {
   }
 }
 
-export default Check;
+export default connect(({video})=>({
+  video,
+}))(Check);
