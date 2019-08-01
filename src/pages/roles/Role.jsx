@@ -1,95 +1,9 @@
 import React from 'react';
-import {Button,Table, Icon,Menu,Modal,Input,Dropdown,message,menu1,Checkbox, Transfer, Tree ,} from 'antd';
+import {Button,Table,Modal,Radio,Menu,
+          menu1,Dropdown,Icon,Input,} from 'antd';
 import styles from './role.less'
 // import RoleForm from './RoleForm'
 import {connect} from 'dva'
-
-
-// 穿梭框
-const { TreeNode } = Tree;
-
-// Customize Table Transfer
-const isChecked = (selectedKeys, eventKey) => {
-  return selectedKeys.indexOf(eventKey) !== -1;
-};
-
-const generateTree = (treeNodes = [], checkedKeys = []) => {
-  return treeNodes.map(({ children, ...props }) => (
-    <TreeNode {...props} disabled={checkedKeys.includes(props.key)}>
-      {generateTree(children, checkedKeys)}
-    </TreeNode>
-  ));
-};
-
-const TreeTransfer = ({ dataSource, targetKeys, ...restProps }) => {
-  const transferDataSource = [];
-  function flatten(list = []) {
-    list.forEach(item => {
-      transferDataSource.push(item);
-      flatten(item.children);
-    });
-  }
-  flatten(dataSource);
-
-  return (
-    <Transfer
-      {...restProps}
-      targetKeys={targetKeys}
-      dataSource={transferDataSource}
-      className="tree-transfer"
-      render={item => item.title}
-      showSelectAll={false}
-    >
-      {({ direction, onItemSelect, selectedKeys }) => {
-        if (direction === 'left') {
-          const checkedKeys = [...selectedKeys, ...targetKeys];
-          return (
-            <Tree
-              blockNode
-              checkable
-              checkStrictly
-              defaultExpandAll
-              checkedKeys={checkedKeys}
-              onCheck={(
-                _,
-                {
-                  node: {
-                    props: { eventKey },
-                  },
-                },
-              ) => {
-                onItemSelect(eventKey, !isChecked(checkedKeys, eventKey));
-              }}
-              onSelect={(
-                _,
-                {
-                  node: {
-                    props: { eventKey },
-                  },
-                },
-              ) => {
-                onItemSelect(eventKey, !isChecked(checkedKeys, eventKey));
-              }}
-            >
-              {generateTree(dataSource, targetKeys)}
-            </Tree>
-          );
-        }
-      }}
-    </Transfer>
-  );
-};
-
-    const treeData = [
-      { key: '0-0', title: '0-0' },
-      {
-        key: '0-1',
-        title: '0-1',
-        children: [{ key: '0-1-0', title: '0-1-0' }, { key: '0-1-1', title: '0-1-1' }],
-      },
-      { key: '0-2', title: '0-3' },
-    ];
-
 
 
 class Role extends React.Component {
@@ -99,66 +13,116 @@ class Role extends React.Component {
     this.state = {
       form: {},
       visible: false,
-      // 穿梭框
-      targetKeys: [],
+      visibleWeb:false,
+      
+      // 添加单选按钮
+      value:"",
     };
   }
 
-  // 权限menu
-  handleClick = e => {
-    console.log('click ', e);
-  };
-
- 
-  // 模态框
-  handleOk = e => {
-    console.log(e);
+  // 添加展示模态框
+  showModal = () => {
     this.setState({
-      visible: false,
-      visibles:false,
+      visible: true,
+      // visibleWeb:false,
+    });
+  };
+  //配置模态框 
+  configHandle= () => {
+    this.setState({
+      visibleConfig: true,
     });
   };
 
+  // 添加模态框 ok
+  handleOk = e => {
+    console.log(e);
+    this.setState({
+      value:""
+    })
+    if(this.state.value===1){
+      this.setState({
+        visibleWeb:true
+      })
+    }else if(this.state.value===""){
+        this.setState({
+          visible:"false"
+        })
+    }else{
+      this.setState({
+        visibleBack:true,
+      })
+    }
+    this.setState({
+      visible: false,
+    });
+  };
+  // 添加模态框关闭 
   handleCancel = e => {
     console.log(e);
     this.setState({
       visible: false,
-      visibles:false,
     });
   };
 
-  //menu 
-  handleMenuClick(e) {
-    message.info('Click on menu item.');
-    console.log('click', e);
-  }
-  // 穿梭框
-  onChange1 = targetKeys => {
-    console.log('Target Keys:', targetKeys);
-    this.setState({ targetKeys });
-  };
-
-  // 权限多选框
-  onChange(e) {
-    console.log(`checked = ${e.target.checked}`);
-  }
- 
-  //新加权限
-  plusHandle = (record) =>{
+  // 网络用户ok
+  handleOkWeb = e => {
+    console.log(e);
     this.setState({
-      visibles: true,
+      visibleWeb: false,
+    });
+  };
+  // 网络用户关闭
+  handleCancelWeb = e => {
+    console.log(e);
+    this.setState({
+      visibleWeb: false,
     });
   };
 
-  //添加
-  AddHandle = () =>{
+    // 后台用户ok
+    handleOkBack = e => {
+      console.log(e);
+      this.setState({
+        visibleBack: false,
+      });
+    };
+    // 后台用户关闭
+    handleCancelBack = e => {
+      console.log(e);
+      this.setState({
+        visibleBack: false,
+      });
+    };
+
+     // 配置ok
+     handleOkConfig = e => {
+      console.log(e);
+      this.setState({
+        visibleConfig: false,
+      });
+    };
+    // 配置关闭
+    handleCancelConfig = e => {
+      console.log(e);
+      this.setState({
+        visibleConfig: false,
+      });
+    };
+  
+
+  // 添加单选按钮
+  onChange = e => {
+    console.log('radio checked', e.target.value);
+    console.log(e.target.value);
     this.setState({
-      visible: true,
+      value: e.target.value,
     });
   };
+
+
 
   render(){ 
-    const { targetKeys } = this.state;  
     // 新增
     const columns = [
       {
@@ -167,25 +131,14 @@ class Role extends React.Component {
       },
       {
         title: '权限',
-        dataIndex: 'privilege',
+        dataIndex: 'permissions_name',
         render:(text,record)=>{
           return(
           <div>
-            <Icon type="plus" onClick={this.plusHandle} style={{color:'blue' }} />
-      
+           <a onClick={this.configHandle}>配置</a>
           </div>
           )}
       },
-      {
-        title: '标识',
-        dataIndex: 'biaoshi',
-        render:(text,record)=>{
-          return(
-            <div style={{color:'blue',fontFamily:'bold',fontSize:'20px'}}>
-              v
-            </div>
-            )}
-        },
         
       {
         title: '状态',
@@ -237,68 +190,99 @@ class Role extends React.Component {
       </Menu>
     );
     
- // 权限menu
-    const { SubMenu } = Menu;
-    const menu = (
-      <Menu>
-        <Menu.Item><Checkbox onChange={this.onChange}>浏览</Checkbox></Menu.Item>
-        <Menu.Item><Checkbox onChange={this.onChange}>冻结</Checkbox></Menu.Item>
-        <Menu.Item><Checkbox onChange={this.onChange}>显示</Checkbox></Menu.Item>
-        <SubMenu title="资源审核">
-          <Menu.Item><Checkbox onChange={this.onChange}>文档审核</Checkbox></Menu.Item>
-          <Menu.Item><Checkbox onChange={this.onChange}>视频审核</Checkbox></Menu.Item>
-        </SubMenu>
-      </Menu>
-    );
   
     return (
       <div className={styles.content}>
         <div className="btn1">
-         <Button type="primary" onClick={this.AddHandle} size="small">添加</Button>
-         <Modal
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}>
-            <Input placeholder="输入角色名称"  style={{width:400}}/>
-            <br></br>
-            <br></br>
-            基本权限
-            <br></br>
-            <br></br>
+           <Button type="primary" onClick={this.showModal} size="small">+添加</Button>
+        </div>
 
-            <Dropdown overlay={menu}>
-                <a className="ant-dropdown-link" href="#">
-                 <Button size="small"> 资源库管理 <Icon type="down" /></Button>
-                </a>
-              </Dropdown>&nbsp;    
-            <Button size="small" >评论</Button>&nbsp;
-            <Button size="small">上传</Button>&nbsp;
-            <Button size="small">权限</Button>
-            <br></br>
-            <br></br>
-            <Button size="small">权限</Button>&nbsp;
-            <br></br>
-            <br></br>
-             身份权限
-            <br></br>
-            <br></br>
-            <Button >蓝v</Button>&nbsp;
-            <Button>金v</Button>
-            <br></br>
-            <br></br>
-             资源权限
-            <br></br>
-            <br></br>
-            {/* 穿梭框 */}
-            <div>
-              <TreeTransfer dataSource={treeData} targetKeys={targetKeys} onChange={this.onChange1} />
-            </div>
+        {/* 添加模态框 */}
+        <div>
+         <Modal
+            title="请选择角色类型"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            // onCancel={this.handleCancel}
+            footer={[
+            // 定义右下角按钮的地方
+            <Button key="ok" style={{marginRight:230}} onClick={this.handleOk}>ok</Button>,
+          ]}>
+              {/* 添加单选按钮 */}
+            <Radio.Group onChange={this.onChange} value={this.state.value}>
+                <Radio style={{margin:50,marginLeft:110}} value={1}>网站用户</Radio>
+                <Radio value={2}>后台管理</Radio>        
+            </Radio.Group>      
+            
         </Modal>
         </div>
-       <br></br>
+
+       {/* 网站用户模态框 */}
+       <Modal 
+            
+            visible={this.state.visibleWeb}
+            onOk={this.handleOkWeb}
+            onCancel={this.handleCancelWeb}
+            width="600px"
+            height="400px"
+            >
+           <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
+          
+           <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
+           <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+
+           </div>
+           <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+
+           </div>
+           </div>
+        </Modal>
+
+        {/* 后台用户模态框 */}
+       <Modal
+            visible={this.state.visibleBack}
+            onOk={this.handleOkBack}
+            onCancel={this.handleCancelBack}
+            width="600px"
+            height="400px">
+          <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
+          
+          <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
+          <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+
+          </div>
+          <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+
+          </div>
+          </div>
+
+        </Modal>
+
+         {/* 配置模态框 */}
+       <Modal
+            visible={this.state.visibleConfig}
+            onOk={this.handleOkConfig}
+            onCancel={this.handleCancelConfig}
+            width="600px"
+            height="400px">
+          <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
+          
+          <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
+          <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+
+          </div>
+          <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+
+          </div>
+          </div>
+
+        </Modal>
+
+       {/* 数据表格 */}
         <div>
+        <br></br>
            <Table
-           
               rowKey="id"
               size="small"
               rowSelection={{rowSelection,columnTitle:"#"}} 
@@ -307,25 +291,8 @@ class Role extends React.Component {
               dataSource={data}
               />
         </div>
-        {/* 权限新增模态框 */}
-        <div>
-        <Modal
-            title={"为该角色配置权限"}
-            visible={this.state.visibles}
-            onOk={this.handleOk}
-            onCancel={this.handleCancel}
-            >
-              <Button>浏览</Button>&nbsp;
-              <Button type="primary">评论</Button>&nbsp;
-              <Button>上传</Button>&nbsp;
-              <Button type="primary">权限</Button>
-              <br></br>
-              <br></br>
-              <Button type="primary">权限</Button>&nbsp;
-              <Button type="primary">权限</Button>&nbsp;
-            
-        </Modal>
-        </div>
+
+        {/* 底部按钮 */}
         <div className="btn1">
             <Button type="primary" size="small">启用</Button>&nbsp;
             <Button type="danger" size="small">冻结</Button>&nbsp;
