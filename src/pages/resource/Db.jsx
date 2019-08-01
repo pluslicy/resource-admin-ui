@@ -1,15 +1,16 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Menu,message, Icon,DatePicker,Input,Progress,Table,Select,Dropdown,Checkbox,Modal,Button,Cascader, Upload} from 'antd';
+import { Menu,message, Icon,DatePicker,Input,Progress,Table,Select,Dropdown,Checkbox,Modal,Button,Cascader, Upload,Radio} from 'antd';
 import styles from './db.less';
 
 import DbForm from './DbForm';
-import Video from './video';
-import Text from './text';
-import {BrowserRouter,Switch,Route,Link} from 'react-router-dom'
+import moment from 'moment'
+import $ from 'jquery'
 const { SubMenu } = Menu;
 const {confirm} =Modal
-
+const { Search } = Input;
+const {RangePicker} = DatePicker;
+const { Option } = Select;
 // 资源库
 class Db extends React.Component {
   constructor(props) {
@@ -20,7 +21,43 @@ class Db extends React.Component {
       fileList: [],
       };
     }
-    
+    handleOk = e => {
+      // 提交表单
+      // e.preventDefault();
+      // this.state.form.validateFields((err, values) => {
+      //   if (!err) {
+      //     console.log('Received values of form: ', values);
+      //     //this.props.dispatch(saveOrUpdateCourse(values));
+      //   }
+      // });
+      this.setState({
+        visible1:false
+      })
+    };
+  handleCancel1 = e => {
+      console.log(e);
+      this.setState({
+        visible1: false,
+        
+      });
+      };
+  onChange2=(date, dateString)=>{
+      console.log(date, dateString);
+  }
+  showModal1=()=>{
+      this.setState({
+        visible1: true,
+      });
+    }
+  handleChange(value) {
+      console.log(`selected ${value}`);
+  }
+  checkBoxChange(e) {
+      console.log(`checked = ${e.target.checked}`);
+    }
+  handleMouse=(e)=>{
+      console.log(e)
+  }   
   saveorForm=(form)=>{
     this.setState({
       form
@@ -36,20 +73,26 @@ class Db extends React.Component {
   handleOk = e => {
     // 提交表单
     e.preventDefault();
-    this.state.form.validateFields((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-        //this.props.dispatch(saveOrUpdateCourse(values));
-      }
-    });
+    // this.state.form.validateFields((err, values) => {
+    //   if (!err) {
+    //     console.log('Received values of form: ', values);
+    //     //this.props.dispatch(saveOrUpdateCourse(values));
+    //   }
+    // });
     this.setState({
       visible:false,
       visible1:false
     })
   };
   handleClick2=(e)=>{
-    console.log(e.key)
-  }
+    if(e.key==="视频"){
+      $('.video_table').css({"display":"block"})
+      $('.text_table').css({"display":"none"})
+    }else{
+      $('.video_table').css({"display":"none"})
+      $('.text_table').css({"display":"block"})
+    }
+}
   
   handleCancel = e => {
     console.log(e);
@@ -78,8 +121,10 @@ class Db extends React.Component {
     
     console.log(event.target.innerText);
     event.persist();
+    // let {target}=event;
+    // this.props.history.push({ pathname: "/video",obj:{target}});
   }
-
+  
   //文件上传
   handleChange2=(info)=>{
     console.log(info);
@@ -96,11 +141,106 @@ class Db extends React.Component {
 
   
   render() {
+    
+  
+   
+    const columns = [
+      {
+        title: '名称',
+        dataIndex: 'name',
+        render: text => <a href="javascript:;">{text}</a>,
+      },
+      {
+        title: '作者',
+        dataIndex: 'age',
+      },
+      {
+        title: '方向',
+        dataIndex:'fangx'
+      },
+      {
+        title: '技术',
+        dataIndex:'jishu'
+      },
+      {
+        title: '类型',
+        dataIndex:'leix'
+      },
+      {
+        title: '权限',
+        dataIndex:'quanxian',
+        render: (text, record) => (
+          <Dropdown overlay={menu} trigger={['click']}>
+              <a className="ant-dropdown-link" href="#">
+                权限<Icon type="down" />
+              </a>
+          </Dropdown>
+        ),
+      },
+      {
+        title: '格式',
+        dataIndex: 'address',
+      },
+      {
+        title: '日期',
+        dataIndex: 'time',
+      },
+      {
+        title: '状态',
+        dataIndex:'status',
+       
+        render: (text, record) => (
+          <Dropdown overlay={menu} trigger={['click']}>
+              <a className="ant-dropdown-link" href="#">
+                状态 <Icon type="down" />
+              </a>
+          </Dropdown>
+        ),
+      },
+    ];
+    const dataSource = [
+      {
+        key: '1',
+        name: '胡彦斌',
+        age: 32,
+        fangx:"jack",
+        jishu:"jack",
+        leix:"Yiminghe",
+        quanxian:"lucy",
+        address: '西湖区湖底公园1号',
+        time:"2018-8-11",
+        status:"jack"
+      },
+      {
+        key: '2',
+        name: '张郃',
+        age: 12,
+        fangx:"jack",
+        jishu:"jack",
+        leix:"Yiminghe",
+        quanxian:"lucy",
+        address: '西湖区湖底公园1号',
+        time:"2018-8-11",
+        status:"jack"
+      },
+    ];
+    const dateFormat = 'YYYY-MM-DD';
+    const rowSelection = {
+      columnTitle:"#",
+      fixed:"left",
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        
+      },
+    };
+
+    //文件上传的地址与配置
     const props = {
       action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
       onChange: this.handleChange2,
     
     };
+    //权限和类型
     const menu = (
       <Menu>
         <Menu.Item key="0">
@@ -150,8 +290,9 @@ class Db extends React.Component {
    
     const {results} =this.props.Db.catalist;
     return (
+    
       <div className={styles.content}>
-          <div className="left-div" style={{borderRight:"1px solid #e8e8e8"}}>
+      <div className="left-div" style={{borderRight:"1px solid #e8e8e8"}}>
       <img style={{position:"absolute",marginLeft:"-1.8em",marginTop:"1em"}} src={require('./u578.png')} alt=""/>
       <div onMouseOver={this.handleMouse} style={{position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1em",marginLeft:"-1em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
           {this.props.Db.catalist.results[0].catalogue_name}
@@ -244,37 +385,131 @@ class Db extends React.Component {
 
 
           </div>
-          <BrowserRouter>
+         
           <div  className="right-div" style={{flex:"6",overflow:"hidden"}}>
     
           <Menu style={{marginLeft:"1em"}} onClick={this.handleClick2} selectedKeys={[this.state.current]} mode="horizontal">
             <Menu.Item key="视频" style={{fontSize:"16px",fontWeight:"400"}}>
-              <Link to="/video">视频</Link>
+             视频
             </Menu.Item>
           
           
             <Menu.Item key="文档" style={{fontSize:"16px",fontWeight:"400"}}>
-               <Link to="/text">文档</Link>
+               文档
             </Menu.Item>
             
           </Menu>
-          <div className="table">
-          <Upload  {...props} showUploadList={false} multiple={true}>
-            <Button style={{width:"90px",top:"9em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"58.5%",marginTop:"0em"}} onClick={this.showModal}>
-              <Icon type="upload" />上传
-            </Button>
-          </Upload>
-            
-       
-          </div>
-          <Switch>
-                <Route path={"/resource/db"} component={Video} exact></Route>
-                <Route path={"/video"} component={Video} exact></Route>
-                <Route path={"/text"} component={Text} ></Route>
-            </Switch>
+            <div className="table">
+            <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{this.showModal()}}>
+              <Button style={{width:"90px",top:"9em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"58.5%",marginTop:"0em"}} >
+                <Icon type="upload" />上传
+              </Button>
+            </Upload>
+              
         
+            </div>
+              <RangePicker  onChange={this.onChange2} style={{marginLeft:"1.58em",marginTop:"1em",width:"220px"}} defaultValue={[moment('2018/12/11', dateFormat), moment('2018/12/12', dateFormat)]}
+          format={dateFormat} />
+              <Search
+              placeholder="请输入搜索内容"
+              onSearch={value => console.log(value)}
+              style={{ marginLeft:"2em",width: "222px",height:"30px"}}
+            />
+            <br/>
+          <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
+          <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>权限 </span>
+          <Select size="small" defaultValue="lucy" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
+            {/* <Option value="jack">Jack</Option>
+            <Option value="lucy">全部</Option>
+            <Option value="Yiminghe">yiminghe</Option> */}
+          </Select>
+          <span style={{marginLeft:"2em",fontWeight:"700"}}>格式 </span>
+          <Select size="small" defaultValue="lucy" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange}>
+            {/* <Option value="jack">Jack</Option>
+            <Option value="lucy">全部</Option>
+            <Option value="Yiminghe">yiminghe</Option> */}
+          </Select>
+          <span style={{marginLeft:"2em",fontWeight:"700"}}>状态 </span>
+          <Select size="small" defaultValue="lucy" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange}>
+            {/* <Option value="jack">Jack</Option>
+            <Option value="lucy">全部</Option>
+            <Option value="Yiminghe">yiminghe</Option> */}
+          </Select>
+          <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange} style={{fontSize:"12px"}}>按时间</Checkbox></span>
+          <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange} style={{fontSize:"12px"}}>按热度</Checkbox></span>
           </div>
-          </BrowserRouter>
+          <Table 
+          className="video_table"
+          size="small" 
+          style={{marginLeft:"2em",marginTop:"2em",}} 
+          rowKey="key"
+          pagination={{
+            onChange: page => {
+              console.log(page);
+              let p = page - 1;
+              console.log(p);
+            },
+            pageSize: 1,
+            total:100,
+            size:'small',
+            
+            hideOnSinglePage: false,
+            itemRender: (current, type, originalElement) => {
+              if (type === 'prev') {
+                return <Button size="small" style={{marginRight:"1em"}}>上一页shi</Button>;
+              }
+              if (type === 'next') {
+                return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+              }
+              return originalElement;
+            },
+          }}
+          rowSelection={rowSelection} columns={columns} dataSource={dataSource} />
+           <Table className="text_table"
+          size="small" 
+          style={{marginLeft:"2em",marginTop:"2em",display:"none"}} 
+          rowKey="key"
+          pagination={{
+            onChange: page => {
+              console.log(page);
+              let p = page - 1;
+              console.log(p);
+            },
+            pageSize: 1,
+            total:100,
+            size:'small',
+            
+            hideOnSinglePage: false,
+            itemRender: (current, type, originalElement) => {
+              if (type === 'prev') {
+                return <Button size="small" style={{marginRight:"1em"}}>上一页text</Button>;
+              }
+              if (type === 'next') {
+                return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+              }
+              return originalElement;
+            },
+          }}
+          rowSelection={rowSelection} columns={columns} dataSource={dataSource} />
+          <Button type="primary" style={{marginLeft:"2em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}}>启用</Button>
+          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}}>冻结</Button>
+          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}}>删除</Button>
+          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>          
+          <Modal
+            onCancel={this.handleCancel1}
+            title="请选择资源所在编目"
+            visible={this.state.visible1}
+            style={{display:"flex",justifyContent:"space-around"}}
+            footer={[
+                <Button onClick={this.handleOk} style={{marginRight:"40%"}}>确认</Button>
+            ]}
+            >
+            <Cascader options={options} onChange={this.casonChange} placeholder="请选择" />
+            <Cascader style={{marginLeft:"1em"}} onChange={this.casonChange1} placeholder="请选择" />
+            </Modal>        
+                            
+          </div>
+         
           <Modal
           style={{top:"20px"}}
           title={
@@ -290,6 +525,7 @@ class Db extends React.Component {
                 percent={99.9}
               />
           <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：5/6</span>
+        
         </div>
           }
           closable={false}
@@ -298,19 +534,19 @@ class Db extends React.Component {
           width={850}
         >
           <div className={styles.left}>
-           <span style={{fontWeight:700}}>您上传的视频:
+           <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的视频:
             <br/>
             <ol>
-              <li style={{marginLeft:"-3em",marginTop:".5em"}}>
-                1.视频一
-                <span>修改</span> <span>+文档</span>
+              <li style={{marginLeft:"-10px",marginTop:".5em"}}>
+                1.视频一 
+                <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span style={{fontSize:"12px",color:"#3585FE"}}>&nbsp;&nbsp;+文档</span>
               </li>
               <li></li>
               <li></li>
             </ol>
            </span> <br/><br/>
 
-            <p style={{color:'red'}}>
+            <p style={{marginLeft:"30px",color:'red'}}>
               当上传视频为一个时：<br/>
               用户可以选择单视频或专辑<br/>
               当上传视频为多个时：<br/>
@@ -318,10 +554,12 @@ class Db extends React.Component {
             </p>
 
           </div>
-          <DbForm ref={this.saveorForm}/>
+          <DbForm ref={this.saveorForm} flag={this.state.value}/>
+          <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
         </Modal>
         
       </div>
+
     );
   }
 }

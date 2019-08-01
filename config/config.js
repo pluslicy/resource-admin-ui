@@ -98,7 +98,8 @@ export default {
           path: '/resource',
           name: 'resource',
           icon: 'desktop',
-          routes:[{
+          routes:[
+          {
             path: '/resource/db',
             name: 'db',
             icon: 'right',

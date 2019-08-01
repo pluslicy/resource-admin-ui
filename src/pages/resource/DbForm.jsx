@@ -5,8 +5,10 @@ import {
     Select,
     Upload,Button,Icon,Checkbox,Radio
   } from 'antd'
+const { TextArea } = Input;
 import {connect} from 'dva'
 import styles from './db.less';
+import $ from 'jquery'
 
 
 const Option = Select.Option;
@@ -17,8 +19,14 @@ for (let i = 10; i < 36; i++) {
 
 class DbForm extends React.Component{
 
+    constructor(props){
+      super(props)
+      this.state={
+        value:"视频"
+      }
+    }
     componentWillMount(){
-      
+      console.log(this.props.flag)
     }
     handleChange(value) {
       console.log(`selected ${value}`);
@@ -29,6 +37,19 @@ class DbForm extends React.Component{
         return e;
       }
       return e && e.fileList;
+    };
+    onRadioChange = e => {
+      console.log('radio checked', e.target.value);
+      if(e.target.value==="视频"){
+        $('.video-form').css({"display":"block"})
+        $('.album-form').css({"display":"none"})
+      }else{
+        $('.album-form').css({"display":"block"})
+        $('.video-form').css({"display":"none"})
+      }
+      this.setState({
+        value: e.target.value,
+      });
     };
     render(){
         const { getFieldDecorator } = this.props.form;
@@ -49,35 +70,17 @@ class DbForm extends React.Component{
             // <div className="DbForm" style={{width:"800px",height:"550px",}}>
             <div className={styles.DbForm}>
             {/* <div></div> */}
-    
-            <Form {...formItemLayout} className="login-form">
+            <Radio.Group style={{position:"absolute",left:"33.5%",top:"11em"}} onChange={this.onRadioChange} value={this.state.value} >
+                <Radio value={"视频"}>视频</Radio>
+                <Radio value={"专辑"} style={{marginLeft:"2em"}}>专辑</Radio>
+            </Radio.Group>
+            <Form {...formItemLayout} className="video-form">
             
-                
-                <Form.Item  label="">
-                {getFieldDecorator('name', {
-                  rules: [{ required: true, message: 'Please input your realname!' }],
-                })(
-                  <Radio.Group
-                  style={{ marginBottom: '0.5em', marginLeft: '0.5em' }}
-                >
-                  <Radio value={1}>视频</Radio>
-                  <Radio value={2}>专辑</Radio>
-                  <span style={{marginLeft:"10em",color:"blue"}}>+为视频添加文档</span>
-                </Radio.Group>
-                )}
-              </Form.Item>
-              <Form.Item  label="视频标题">
-                {getFieldDecorator('name', {
-                  rules: [{ required: true, message: 'Please input your realname!' }],
-                })(
-                  <Input placeholder="Name" />,
-                )}
-              </Form.Item>
               <Form.Item label="方向">
                     {
                         getFieldDecorator('teacherId',{})
                         (
-                            <Select  placeholder="请选择教师" name='teacherId'  >
+                            <Select  placeholder="请选择方向" name='teacherId'  >
                             {/* {
                                 this.props.teacherState.teachers.map((item)=>{
                                     return <Option key={item.id} value={item.id}>{item.realname}</Option>
@@ -87,11 +90,11 @@ class DbForm extends React.Component{
                         )
                     }
               </Form.Item>
-              <Form.Item label="技术" extra="请为你的视频填写技术标签，使用空格隔开，不超过10个.">
+              <Form.Item label="技术" >
                     {
                         getFieldDecorator('teacherId',{})
                         (
-                            <Select  placeholder="请选择教师" name='teacherId'  >
+                            <Select  placeholder="请选择技术" name='teacherId'  >
                             {/* {
                                 this.props.teacherState.teachers.map((item)=>{
                                     return <Option key={item.id} value={item.id}>{item.realname}</Option>
@@ -101,25 +104,82 @@ class DbForm extends React.Component{
                         )
                     }
               </Form.Item>  
-              <Form.Item label="标签" extra="您可以选择：html JS jQuery react VUE">
-                {getFieldDecorator('credit', {
-                  rules: [{ required: true, message: 'Please input your Password!' }],
-                })(
-                 
-                  <Select mode="tags" style={{ width: '100%' }} onChange={this.handleChange} tokenSeparators={[',']}>
-                    {children}
-                  </Select>
-                  
+              <Form.Item  label="">
+                {getFieldDecorator('name', {
+                  })(
+                
+                  <Checkbox style={{paddingLeft:"5em"}} value={1}> &nbsp;设置为vip</Checkbox>
                 )}
               </Form.Item>
               <Form.Item  label="视频描述">
                 {getFieldDecorator('description', {
-                  rules: [{ required: true, message: 'Please input your username!' }],
+                
                 })(
-                  <Input placeholder="Description" />,
+                  <TextArea rows={3} />
                 )}
               </Form.Item>
             </Form>
+          
+            <Form {...formItemLayout} className="album-form" style={{display:"none"}}>
+            
+            <Form.Item label="所属专辑">
+                    {
+                        getFieldDecorator('teacherId',{})
+                        (
+                            <Select  placeholder="请选择专辑" name='teacherId'  >
+                            {/* {
+                                this.props.teacherState.teachers.map((item)=>{
+                                    return <Option key={item.id} value={item.id}>{item.realname}</Option>
+                                })
+                            } */}
+                            </Select>
+                        )
+                    }
+              </Form.Item>
+              <Form.Item label="方向">
+                    {
+                        getFieldDecorator('teacherId',{})
+                        (
+                            <Select  placeholder="请选择方向" name='teacherId'  >
+                            {/* {
+                                this.props.teacherState.teachers.map((item)=>{
+                                    return <Option key={item.id} value={item.id}>{item.realname}</Option>
+                                })
+                            } */}
+                            </Select>
+                        )
+                    }
+              </Form.Item>
+              <Form.Item label="技术" >
+                    {
+                        getFieldDecorator('teacherId',{})
+                        (
+                            <Select  placeholder="请选择技术" name='teacherId'  >
+                            {/* {
+                                this.props.teacherState.teachers.map((item)=>{
+                                    return <Option key={item.id} value={item.id}>{item.realname}</Option>
+                                })
+                            } */}
+                            </Select>
+                        )
+                    }
+              </Form.Item>  
+              <Form.Item  label="">
+                {getFieldDecorator('name', {
+                  })(
+                
+                  <Checkbox style={{paddingLeft:"5em"}} value={1}> &nbsp;设置为vip</Checkbox>
+                )}
+              </Form.Item>
+              <Form.Item  label="专辑描述">
+                {getFieldDecorator('description', {
+                
+                })(
+                  <TextArea rows={3} />
+                )}
+              </Form.Item>
+            </Form>
+            
             </div>
         );
     }
