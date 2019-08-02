@@ -64,7 +64,11 @@ class Role extends React.Component {
       visible: false,
     });
   };
-
+  componentDidMount(){
+    this.props.dispatch({
+      type:'role/fetchRoles'
+    })
+  }
   // 网络用户ok
   handleOkWeb = e => {
     console.log(e);
@@ -157,21 +161,7 @@ class Role extends React.Component {
       },
     ];
     
-    const data = [
-      {
-        key: '1',
-        name: '杰普认证教师',
-      },
-      {
-        key: '2',
-        name: '杰普学生',
-      },
-      {
-        key: '3',
-        name: '杰普教师',
-      },
-    ];
-
+   
     // 表格
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -288,8 +278,9 @@ class Role extends React.Component {
               rowSelection={{rowSelection,columnTitle:"#"}} 
               columns={columns} 
               // dataSource={this.props.role.role}
-              dataSource={data}
+              dataSource={this.props.role.roles}
               />
+        
         </div>
 
         {/* 底部按钮 */}
@@ -306,6 +297,6 @@ class Role extends React.Component {
     }
 }
 
-export default connect(({ Role }) => ({
-  Role,
+export default connect(({ role }) => ({
+  role,
 }))(Role);
