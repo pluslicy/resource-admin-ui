@@ -19,6 +19,7 @@ class Db extends React.Component {
       visible:false,
       visible1:false,
       fileList: [],
+      catalog:{},
       };
     }
     handleOk = e => {
@@ -105,9 +106,15 @@ class Db extends React.Component {
   //   console.log(date, dateString);
   // }
   componentWillMount() {
-    // this.props.dispatch({
-    //   type:"Db/fetchCata"
-    // })
+    this.props.dispatch({
+      type:"Db/fetchCata"
+    })
+    this.props.dispatch({
+      type:"Db/fetchVideo"
+    })
+    this.props.dispatch({
+      type:"Db/fetchText"
+    })
   }
   //级联选择编目
   casonChange(value) {
@@ -139,55 +146,86 @@ class Db extends React.Component {
     }
   }
 
-  
+  loadCatalog=(num)=>{
+    console.log(num)
+    var ca={};
+    for(let i=1;i<num+1;i++){
+      ca["cata_"+i]=[];
+      continue;
+    }
+    this.props.Db.catalist.results.forEach((item,index)=>{
+      for(let i=1;i<num+1;i++){
+        if(item.cata_level_id.cata_level_num!=i){
+          continue;
+        }else{
+          ca["cata_"+i].push(item);
+        }
+      }
+    })
+    if(ca["cata_"+1]!=null){
+    ca["cata_"+1].forEach((item)=>{
+        let str=item.cata_path;
+        item["cata_two"]=[];
+        ca.cata_2.forEach((a,index,arr)=>{
+          if(a.cata_path.indexOf(str)!=-1){
+            console.log(a);
+            item["cata_two"].push(a);
+          }
+        })
+    })}
+    console.log(ca.cata_1)
+    // for(let i=0;i<num;i++){
+      
+    // }
+  }
   render() {
     
   
-   
+    var num=0;
     const columns = [
       {
         title: '名称',
-        dataIndex: 'name',
+        dataIndex: 'vr_name',
         render: text => <a href="javascript:;">{text}</a>,
       },
       {
         title: '作者',
-        dataIndex: 'age',
+        dataIndex: 'va_user',
       },
       {
         title: '方向',
-        dataIndex:'fangx'
+        dataIndex:'vr_cata_one'
       },
       {
         title: '技术',
-        dataIndex:'jishu'
+        dataIndex:'vr_cata_two'
       },
       {
         title: '类型',
-        dataIndex:'leix'
+        dataIndex:'vr_owner'
       },
       {
         title: '权限',
-        dataIndex:'quanxian',
+        dataIndex:'vr_permission',
         render: (text, record) => (
           <Dropdown overlay={menu} trigger={['click']}>
               <a className="ant-dropdown-link" href="#">
-                权限<Icon type="down" />
+                {text}<Icon type="down" />
               </a>
           </Dropdown>
         ),
       },
       {
         title: '格式',
-        dataIndex: 'address',
+        dataIndex: 'vr_format',
       },
       {
         title: '日期',
-        dataIndex: 'time',
+        dataIndex: 'vr_created_time',
       },
       {
         title: '状态',
-        dataIndex:'status',
+        dataIndex:'vr_enable',
        
         render: (text, record) => (
           <Dropdown overlay={menu} trigger={['click']}>
@@ -198,30 +236,58 @@ class Db extends React.Component {
         ),
       },
     ];
-    const dataSource = [
+    const columns2 = [
       {
-        key: '1',
-        name: '胡彦斌',
-        age: 32,
-        fangx:"jack",
-        jishu:"jack",
-        leix:"Yiminghe",
-        quanxian:"lucy",
-        address: '西湖区湖底公园1号',
-        time:"2018-8-11",
-        status:"jack"
+        title: '名称',
+        dataIndex: 'dr_name',
+        render: text => <a href="javascript:;">{text}</a>,
       },
       {
-        key: '2',
-        name: '张郃',
-        age: 12,
-        fangx:"jack",
-        jishu:"jack",
-        leix:"Yiminghe",
-        quanxian:"lucy",
-        address: '西湖区湖底公园1号',
-        time:"2018-8-11",
-        status:"jack"
+        title: '作者',
+        dataIndex: 'da.user',
+      },
+      {
+        title: '方向',
+        dataIndex:'dr_cata_one'
+      },
+      {
+        title: '技术',
+        dataIndex:'dr_cata_two'
+      },
+      {
+        title: '类型',
+        dataIndex:'dr_owner'
+      },
+      {
+        title: '权限',
+        dataIndex:'dr_permission',
+        render: (text, record) => (
+          <Dropdown overlay={menu} trigger={['click']}>
+              <a className="ant-dropdown-link" href="#">
+                {text}<Icon type="down" />
+              </a>
+          </Dropdown>
+        ),
+      },
+      {
+        title: '格式',
+        dataIndex: 'dr_format',
+      },
+      {
+        title: '日期',
+        dataIndex: 'dr_created_time',
+      },
+      {
+        title: '状态',
+        dataIndex:'dr_enable',
+       
+        render: (text, record) => (
+          <Dropdown overlay={menu} trigger={['click']}>
+              <a className="ant-dropdown-link" href="#">
+                状态 <Icon type="down" />
+              </a>
+          </Dropdown>
+        ),
       },
     ];
     const dateFormat = 'YYYY-MM-DD';
@@ -292,103 +358,48 @@ class Db extends React.Component {
     return (
     
       <div className={styles.content}>
-      <div className="left-div" style={{borderRight:"1px solid #e8e8e8"}}>
+      <div className="left-div" style={{borderRight:"1px solid #e8e8e8",minWidth:"145px"}}>
       <img style={{position:"absolute",marginLeft:"-1.8em",marginTop:"1em"}} src={require('./u578.png')} alt=""/>
       <div onMouseOver={this.handleMouse} style={{position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1em",marginLeft:"-1em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
           {this.props.Db.catalist.results[0].catalogue_name}
       </div>
       <Menu
-       
+
+              id="menu"
               defaultSelectedKeys={['1']}
               defaultOpenKeys={['sub1']}
               mode="inline"
               style={{minHeight:"500px",marginTop:"2em",border:"none"}}
             >
-            
-              <SubMenu
+              {
+                this.props.Db.catalist.results.map((item,index)=>{
+                    if(num<item.cata_level_id.cata_level_num){
+                      num=item.cata_level_id.cata_level_num;
+                    }
+                    if(item.cata_level_id.cata_level_num==1){
+                      return ( <SubMenu
                             
-                            key="sub1"
-                            title={
-                              <span>
-                                <span style={{fontWeight:"700",fontSize:"12px",marginLeft:"-1em"}}   onClick={this.handleClick}>JavaEE企业级开发</span>
-                              </span>
-                            }
-                          >
-                            
-                          </SubMenu>
-                          <SubMenu
-                            key="sub2"
-                            title={
-                              <span>
-                                
-                                <span  style={{fontWeight:"400",fontSize:"12px"}}>Spring boot</span>
-                              </span>
-                            }
-                          >
-                            <SubMenu key="sub3" 
-                            title={
-                              <span>
-                                
-                                <span style={{fontWeight:"400",fontSize:"12px"}}>视频库</span>
-                              </span>
-                            }>
-                            
-                                <SubMenu key="sub5" title={
-                              <span>
-                                
-                                <span style={{fontWeight:"400",fontSize:"12px"}}>视频</span>
-                              </span>
-                            }>  
-                                  
-                                </SubMenu>
-                                <SubMenu key="sub6" title={
-                              <span>
-                                
-                                <span style={{fontWeight:"400",fontSize:"12px"}}>专辑</span>
-                              </span>
-                            }>
-                                  
-                                </SubMenu>
-                            </SubMenu>
-                            <SubMenu key="sub4" 
-                              title={
-                              <span>
-                                
-                                <span style={{fontWeight:"400",fontSize:"12px"}}>文档库</span>
-                              </span>
-                            }>
+                        key={item.cata_path}
+                        title={
+                          <span>
+                            <span style={{fontWeight:"700",fontSize:"12px",marginLeft:"-1em"}}   onClick={this.handleClick}>{item.catalogue_name}</span>
+                          </span>
+                        }
+                      >
                         
-                            </SubMenu>
-                          </SubMenu>
-                          <SubMenu
-                            key="sub7"
-                            title={
-                              <span>
-                                
-                                <span style={{fontWeight:"400",fontSize:"12px"}}>Mybatis</span>
-                              </span>
-                            }
-                          >
-                          </SubMenu>
-                          <SubMenu
-                            key="sub8"
-                            title={
-                              <span>
-                      
-                                <span style={{fontWeight:"400",fontSize:"12px"}}>SpringMVC</span>
-                              </span>
-                            }
-                          >
-                          </SubMenu>
+                      </SubMenu>)
+                    }
+                })
+              }
              </Menu>
       
 
 
           </div>
-         
+            {this.loadCatalog(num)}
           <div  className="right-div" style={{flex:"6",overflow:"hidden"}}>
     
-          <Menu style={{marginLeft:"1em"}} onClick={this.handleClick2} selectedKeys={[this.state.current]} mode="horizontal">
+          <Menu  style={{marginLeft:"1em"}} onClick={this.handleClick2} selectedKeys={[this.state.current]} mode="horizontal">
             <Menu.Item key="视频" style={{fontSize:"16px",fontWeight:"400"}}>
              视频
             </Menu.Item>
@@ -438,11 +449,12 @@ class Db extends React.Component {
           <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange} style={{fontSize:"12px"}}>按时间</Checkbox></span>
           <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange} style={{fontSize:"12px"}}>按热度</Checkbox></span>
           </div>
+         
           <Table 
           className="video_table"
           size="small" 
           style={{marginLeft:"2em",marginTop:"2em",}} 
-          rowKey="key"
+          rowKey="id"
           pagination={{
             onChange: page => {
               console.log(page);
@@ -450,7 +462,7 @@ class Db extends React.Component {
               console.log(p);
             },
             pageSize: 1,
-            total:100,
+            total:this.props.Db.videolist.count,
             size:'small',
             
             hideOnSinglePage: false,
@@ -464,11 +476,11 @@ class Db extends React.Component {
               return originalElement;
             },
           }}
-          rowSelection={rowSelection} columns={columns} dataSource={dataSource} />
+          rowSelection={rowSelection} columns={columns} dataSource={this.props.Db.videolist.results} />
            <Table className="text_table"
           size="small" 
           style={{marginLeft:"2em",marginTop:"2em",display:"none"}} 
-          rowKey="key"
+          rowKey="id"
           pagination={{
             onChange: page => {
               console.log(page);
@@ -476,7 +488,7 @@ class Db extends React.Component {
               console.log(p);
             },
             pageSize: 1,
-            total:100,
+            total:this.props.Db.textlist.count,
             size:'small',
             
             hideOnSinglePage: false,
@@ -490,7 +502,7 @@ class Db extends React.Component {
               return originalElement;
             },
           }}
-          rowSelection={rowSelection} columns={columns} dataSource={dataSource} />
+          rowSelection={rowSelection} columns={columns2}  dataSource={this.props.Db.textlist.results} />
           <Button type="primary" style={{marginLeft:"2em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}}>启用</Button>
           <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}}>冻结</Button>
           <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}}>删除</Button>

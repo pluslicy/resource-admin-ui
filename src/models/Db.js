@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { findAllCata } from '@/services/Db';
+import { findAllCata, findAllVideo, findAllText } from '@/services/Db';
 
 const DbModel = {
   namespace: 'Db',
@@ -8,7 +8,9 @@ const DbModel = {
       results:[{
         cata_level_id:{cata_level_num:""}
       }]
-    }
+    },
+    videolist:{},
+    textlist:{}
   },
   effects: {
     // 获取所有编目
@@ -16,6 +18,20 @@ const DbModel = {
       const response = yield call(findAllCata);
       yield put({
         type: 'reloadCatalist',
+        payload: response,
+      });
+    },
+    *fetchVideo(_, { call, put }) {
+      const response = yield call(findAllVideo);
+      yield put({
+        type: 'reloadVideolist',
+        payload: response,
+      });
+    },
+    *fetchText(_, { call, put }) {
+      const response = yield call(findAllText);
+      yield put({
+        type: 'reloadTextlist',
         payload: response,
       });
     }
@@ -26,6 +42,19 @@ const DbModel = {
       return {
         ...state,
         catalist: action.payload,
+      };
+    },
+    reloadVideolist(state, action) {
+      
+      return {
+        ...state,
+       videolist:action.payload
+      };
+    },
+    reloadTextlist(state, action) {
+      return {
+        ...state,
+        textlist: action.payload,
       };
     },
   },
