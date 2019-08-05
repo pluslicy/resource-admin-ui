@@ -5,10 +5,13 @@ export async function findAll() {
 }
 
 
-export async function fetchCheck(check) {
-  return request('http://10.0.6.5:16012/mp_audit_res/audit_video/',{
+export async function fetchCheck(param) {
+  console.log(param)
+  return request('http://10.0.6.5:16012/mp_audit_res/audit_video/', {
     method: 'post',
-    params: check,
+    data: qs.stringify(param),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
     getResponse: true,
   });
 }
+

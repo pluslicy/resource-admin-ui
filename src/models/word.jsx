@@ -1,17 +1,14 @@
-import { findAll, fetchCheck} from '@/services/video';
+import { findAll, fetchCheck} from '@/services/word';
 
 export default {
-  namespace: 'video',
+  namespace: 'word',
   state: {
     loading: true,
-    videos: [],
+    words: [],
     check:{
-      // "id": id,
-      // "vr_audit_status": "0",
-      // "vr_audit_decs": "拒绝"
       id:'',
-      vr_audit_status:'1',
-      vr_audit_decs:'通过'
+      dr_audit_status:'',
+      dr_audit_decs:''
     },
   },
   effects: {
@@ -22,27 +19,27 @@ export default {
         payload: response.results
        });
     },
-    *fetchCheck(_, { call, put }) {
-      const response = yield call(fetchCheck, _.payload);
-      yield put({
-        type: 'reloadAll',
-        payload: response.results
-       });
-    },
+  },
+  *fetchCheck(_, { call, put }) {
+    const response = yield call(fetchCheck,{id: _.payload.id, status: _.payload.status});
+    yield put({
+      type: 'reloadStatus',
+      payload: response.results
+     });
   },
 
   reducers: {
     reloadAll(state, action) {
       return {
         ...state,
-        videos: action.payload,
+        words: action.payload,
         loading: false,
       };
     },
     reloadStatus(state, action){
       return {
         ...state,
-        videos: action.payload,
+        words: action.payload,
         loading: false,
       };
     }
