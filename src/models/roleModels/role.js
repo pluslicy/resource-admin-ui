@@ -33,7 +33,7 @@ const RoleModel = {
     },
 
     *RoleForzen(_, { call, put }) {
-      const response = yield call(forzenRole, _.payload);
+      const response = yield call(forzenRolecd, _.payload);
       message.success(response.message);
       yield put({ type: 'changeVisible', payload: false });
       yield put({ type: 'fetchRoles'});

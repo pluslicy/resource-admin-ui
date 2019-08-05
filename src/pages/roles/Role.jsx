@@ -19,6 +19,11 @@ class Role extends React.Component {
       value:"",
     };
   }
+  componentDidMount(){
+    this.props.dispatch({
+      type:'role/fetchRoles'
+    })
+  }
 
   // 添加展示模态框
   showModal = () => {
@@ -64,11 +69,7 @@ class Role extends React.Component {
       visible: false,
     });
   };
-  componentDidMount(){
-    this.props.dispatch({
-      type:'role/fetchRoles'
-    })
-  }
+ 
   // 网络用户ok
   handleOkWeb = e => {
     console.log(e);
@@ -277,7 +278,6 @@ class Role extends React.Component {
               size="small"
               rowSelection={{rowSelection,columnTitle:"#"}} 
               columns={columns} 
-              // dataSource={this.props.role.role}
               dataSource={this.props.role.roles}
               />
         
