@@ -1,16 +1,21 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Menu,message, Icon,DatePicker,Input,Progress,Table,Select,Dropdown,Checkbox,Modal,Button,Cascader, Upload,Radio} from 'antd';
+import { Popover,Tooltip,Tree,Menu,message, Icon,DatePicker,Input,Progress,Table,Select,Dropdown,Checkbox,Modal,Button,Cascader, Upload,Radio} from 'antd';
 import styles from './db.less';
 
 import DbForm from './DbForm';
 import moment from 'moment'
 import $ from 'jquery'
+import Test from './test'
+const { TreeNode } = Tree;
 const { SubMenu } = Menu;
 const {confirm} =Modal
 const { Search } = Input;
 const {RangePicker} = DatePicker;
 const { Option } = Select;
+
+
+
 // 资源库
 class Db extends React.Component {
   constructor(props) {
@@ -19,7 +24,6 @@ class Db extends React.Component {
       visible:false,
       visible1:false,
       fileList: [],
-      catalog:{},
       };
     }
     handleOk = e => {
@@ -105,7 +109,7 @@ class Db extends React.Component {
   // onChange2=(date, dateString)=>{
   //   console.log(date, dateString);
   // }
-  componentWillMount() {
+  componentDidMount() {
     this.props.dispatch({
       type:"Db/fetchCata"
     })
@@ -145,75 +149,94 @@ class Db extends React.Component {
       message.error(`${info.file.name} file upload failed.`);
     }
   }
-
-  loadCatalog=(num)=>{
-    console.log(num)
-    var ca={};
-    for(let i=1;i<num+1;i++){
-      ca["cata_"+i]=[];
-      continue;
-    }
-    this.props.Db.catalist.results.forEach((item,index)=>{
-      for(let i=1;i<num+1;i++){
-        if(item.cata_level_id.cata_level_num!=i){
-          continue;
-        }else{
-          ca["cata_"+i].push(item);
-        }
-      }
-    })
-    if(ca["cata_"+1]!=null){
-    ca["cata_"+1].forEach((item)=>{
-        let str=item.cata_path;
-        item["cata_two"]=[];
-        ca.cata_2.forEach((a,index,arr)=>{
-          if(a.cata_path.indexOf(str)!=-1){
-            console.log(a);
-            item["cata_two"].push(a);
-          }
-        })
-    })}
-    console.log(ca.cata_1)
-    // for(let i=0;i<num;i++){
-      
-    // }
+  update(record,value){
+    console.log(record)
+    console.log(`selected ${value}`);
   }
+  renderTreeNodes = data =>
+  data.map(item => {
+    if (item.childs) {
+      return (
+        <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
+          {this.renderTreeNodes(item.childs)}
+        </TreeNode>
+      );
+    }
+    return <TreeNode {...item} />;
+  });
   render() {
     
-  
-    var num=0;
+
+     // 状态的下拉菜单
+     const menu1 = (
+      <Menu>
+        <Menu.Item style={{color:'red'}}>冻结</Menu.Item>
+      </Menu>
+    );
+
+    const menu2 = (
+      <Menu>
+        <Menu.Item >vip</Menu.Item>
+        <Menu.Item >free</Menu.Item>
+        <Menu.Item >other</Menu.Item>
+      </Menu>
+    );
     const columns = [
       {
         title: '名称',
         dataIndex: 'vr_name',
-        render: text => <a href="javascript:;">{text}</a>,
+        render: (text,record) => 
+        <Popover overlayStyle={{maxHeight:"10px"}} placement="bottomLeft" trigger="hover" content={[
+          <div style={{maxHeight:"10px",marginTop:"-13px"}} key="id" >
+              <img  src={require('./u483.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_play_times}</span>
+              <img style={{marginLeft:"5px"}} src={require('./u486.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_favor_num}</span>
+              <img style={{marginLeft:"5px"}} src={require('./u489.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_collection_num}</span>
+              <img style={{marginLeft:"5px"}} src={require('./u492.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_comment_num}</span>
+          </div>
+        ]} >
+          <span style={{cursor:"pointer"}}>{text}</span>&nbsp;&nbsp;&nbsp;<span style={{color:"#FF0000",fontSize:"12px",fontWeight:"400"}} onClick={this.update.bind(this,record)}>修改</span>
+        </Popover>
       },
       {
         title: '作者',
-        dataIndex: 'va_user',
+        dataIndex: 'vr_author',
       },
       {
         title: '方向',
-        dataIndex:'vr_cata_one'
-      },
-      {
-        title: '技术',
         dataIndex:'vr_cata_two'
       },
       {
+        title: '技术',
+        dataIndex:'vr_cata_one'
+      },
+      {
         title: '类型',
-        dataIndex:'vr_owner'
+        dataIndex:'vr_owner',
+        // 0 杰普资源 1 网络资源
+        render: (text, record) => {
+          if(text==0){
+            return "杰普资源";
+          }else{
+            return "网络资源";
+          }
+        } 
       },
       {
         title: '权限',
         dataIndex:'vr_permission',
-        render: (text, record) => (
-          <Dropdown overlay={menu} trigger={['click']}>
-              <a className="ant-dropdown-link" href="#">
-                {text}<Icon type="down" />
-              </a>
-          </Dropdown>
-        ),
+        // 0 vip 1 Free 2 other
+        render: (text,record) => {
+          return (
+            <div>
+             {/*下拉菜单*/}
+              <Dropdown overlay={menu2}>
+                <a className="ant-dropdown-link" href="#">
+                  {text} <Icon type="down" />
+                </a>
+              </Dropdown>
+            </div>
+          );
+        },
       },
       {
         title: '格式',
@@ -225,15 +248,28 @@ class Db extends React.Component {
       },
       {
         title: '状态',
-        dataIndex:'vr_enable',
-       
-        render: (text, record) => (
-          <Dropdown overlay={menu} trigger={['click']}>
+        // dataIndex:'vr_enable',
+      //  1 可用 0 不可用
+        // render: (text, record) => (
+        //   <Select defaultValue={text} style={{ width: 50 }} >
+        //       <Option value={0}>可用</Option>
+        //       <Option value={1}>不可用</Option>
+        //   </Select>
+        // ),
+        render: () => {
+          return (
+            <div>
+             {/*下拉菜单*/}
+              <Dropdown overlay={menu1}>
               <a className="ant-dropdown-link" href="#">
-                状态 <Icon type="down" />
+                启用中 <Icon type="down" />
               </a>
-          </Dropdown>
-        ),
+            </Dropdown>
+            </div>
+          );
+        },
+
+
       },
     ];
     const columns2 = [
@@ -244,29 +280,37 @@ class Db extends React.Component {
       },
       {
         title: '作者',
-        dataIndex: 'da.user',
+        dataIndex: 'dr_author',
       },
       {
         title: '方向',
-        dataIndex:'dr_cata_one'
-      },
-      {
-        title: '技术',
         dataIndex:'dr_cata_two'
       },
       {
+        title: '技术',
+        dataIndex:'dr_cata_one'
+      },
+      {
         title: '类型',
-        dataIndex:'dr_owner'
+        dataIndex:'dr_owner',
+        // 0 杰普资源 1 网络资源
+        render: (text, record) => {
+          if(text==0){
+            return "杰普资源";
+          }else{
+            return "网络资源";
+          }
+        } 
       },
       {
         title: '权限',
         dataIndex:'dr_permission',
         render: (text, record) => (
-          <Dropdown overlay={menu} trigger={['click']}>
-              <a className="ant-dropdown-link" href="#">
-                {text}<Icon type="down" />
-              </a>
-          </Dropdown>
+          <Select defaultValue={text} style={{ width: 50 }}>
+              <Option value={0}>Vip</Option>
+              <Option value={1}>Free</Option>
+              <Option value={2}>Other</Option>
+          </Select>
         ),
       },
       {
@@ -282,11 +326,10 @@ class Db extends React.Component {
         dataIndex:'dr_enable',
        
         render: (text, record) => (
-          <Dropdown overlay={menu} trigger={['click']}>
-              <a className="ant-dropdown-link" href="#">
-                状态 <Icon type="down" />
-              </a>
-          </Dropdown>
+          <Select defaultValue={text} style={{ width: 50 }} >
+              <Option value={0}>可用</Option>
+              <Option value={1}>不可用</Option>
+          </Select>
         ),
       },
     ];
@@ -307,18 +350,7 @@ class Db extends React.Component {
     
     };
     //权限和类型
-    const menu = (
-      <Menu>
-        <Menu.Item key="0">
-          <a href="http://www.alipay.com/">1st menu item</a>
-        </Menu.Item>
-        <Menu.Item key="1">
-          <a href="http://www.taobao.com/">2nd menu item</a>
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="3">3rd menu item</Menu.Item>
-      </Menu>
-    );
+    
     const options = [
       {
         value: 'zhejiang',
@@ -354,14 +386,13 @@ class Db extends React.Component {
       },
     ];
    
-    const {results} =this.props.Db.catalist;
+    const {childs} =this.props.Db.catalist[0];
     return (
-    
       <div className={styles.content}>
       <div className="left-div" style={{borderRight:"1px solid #e8e8e8",minWidth:"145px"}}>
       <img style={{position:"absolute",marginLeft:"-1.8em",marginTop:"1em"}} src={require('./u578.png')} alt=""/>
       <div onMouseOver={this.handleMouse} style={{position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1em",marginLeft:"-1em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
-          {this.props.Db.catalist.results[0].catalogue_name}
+         {this.props.Db.catalist[0].catalogue_name}
       </div>
       <Menu
 
@@ -371,32 +402,15 @@ class Db extends React.Component {
               mode="inline"
               style={{minHeight:"500px",marginTop:"2em",border:"none"}}
             >
-              {
-                this.props.Db.catalist.results.map((item,index)=>{
-                    if(num<item.cata_level_id.cata_level_num){
-                      num=item.cata_level_id.cata_level_num;
-                    }
-                    if(item.cata_level_id.cata_level_num==1){
-                      return ( <SubMenu
-                            
-                        key={item.cata_path}
-                        title={
-                          <span>
-                            <span style={{fontWeight:"700",fontSize:"12px",marginLeft:"-1em"}}   onClick={this.handleClick}>{item.catalogue_name}</span>
-                          </span>
-                        }
-                      >
-                        
-                      </SubMenu>)
-                    }
-                })
-              }
-             </Menu>
+              <Tree>
+                {this.renderTreeNodes(childs)}
+              </Tree>
+       </Menu>
       
 
 
           </div>
-            {this.loadCatalog(num)}
+           
           <div  className="right-div" style={{flex:"6",overflow:"hidden"}}>
     
           <Menu  style={{marginLeft:"1em"}} onClick={this.handleClick2} selectedKeys={[this.state.current]} mode="horizontal">

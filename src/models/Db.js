@@ -4,11 +4,7 @@ import { findAllCata, findAllVideo, findAllText } from '@/services/Db';
 const DbModel = {
   namespace: 'Db',
   state: {
-    catalist: {
-      results:[{
-        cata_level_id:{cata_level_num:""}
-      }]
-    },
+    catalist: [{childs:[]}],
     videolist:{},
     textlist:{}
   },
@@ -18,7 +14,7 @@ const DbModel = {
       const response = yield call(findAllCata);
       yield put({
         type: 'reloadCatalist',
-        payload: response,
+        payload: response.data,
       });
     },
     *fetchVideo(_, { call, put }) {
