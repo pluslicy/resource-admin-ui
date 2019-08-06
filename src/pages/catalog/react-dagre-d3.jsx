@@ -5,8 +5,8 @@ import * as d3 from 'd3';
  
 class DagreD3 extends React.Component {
   static defaultProps = {
-    width: '500px',
-    height: '500px',
+    width: '100%',
+    height: '100%',
     nodes: {},
     edges: [],
     graph: {},
@@ -44,6 +44,7 @@ class DagreD3 extends React.Component {
     this.renderDag();
   }
  
+  //nodeTree和nodeTreeInner来保存具体的dom节点。
   setNodeTree = (nodeTree) => {
     this.nodeTree = nodeTree;
   }
@@ -72,16 +73,21 @@ class DagreD3 extends React.Component {
  
     const { nodes, edges, interactive, fit, onNodeClick, graph } = this.props;
     const g = new dagreD3.graphlib.Graph()
-      .setGraph({ ...graph }) // Set an object for the graph label
+      // 为图形标签设置一个对象
+      .setGraph({ ...graph }) 
       .setDefaultNodeLabel(() => ({}))
-      .setDefaultEdgeLabel(() => ({})); // Default to assigning a new object as a label for each new edge.
+      // 默认情况下，为每个新边分配一个新对象作为标签
+      .setDefaultEdgeLabel(() => ({})); 
+      // 画点
     Object.keys(nodes).forEach((id) => {
       g.setNode(id, nodes[id]);
     });
+      // 画线 
     edges.forEach((edge) => {
       edge[2] ? g.setEdge(edge[0], edge[1], edge[2]) : g.setEdge(edge[0], edge[1]);
     });
  
+    // 渲染dag图
     const svg = d3.select(this.nodeTree);
     const inner = d3.select(this.nodeTreeInner);
     if (interactive) { // 自适应缩放
@@ -118,7 +124,7 @@ class DagreD3 extends React.Component {
         <svg id="svg-canvas" ref={this.setNodeTree}>
             <g  ref={this.setNodeTreeInner} />
         </svg>
-        <div id="myMenu">aaaa</div>
+        <div id="myMenu"></div>
       </div>  
     );
   }
