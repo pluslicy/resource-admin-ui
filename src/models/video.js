@@ -42,12 +42,5 @@ export default {
 				loading: false,
 			};
 		},
-		reloadStatus(state, action) {
-			return {
-				...state,
-				videos: action.payload,
-				loading: false,
-			};
-		}
 	},
 };

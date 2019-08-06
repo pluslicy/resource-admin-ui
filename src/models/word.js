@@ -1,15 +1,10 @@
-import { findAll, fetchCheck} from '@/services/word';
+import { findAll, fetchCheck,findByCondidtion,passWord} from '@/services/word';
 
 export default {
   namespace: 'word',
   state: {
     loading: true,
     words: [],
-    check:{
-      id:'',
-      dr_audit_status:'',
-      dr_audit_decs:''
-    },
   },
   effects: {
     *findAll(_, { call, put }) {
@@ -19,14 +14,26 @@ export default {
         payload: response.results
        });
     },
-  },
   *fetchCheck(_, { call, put }) {
-    const response = yield call(fetchCheck,{id: _.payload.id, status: _.payload.status});
+    const response = yield call(fetchCheck, _.payload);
     yield put({
-      type: 'reloadStatus',
-      payload: response.results
+      type: 'findAll',
      });
   },
+  *findByCondidtion(_, { call, put }) {
+    const response = yield call(findByCondidtion, _.payload);
+    yield put({
+      type: 'reloadAll',
+      payload: response.results
+    });
+  },
+  *passWord(_, { call, put }) {
+    const response = yield call(passWord, _.payload);
+    yield put({
+      type: 'findAll',
+    });
+  },
+},
 
   reducers: {
     reloadAll(state, action) {
@@ -36,12 +43,6 @@ export default {
         loading: false,
       };
     },
-    reloadStatus(state, action){
-      return {
-        ...state,
-        words: action.payload,
-        loading: false,
-      };
-    }
+   
   },
 };
