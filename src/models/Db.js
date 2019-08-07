@@ -18,19 +18,20 @@ const DbModel = {
       });
     },
     *fetchVideo(_, { call, put }) {
-      const response = yield call(findAllVideo);
+      const response = yield call(findAllVideo,_.payload);
       yield put({
         type: 'reloadVideolist',
-        payload: response,
+        payload: response.data,
       });
     },
     *fetchText(_, { call, put }) {
-      const response = yield call(findAllText);
+      const response = yield call(findAllText,_.payload);
       yield put({
         type: 'reloadTextlist',
-        payload: response,
+        payload: response.data,
       });
-    }
+    },
+   
   },
   reducers: {
     // 更新状态中的catalist
@@ -52,7 +53,7 @@ const DbModel = {
         ...state,
         textlist: action.payload,
       };
-    },
+    }
   },
 };
 

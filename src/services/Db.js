@@ -4,9 +4,19 @@ import qs from 'qs';
 export async function findAllCata() {
   return request('/api/mp_man_catalog/catanestlist/');
 }
-export async function findAllVideo() {
-  return request('/api/mp_man_res/videolist/');
+
+export async function findAllVideo(param) {
+ 
+  return request('/api/mp_man_res/videolist/', {
+    method: 'get',
+    params: param,
+    getResponse: true,
+  });
 }
-export async function findAllText() {
-  return request('/api/mp_man_res/docslist/');
+export async function findAllText(param) {
+  return request('/api/mp_man_res/docslist/', {
+    method: 'get',
+    params: param,
+    getResponse: true,
+  })
 }

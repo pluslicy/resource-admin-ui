@@ -14,8 +14,6 @@ const { Search } = Input;
 const {RangePicker} = DatePicker;
 const { Option } = Select;
 
-
-
 // 资源库
 class Db extends React.Component {
   constructor(props) {
@@ -24,30 +22,37 @@ class Db extends React.Component {
       visible:false,
       visible1:false,
       fileList: [],
-      };
-    }
-    handleOk = e => {
-      // 提交表单
-      // e.preventDefault();
-      // this.state.form.validateFields((err, values) => {
-      //   if (!err) {
-      //     console.log('Received values of form: ', values);
-      //     //this.props.dispatch(saveOrUpdateCourse(values));
-      //   }
-      // });
-      this.setState({
-        visible1:false
-      })
+      query:{
+        vr_created_time_start:"",
+        vr_created_time_end:"",
+        bytime:false,
+        byhot:false,
+        search:""
+      },
+      percent:0,
+      filelist:[],
+      file:{},
+      ok:0
     };
+  }
   handleCancel1 = e => {
       console.log(e);
       this.setState({
         visible1: false,
-        
       });
-      };
+  };
   onChange2=(date, dateString)=>{
-      console.log(date, dateString);
+      var par={
+        vr_created_time_start:dateString[0],
+        vr_created_time_end:dateString[1]
+      }
+      this.setState({
+        query:{...this.state.query,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchVideo",payload:this.state.query
+      })
   }
   showModal1=()=>{
       this.setState({
@@ -57,12 +62,22 @@ class Db extends React.Component {
   handleChange(value) {
       console.log(`selected ${value}`);
   }
-  checkBoxChange(e) {
-      console.log(`checked = ${e.target.checked}`);
-    }
-  handleMouse=(e)=>{
-      console.log(e)
-  }   
+  checkTimeChange=(e)=> {
+    this.setState({
+      query:{...this.state.query,...{bytime:`${e.target.checked}`}}
+    })
+    this.props.dispatch({
+      type:"Db/fetchVideo",payload:this.state.query
+    })
+  }
+  checkHotChange=(e)=>{
+    this.setState({
+      query:{...this.state.query,...{byhot:`${e.target.checked}`}}
+    })
+    this.props.dispatch({
+      type:"Db/fetchVideo",payload:this.state.query
+    })
+  }
   saveorForm=(form)=>{
     this.setState({
       form
@@ -74,7 +89,7 @@ class Db extends React.Component {
       visible: true,
     });
   }
- 
+  // 关闭模态框
   handleOk = e => {
     // 提交表单
     e.preventDefault();
@@ -89,6 +104,7 @@ class Db extends React.Component {
       visible1:false
     })
   };
+  //切换视频和文档
   handleClick2=(e)=>{
     if(e.key==="视频"){
       $('.video_table').css({"display":"block"})
@@ -97,12 +113,15 @@ class Db extends React.Component {
       $('.video_table').css({"display":"none"})
       $('.text_table').css({"display":"block"})
     }
-}
+  }
   
   handleCancel = e => {
-    console.log(e);
+    
     this.setState({
       visible: false,
+      filelist:[],
+      percent:0,
+      file:{}
     });
   };
   //选择时间的
@@ -127,32 +146,29 @@ class Db extends React.Component {
   casonChange1(value) {
     console.log(value);
   }
-  //点击菜单
-  handleClick = event => {
-    
-    console.log(event.target.innerText);
-    event.persist();
-    // let {target}=event;
-    // this.props.history.push({ pathname: "/video",obj:{target}});
-  }
-  
+ 
   //文件上传
   handleChange2=(info)=>{
-    console.log(info);
+    
+    this.setState({
+      percent:Math.round(info.file.percent),
+      filelist:info.fileList,
+      file:info.file
+    })
     if (info.file.status == 'uploading') {
-      console.log(info.file, info.fileList);
+     
     }
     // this.showModal();
     if (info.file.status === 'done') {
+      this.setState({
+        ok:ok+1
+      })
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
     }
   }
-  update(record,value){
-    console.log(record)
-    console.log(`selected ${value}`);
-  }
+ 
   renderTreeNodes = data =>
   data.map(item => {
     if (item.childs) {
@@ -163,24 +179,11 @@ class Db extends React.Component {
       );
     }
     return <TreeNode {...item} />;
-  });
+  }); 
   render() {
     
 
-     // 状态的下拉菜单
-     const menu1 = (
-      <Menu>
-        <Menu.Item style={{color:'red'}}>冻结</Menu.Item>
-      </Menu>
-    );
-
-    const menu2 = (
-      <Menu>
-        <Menu.Item >vip</Menu.Item>
-        <Menu.Item >free</Menu.Item>
-        <Menu.Item >other</Menu.Item>
-      </Menu>
-    );
+    
     const columns = [
       {
         title: '名称',
@@ -194,7 +197,7 @@ class Db extends React.Component {
               <img style={{marginLeft:"5px"}} src={require('./u492.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_comment_num}</span>
           </div>
         ]} >
-          <span style={{cursor:"pointer"}}>{text}</span>&nbsp;&nbsp;&nbsp;<span style={{color:"#FF0000",fontSize:"12px",fontWeight:"400"}} onClick={this.update.bind(this,record)}>修改</span>
+          <span style={{cursor:"pointer"}}>{text}</span>
         </Popover>
       },
       {
@@ -227,14 +230,13 @@ class Db extends React.Component {
         // 0 vip 1 Free 2 other
         render: (text,record) => {
           return (
-            <div>
-             {/*下拉菜单*/}
-              <Dropdown overlay={menu2}>
-                <a className="ant-dropdown-link" href="#">
-                  {text} <Icon type="down" />
-                </a>
-              </Dropdown>
-            </div>
+            <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
+                <Select defaultValue={text} style={{ width:"80px",marginLeft:"-2px",marginTop:"-5px"}} onChange={this.handleChange}>
+                  <Option  value={0}>vip</Option>
+                  <Option value={1}>free</Option>
+                  <Option value={2}>other</Option>
+                </Select>
+             </div>
           );
         },
       },
@@ -248,28 +250,22 @@ class Db extends React.Component {
       },
       {
         title: '状态',
-        // dataIndex:'vr_enable',
-      //  1 可用 0 不可用
-        // render: (text, record) => (
-        //   <Select defaultValue={text} style={{ width: 50 }} >
-        //       <Option value={0}>可用</Option>
-        //       <Option value={1}>不可用</Option>
-        //   </Select>
-        // ),
-        render: () => {
-          return (
-            <div>
-             {/*下拉菜单*/}
-              <Dropdown overlay={menu1}>
-              <a className="ant-dropdown-link" href="#">
-                启用中 <Icon type="down" />
-              </a>
-            </Dropdown>
-            </div>
-          );
+        dataIndex:'vr_enable',
+        render: (text,record) => {
+          if(text==1){
+            return (
+              <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
+                  <Select defaultValue="启用中" style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange}>
+                   
+                    <Option value={0} style={{color:"red"}}>冻结</Option>
+                  </Select>
+              </div>
+            )
+          }else{
+            <span style={{color:"red"}}>冻结</span>
+          }
+
         },
-
-
       },
     ];
     const columns2 = [
@@ -305,13 +301,17 @@ class Db extends React.Component {
       {
         title: '权限',
         dataIndex:'dr_permission',
-        render: (text, record) => (
-          <Select defaultValue={text} style={{ width: 50 }}>
-              <Option value={0}>Vip</Option>
-              <Option value={1}>Free</Option>
-              <Option value={2}>Other</Option>
-          </Select>
-        ),
+        render: (text,record) => {
+          return (
+            <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
+                <Select defaultValue={text} style={{ width:"80px",marginLeft:"-2px",marginTop:"-5px"}} onChange={this.handleChange}>
+                  <Option  value={0}>vip</Option>
+                  <Option value={1}>free</Option>
+                  <Option value={2}>other</Option>
+                </Select>
+             </div>
+          );
+        },
       },
       {
         title: '格式',
@@ -325,12 +325,22 @@ class Db extends React.Component {
         title: '状态',
         dataIndex:'dr_enable',
        
-        render: (text, record) => (
-          <Select defaultValue={text} style={{ width: 50 }} >
-              <Option value={0}>可用</Option>
-              <Option value={1}>不可用</Option>
-          </Select>
-        ),
+        render: (text,record) => {
+          if(text==1){
+            return (
+              <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
+                  <Select defaultValue="启用中" style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange}>
+                   
+                    <Option value={0} style={{color:"red"}}>冻结</Option>
+                  </Select>
+              </div>
+            )
+          }else{
+            <span style={{color:"red"}}>冻结</span>
+          }
+
+        },
+
       },
     ];
     const dateFormat = 'YYYY-MM-DD';
@@ -391,40 +401,33 @@ class Db extends React.Component {
       <div className={styles.content}>
       <div className="left-div" style={{borderRight:"1px solid #e8e8e8",minWidth:"145px"}}>
       <img style={{position:"absolute",marginLeft:"-1.8em",marginTop:"1em"}} src={require('./u578.png')} alt=""/>
-      <div onMouseOver={this.handleMouse} style={{position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1em",marginLeft:"-1em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
+      <div  style={{position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1em",marginLeft:"-1em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
          {this.props.Db.catalist[0].catalogue_name}
       </div>
-      <Menu
-
-              id="menu"
-              defaultSelectedKeys={['1']}
-              defaultOpenKeys={['sub1']}
-              mode="inline"
-              style={{minHeight:"500px",marginTop:"2em",border:"none"}}
-            >
-              <Tree>
-                {this.renderTreeNodes(childs)}
-              </Tree>
-       </Menu>
-      
+        <div style={{marginTop:"3em",marginLeft:".2em"}}>
+            <Tree>
+              {this.renderTreeNodes(childs)}
+            </Tree>
+        </div>
 
 
           </div>
            
           <div  className="right-div" style={{flex:"6",overflow:"hidden"}}>
-    
+          {/* 视频和文档的切换 */}
           <Menu  style={{marginLeft:"1em"}} onClick={this.handleClick2} selectedKeys={[this.state.current]} mode="horizontal">
-            <Menu.Item key="视频" style={{fontSize:"16px",fontWeight:"400"}}>
-             视频
-            </Menu.Item>
-          
-          
-            <Menu.Item key="文档" style={{fontSize:"16px",fontWeight:"400"}}>
-               文档
-            </Menu.Item>
-            
+                <Menu.Item key="视频" style={{fontSize:"16px",fontWeight:"400"}}>
+                  视频
+                </Menu.Item>
+              
+              
+                <Menu.Item key="文档" style={{fontSize:"16px",fontWeight:"400"}}>
+                  文档
+                </Menu.Item>
           </Menu>
-            <div className="table">
+          {/* 数据的展示 */}
+          <div className="table">
+            {/* 文件上传组件 */}
             <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{this.showModal()}}>
               <Button style={{width:"90px",top:"9em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"58.5%",marginTop:"0em"}} >
                 <Icon type="upload" />上传
@@ -432,9 +435,10 @@ class Db extends React.Component {
             </Upload>
               
         
-            </div>
+          </div>
+
               <RangePicker  onChange={this.onChange2} style={{marginLeft:"1.58em",marginTop:"1em",width:"220px"}} defaultValue={[moment('2018/12/11', dateFormat), moment('2018/12/12', dateFormat)]}
-          format={dateFormat} />
+               format={dateFormat} />
               <Search
               placeholder="请输入搜索内容"
               onSearch={value => console.log(value)}
@@ -450,18 +454,18 @@ class Db extends React.Component {
           </Select>
           <span style={{marginLeft:"2em",fontWeight:"700"}}>格式 </span>
           <Select size="small" defaultValue="lucy" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange}>
-            {/* <Option value="jack">Jack</Option>
+            <Option value="jack">Jack</Option>
             <Option value="lucy">全部</Option>
-            <Option value="Yiminghe">yiminghe</Option> */}
+            <Option value="Yiminghe">yiminghe</Option>
           </Select>
           <span style={{marginLeft:"2em",fontWeight:"700"}}>状态 </span>
           <Select size="small" defaultValue="lucy" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange}>
-            {/* <Option value="jack">Jack</Option>
+            <Option value="jack">Jack</Option>
             <Option value="lucy">全部</Option>
-            <Option value="Yiminghe">yiminghe</Option> */}
+            <Option value="Yiminghe">yiminghe</Option>
           </Select>
-          <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange} style={{fontSize:"12px"}}>按时间</Checkbox></span>
-          <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkBoxChange} style={{fontSize:"12px"}}>按热度</Checkbox></span>
+          <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
+          <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
           </div>
          
           <Table 
@@ -540,7 +544,13 @@ class Db extends React.Component {
           style={{top:"20px"}}
           title={
             <div style={{width:"775px",height:"102px",backgroundColor:"#e8e8e8",borderRadius:"10px",marginLeft:"1em",boxShadow:"0px 0px 5px rgba(0, 0, 0, 0.349019607843137)",textAlign:"center",position:"relative"}}>
-           <span style={{fontWeight:"700",fontSize:"18px",position:"absolute",top:".5em",left:"252px"}}>您上传的视频：视频一、视频二....</span>
+           <span style={{fontWeight:"700",fontSize:"18px",position:"absolute",top:".5em",left:"252px"}}>您上传的视频：
+           {
+             this.state.filelist.map((item,index)=>{
+              return (item.name+"  ")
+            })
+           }
+           </span>
            <Icon type="close-circle" onClick={this.handleCancel} style={{position:"absolute",left:"749px",top:"14px"}}/>
             <Progress
                 style={{width:"669px",height:"50px",marginTop:"2.5em"}}
@@ -548,9 +558,10 @@ class Db extends React.Component {
                   '0%': '#108ee9',
                   '100%': '#87d068',
                 }}
-                percent={99.9}
+                percent={this.state.percent}
               />
-          <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：5/6</span>
+            
+          <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.filelist.length}</span>
         
         </div>
           }
@@ -563,12 +574,15 @@ class Db extends React.Component {
            <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的视频:
             <br/>
             <ol>
-              <li style={{marginLeft:"-10px",marginTop:".5em"}}>
-                1.视频一 
-                <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span style={{fontSize:"12px",color:"#3585FE"}}>&nbsp;&nbsp;+文档</span>
-              </li>
-              <li></li>
-              <li></li>
+              {
+                this.state.filelist.map((item,index)=>{
+                  return (<li style={{marginLeft:"-10px",marginTop:".5em"}}>
+                  {item.name} 
+                  <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span style={{fontSize:"12px",color:"#3585FE"}}>&nbsp;&nbsp;+文档</span>
+                </li>)
+                })
+              }
+             
             </ol>
            </span> <br/><br/>
 
