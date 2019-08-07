@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './catelog.less'
-import {Tree} from 'antd'
-import DagreD3, { d3 } from './react-dagre-d3';
+import {Tree,Input} from 'antd'
+// import DagreD3, { d3 } from './react-dagre-d3';
 import {connect} from 'dva'
 
 const { TreeNode } = Tree;
@@ -31,46 +31,30 @@ class Catalog extends React.Component {
         );
       }
       return <TreeNode {...item} />;
-    });
+	});
+	
 	
 	
 	render(){
-		// 点
-		const nodes = {
-			0: { label: 'ReactComponent', style: 'fill: rgb(80, 194, 138);' },
-			1: { label: 'props', style: 'fill: rgb(204, 230, 255);' },
-			2: { label: 'context', style: 'fill: rgb(204, 230, 255);' },
-			3: { label: 'refs', style: 'fill: rgb(204, 230, 255);' }
-		  };
-		//  边
-		  const edges = [
-			[0, 1, { style: 'stroke: rgb(214, 214, 214); fill: none', curve: d3.curveBasis }],
-			[0, 2, { style: 'stroke: rgb(214, 214, 214); fill: none', curve: d3.curveBasis }],
-			[0, 3, { style: 'stroke: rgb(214, 214, 214); fill: none', curve: d3.curveBasis }]
-		  ];
-
 
 		return (
-			
 		<div className={styles.content}>
 			<div className={styles.left}>	
-			
-			<Tree>
-				{this.renderTreeNodes(this.props.catalog.roles[0].childs)}
-      		</Tree>
-				
+			<img style={{position:"absolute",marginLeft:"-0.8em",marginTop:"1em"}} src={require('./u578.png')} alt=""/>
+			<div onMouseOver={this.handleMouse} style={{position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1.2em",marginLeft:"-0.2em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
+				{this.props.catalog.roles[0].catalogue_name}
+			</div>
+			<div style={{marginTop:"2.5em",marginLeft:"1.5em"}}>
+				<Tree>
+					{this.renderTreeNodes(this.props.catalog.roles[0].childs)}
+				</Tree>
+				</div>
 			</div>
 
 			<div id="jsmind_container" className={styles.right}>
 				<div  className={styles.middle}>操作面板 ｜ 视频库编目</div>
-				<DagreD3
-					fit
-					interactive
-					graph={{ rankdir: 'UD' }}
-					nodes={nodes}
-					edges={edges}
-					onNodeClick={this.onNodeClick}
-				/>
+				
+			
 			</div>
 	
 		</div>

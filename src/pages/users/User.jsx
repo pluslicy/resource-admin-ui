@@ -8,6 +8,7 @@ import style from './User.less'
 import UserForm from './UserForm';
 import AddForm from './AddForm';
 import ModifyForm from './ModifyForm'
+import {connect} from 'dva'
 
 class User extends React.Component { 
   constructor (props){
@@ -19,6 +20,13 @@ class User extends React.Component {
       visibleModify:false
     })
   }
+
+  componentDidMount(){
+    this.props.dispatch({
+      type:'users/fetchUser'
+    })
+  }
+
 
   // 添加用户模态框
   showModal =()=>{
@@ -109,7 +117,7 @@ class User extends React.Component {
     const menu = (
       <Menu>
         <Menu.Item>
-          <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">
+          <a target="_blank" rel="noopener noreferrer" href="">
            冻结
           </a>
         </Menu.Item>
@@ -120,11 +128,11 @@ class User extends React.Component {
     const columns = [
       {
         title: '用户名',
-        dataIndex: 'name',
+        dataIndex: 'last_name',
       },
       {
         title: '性别',
-        dataIndex: 'age',
+        dataIndex: 'user_gender',
       },
       {
         title: '作品',
@@ -143,25 +151,15 @@ class User extends React.Component {
       },
       {
         title: '联系方式',
-        dataIndex: 'phone',
+        dataIndex: 'user_phone',
       },
       {
         title: '头像',
-        dataIndex: 'head',
-        render:()=>{
-          return(
-            <Avatar icon="user" />
-          )
-        }
+        dataIndex: 'user_protrait',
       },
       {
         title: '简介',
-        dataIndex: 'introduction ',
-        render:()=>{
-          return(
-            <div>这是一段描述...</div>
-          )
-        },
+        dataIndex: 'user_desc ',
       },
       {
         title: '操作',
@@ -190,51 +188,10 @@ class User extends React.Component {
     
     ];
 
-    // 表格数据
-    const data = [
-      {
-        key: '1',
-        name: '朱莉',
-        age: '女',
-        address: 15,
-        role:'杰普认证教师、管理员',
-        phone:'1909010191',
-        
-        introduction:'这是简介...',
-        operation:'',
-        status:'启用中'
-      },
-      {
-        key: '2',
-        name: '朱莉',
-        age: '女',
-        address: 15,
-        role:'杰普认证教师、管理员',
-        phone:'1909010191',
-        head:'',
-        introduction:'这是简介...',
-        operation:'',
-        status:'启用中'
-      },
-      {
-        key: '3',
-        name: '朱莉',
-        age: '女',
-        address: 15,
-        role:'杰普认证教师、管理员',
-        phone:'1909010191',
-        head:'',
-        introduction:'这是简介...',
-        operation:'',
-        status:'启用中'
-      },
-    
-    ];
-    
     return (
       <div className={style.Back}>
         <div className={style.btn}>
-          <Button className={style.btn} type='primary' onClick={this.showModal}>添加</Button>
+          <Button className={style.btn} type='primary'size='small' onClick={this.showModal}>添加</Button>
           <Search
             placeholder="请输入用户名"
             onSearch={value => console.log(value)}
@@ -280,16 +237,17 @@ class User extends React.Component {
             </li>
           </ul>
         </div>
+        {console.log(this.props.users.user)}
         <Table 
           bordered
           size='small'
           rowSelection={rowSelection} 
           columns={columns} 
-          dataSource={data} 
+          dataSource={this.props.users.user} 
         />
-        <Button className={style.btn} type='default'>启用</Button>
-        <Button className={style.btn} type='primary'>冻结</Button>
-        <Button type='danger'>删除</Button>
+            <Button type="primary" size="small">启用</Button>&nbsp;
+            <Button type="danger" size="small">冻结</Button>&nbsp;
+            <Button type="delete" size="small">删除</Button>
 
         {/* 添加用户模态框 */}
         <Modal
@@ -350,4 +308,6 @@ class User extends React.Component {
 }
 
 
-export default User;
+export default connect(({ users }) => ({
+  users,
+}))(User);

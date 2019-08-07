@@ -147,7 +147,7 @@ class Role extends React.Component {
         
       {
         title: '状态',
-        render: () => {
+        render: (text,record) => {
           return (
             <div>
              {/*下拉菜单*/}
