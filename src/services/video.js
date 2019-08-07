@@ -22,6 +22,7 @@ export async function findByCondidtion(dateString) {
 	var startDate = '';
 	var endDate = '';
 	var value = '';
+	// dateString = {[startDate,endDate],value}
 	if (dateString[0] != undefined) {
 		var dateString1 = dateString[0];
 		startDate = dateString1[0];

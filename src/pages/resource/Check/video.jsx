@@ -3,10 +3,11 @@ import styles from './video.less';
 import VideoForm from './VideoForm'
 import { connect } from 'dva';
 
-import { Button, Table, Icon, DatePicker, Input, Modal, Form, Divider } from 'antd';
-
+import { Button, Table, Tabs, Icon, DatePicker, Input, Modal, Form, Divider } from 'antd';
+// import {word} from './';
+const { TabPane } = Tabs;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
-const { Search } = Input;
+const { Search, TextArea } = Input;
 
 global.constants = {
 	//初始化批量删除id数组|全局变量
@@ -38,22 +39,18 @@ class Check extends React.Component {
 	}
 	// 日期选择框
 	onChange = (date, dateString) => {
-		console.log(dateString);
 		this.setState({
 			date: dateString,
 		});
 		var values = [dateString, this.state.name];
-		console.log(values)
 		this.props.dispatch({ type: 'video/findByCondidtion', payload: values });
 	};
 	// 名称搜索框
 	onSearch = (value) => {
-		console.log(value);
 		this.setState({
 			name: value,
 		});
 		var values = [this.state.date, value];
-		console.log(values)
 		this.props.dispatch({ type: 'video/findByCondidtion', payload: values });
 	}
 	// 改变多选框
@@ -88,7 +85,6 @@ class Check extends React.Component {
 		form.validateFields((err, values) => {
 			if (!err) {
 				console.log(this.state.id)
-				console.log('Received values of form: ', values);
 				var obj = {
 					"vr_audit_status": "2",//拒绝
 					"id": this.state.id,
@@ -109,21 +105,18 @@ class Check extends React.Component {
 	};
 	// 关闭拒绝理由弹框
 	handleCancel = e => {
-		console.log(e);
 		this.setState({
 			visible: false,
 		});
 	};
 	// 关闭并提交视频
 	handleOk2 = e => {
-		console.log(e);
 		this.setState({
 			visible2: false,
 		});
 	};
 	// 关闭视频模态框
 	handleCancel2 = e => {
-		console.log(e);
 		this.setState({
 			visible2: false,
 		});
@@ -138,7 +131,6 @@ class Check extends React.Component {
 					let { id } = selectedRows[i];
 					global.constants.ids.push(id);
 				}
-				console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 			}
 		};
 		const columns = [
@@ -164,7 +156,6 @@ class Check extends React.Component {
 				align: 'center',
 				dataIndex: '',
 				render: (record) => {
-
 					if (record.vr_audit_status === 1) {
 						return (
 							<div><span>已通过</span></div>
@@ -187,54 +178,62 @@ class Check extends React.Component {
 		];
 		return (
 			<div className={styles.content}>
-				<div className={styles.content_top}>
-					<RangePicker onChange={this.onChange} style={{ width: 300 }} />
-					<Search 
-						onSearch={value => this.onSearch(value)}
-						style={{ width: 200 }} 
-						placeholder={'根据名称搜索'} />
-				</div>
-				<div>
-					<Table
-						size="small"
-						bordered
-						rowSelection={rowSelection}
-						columns={columns}
-						dataSource={this.props.video.videos}
-					/>
-				</div>
-				<div className={styles.content_bottom}>
-					<Button size="small" type="primary" onClick={this.passAll.bind(this)}>
-						一键通过
-					</Button>
-				</div>
-				<VideoForm
-					title="拒绝的理由"
-					wrappedComponentRef={this.saveFormRef}
-					visible={this.state.visible}
-					onOk={this.handleOk}
-					onCancel={this.handleCancel}
-					onCreate={this.handleCreate}
-				>
-					<Form onSubmit={this.handleOk}>
-						<Form.Item>
-							<Input autosize={{ minRows: 6, maxRows: 10 }} placeholder="请输入拒绝理由..." />
-						</Form.Item>
-						<Form.Item >
-							<Button htmlType={'submit'}>提交</Button>
-						</Form.Item>
-					</Form>
-				</VideoForm>
-				<Modal
-					width={900}
-					visible={this.state.visible2}
-					onOk={this.handleOk2}
-					onCancel={this.handleCancel2}
-				>
-					<video width="100%" height="100%" controls>
-						<source src="D:/a.mp4" type="video/mp4" />
-					</video>
-				</Modal>
+				<Tabs defaultActiveKey="1" >
+					<TabPane tab={'视频 (' + this.props.video.videos.count + ')'} key='1'>
+						<div className={styles.content_top}>
+							<RangePicker onChange={this.onChange} style={{ width: 300 }} />
+							<Search onSearch={value => this.onSearch(value)} style={{ width: 200 }} placeholder={'根据名称搜索'} />
+						</div>
+						<div>
+							<Table
+								size="small"
+								bordered
+								rowSelection={rowSelection}
+								columns={columns}
+								dataSource={this.props.video.videos.results}
+							/>
+						</div>
+						<div className={styles.content_bottom}>
+							<Button size="small" type="primary" onClick={this.passAll.bind(this)}>
+								一键通过
+						</Button>
+						</div>
+						<VideoForm
+							title="拒绝的理由"
+							wrappedComponentRef={this.saveFormRef}
+							visible={this.state.visible}
+							onOk={this.handleOk}
+							onCancel={this.handleCancel}
+							onCreate={this.handleCreate}
+						>
+							<Form onSubmit={this.handleOk}>
+								<Form.Item>
+									<Input autosize={{ minRows: 6, maxRows: 10 }} placeholder="请输入拒绝理由..." />
+								</Form.Item>
+								<Form.Item >
+									<Button htmlType={'submit'}>提交</Button>
+								</Form.Item>
+							</Form>
+						</VideoForm>
+						<Modal
+							width={900}
+							visible={this.state.visible2}
+							onOk={this.handleOk2}
+							onCancel={this.handleCancel2}
+						>
+							<video width="100%" height="100%" controls>
+								<source src="D:/a.mp4" type="video/mp4" />
+							</video>
+						</Modal>
+					</TabPane>
+					<TabPane tab="文档(4)" key="2">
+						<iframe
+							src='/resource/Check/word'
+							style={{ width: '100%', height: '350px', }} frameborder='0'>
+								<word></word>
+						</iframe>
+					</TabPane>
+				</Tabs>,
 			</div>
 		);
 	}

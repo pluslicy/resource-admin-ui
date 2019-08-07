@@ -11,7 +11,7 @@ export default {
 			const response = yield call(findAll, _.payload);
 			yield put({
 				type: 'reloadAll',
-				payload: response.results
+				payload: response
 			});
 		},
 		*fetchCheck(_, { call, put }) {

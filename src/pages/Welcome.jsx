@@ -5,10 +5,11 @@ import { Bar, TimelineChart } from 'ant-design-pro/lib/Charts';
 const { TabPane } = Tabs;
 class index extends React.Component {
 	render() {
-		//切换标签页回调函数
+		// 切换标签页回调函数
 		function callback(key) {
 			console.log(key);
 		}
+		// 条形统计图数据源
 		const salesData = [];
 		for (let i = 0; i < 12; i += 1) {
 			salesData.push({
@@ -16,6 +17,7 @@ class index extends React.Component {
 				y: Math.floor(Math.random() * 1000) + 200,
 			});
 		}
+		// 折线统计图数据源
 		const chartData = [];
 		for (let i = 0; i < 20; i += 1) {
 			chartData.push({
@@ -24,6 +26,7 @@ class index extends React.Component {
 				y2: Math.floor(Math.random() * 100) + 700,
 			});
 		}
+		// 表格列的配置
 		const columns = [
 			{
 				title: '#',
@@ -107,8 +110,7 @@ class index extends React.Component {
 								// dataSource={this.props.create.creates}
 								/>
 							</TabPane>
-						</Tabs>,
-
+						</Tabs>
 					</div>
 				</div>
 				<div className={styles.remind}>
@@ -125,4 +127,4 @@ class index extends React.Component {
 		);
 	};
 }
-export default index
+export default index;

@@ -18,12 +18,12 @@ class WordForm extends React.Component {
 		getFieldDecorator('id');
 		return (
 			<Modal visible={visible} title="拒绝的理由" okText="拒绝" onCancel={onCancel} onOk={onCreate}>
-				<Form layout="vertical" id={1}>
+				<Form layout="vertical" >
 					<Form.Item label="拒绝的理由" >
 						{getFieldDecorator('test', {
 							rules: [{ required: true, message: '该项不能为空!' }],
 						})(
-						<Input id={12}></Input>
+						<Input ></Input>
 						)}
 					</Form.Item>
 					{/* {getFieldDecorator('test')} */}
