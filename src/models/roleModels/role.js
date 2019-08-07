@@ -30,7 +30,7 @@ const RoleModel = {
         yield call(deleteRole, {id: _.payload});
         yield put({ type: 'fetchRoles' });
     },
-    },
+    
 
     *RoleForzen(_, { call, put }) {
       const response = yield call(forzenRolecd, _.payload);
@@ -38,6 +38,7 @@ const RoleModel = {
       yield put({ type: 'changeVisible', payload: false });
       yield put({ type: 'fetchRoles'});
   },
+},
   reducers: {
     // 更改模态框的显示状态
     changeVisible(state, action) {

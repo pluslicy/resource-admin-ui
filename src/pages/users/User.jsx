@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button,Input,Table,Icon,Select,Checkbox ,Modal,Radio,Upload,message ,Avatar,Dropdown,Menu } from 'antd';
+import {Button,Input,Table,Icon,Select,Checkbox ,Modal,Radio,Upload,message ,Avatar,Dropdown,Menu, } from 'antd';
 const {Search} = Input;
 const {Option} = Select;
 
@@ -14,6 +14,7 @@ class User extends React.Component {
   constructor (props){
     super(props);
     this.state =({
+      query:{},
       visible:false,
       visibleImport:false,
       visiblePermise:false,
@@ -104,7 +105,25 @@ class User extends React.Component {
       visibleModify: false,
     });
   };  
-
+  //按时间查询
+  checkTimeChange=(e)=> {
+    this.setState({
+      query:{...this.state.query,...{bytime:`${e.target.checked}`}}
+    })
+    this.props.dispatch({
+      type:"users/fetchUser",payload:this.state.query
+    })
+  }
+  // 按热度查询
+  checkHotChange=(e)=>{
+    this.setState({
+      query:{...this.state.query,...{byhot:`${e.target.checked}`}}
+    })
+    this.props.dispatch({
+      type:"users/fetchUser",payload:this.state.query
+    })
+  }
+ 
   render(){    
     // 表格第一列选框
     const rowSelection = {
@@ -133,6 +152,13 @@ class User extends React.Component {
       {
         title: '性别',
         dataIndex: 'user_gender',
+        render:(text,record)=>{
+          if(record.user_gender===1){
+            return ("男")
+          }else{
+            return ("女")
+          }
+        }
       },
       {
         title: '作品',
@@ -191,60 +217,65 @@ class User extends React.Component {
     return (
       <div className={style.Back}>
         <div className={style.btn}>
-          <Button className={style.btn} type='primary'size='small' onClick={this.showModal}>添加</Button>
+          <Button className={style.btn} style={{width:'80px'}} type='primary' onClick={this.showModal}>添加</Button>
           <Search
-            placeholder="请输入用户名"
-            onSearch={value => console.log(value)}
-            style={{ width: '20%' }}
-          />
+              placeholder="请输入用户名"
+              onSearch={value => console.log(value)}
+              style={{ marginLeft:"2em",width: "222px",height:"30px"}}
+            />
+            <br/>
           <Button style={{position:'absolute',right:'5%'}} onClick={this.showImport}><Icon type="upload" />导入</Button>
         </div>
         <div>
-          <ul style={{ display:'inline-block',lineHeight:'32px'}}>
-            <li style={{ float:'left',marginRight:'2em'}}>
-              <div style={{fontWeight:'bold'}}>角色</div>
-            </li>
-            <li style={{ float:'left',marginRight:'1em'}}>
-              <Select defaultValue="全部" style={{width:'200'}}>
-                <Option value="全部">全部</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="Yiminghe">yiminghe</Option>
-              </Select>
-            </li>
-            <li style={{ float:'left',marginRight:'2em'}}>
-              <div style={{fontWeight:'bold'}}>性别</div>
-            </li>
-            <li style={{ float:'left',marginRight:'2em'}}>
-              <Select defaultValue="专辑" style={{width:'200'}}>
-                <Option value="专辑">专辑</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="Yiminghe">yiminghe</Option>
-              </Select>
-            </li>
-            <li style={{ float:'left',marginRight:'2em'}}>
-              <div style={{fontWeight:'bold'}}>状态</div>
-            </li>
-            <li style={{ float:'left',marginRight:'2em'}}>
-              <Select defaultValue="全部" style={{width:'200'}}>
-                <Option value="全部">全部</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="Yiminghe">yiminghe</Option>
-              </Select>
-            </li>
-            <li style={{ float:'left',marginRight:'2em'}}>
-              <Checkbox>按时间</Checkbox>
-              <Checkbox>按热度</Checkbox>
-            </li>
-          </ul>
+          <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>角色 </span>
+          <Select size="small" defaultValue="lucy" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
+            <Option value="jack">Jack</Option>
+            <Option value="lucy">全部</Option>
+          </Select>
+          <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>性别 </span>
+          <Select size="small" defaultValue="all" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
+            <Option value="jack">男</Option>
+            <Option value="lucy">女</Option>
+            <Option value="all">全部</Option>
+          </Select>
+          <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>状态 </span>
+          <Select size="small" defaultValue="lucy" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
+            <Option value="forzen">冻结</Option>
+            <Option value="lucy">全部</Option>
+            <Option value="noforzen">未冻结</Option>
+          </Select>
+          <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
+          <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
         </div>
         {console.log(this.props.users.user)}
+       
         <Table 
-          bordered
-          size='small'
-          rowSelection={rowSelection} 
-          columns={columns} 
-          dataSource={this.props.users.user} 
-        />
+          className="video_table"
+          size="small" 
+          style={{marginTop:"2em",}} 
+          rowKey="id"
+          pagination={{
+            onChange: page => {
+              console.log(page);
+              let p = page - 1;
+              console.log(p);
+            },
+            pageSize: 10,
+            size:'small',
+            
+            hideOnSinglePage: false,
+            itemRender: (current, type, originalElement) => {
+              if (type === 'prev') {
+                return <Button size="small" style={{marginRight:"1em"}}>上一页</Button>;
+              }
+              if (type === 'next') {
+                return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+              }
+              return originalElement;
+            },
+          }}
+          rowSelection={rowSelection} columns={columns}  dataSource={this.props.users.user} />
+          
             <Button type="primary" size="small">启用</Button>&nbsp;
             <Button type="danger" size="small">冻结</Button>&nbsp;
             <Button type="delete" size="small">删除</Button>

@@ -20,7 +20,7 @@ class Catalog extends React.Component {
 	componentWillMount(){
 		
 	}
-	
+	// 遍历左边树
 	renderTreeNodes = data =>
     data.map(item => {
       if (item.childs) {
@@ -33,10 +33,18 @@ class Catalog extends React.Component {
       return <TreeNode {...item} />;
 	});
 	
-	
-	
+	// 遍历右边树
+	renderRightTreeNodes = data =>
+    data.map(item => {
+      if (item.childs) {
+		return <ul><li>{item.catalogue_name}{this.renderRightTreeNodes(item.childs)}</li></ul>
+      }
+    //   return <TreeNode {...item} />;
+	});
+
 	render(){
 
+		const { stage } = this.props.catalog.roles;	
 		return (
 		<div className={styles.content}>
 			<div className={styles.left}>	
@@ -51,9 +59,15 @@ class Catalog extends React.Component {
 				</div>
 			</div>
 
-			<div id="jsmind_container" className={styles.right}>
+			<div className={styles.right}>
 				<div  className={styles.middle}>操作面板 ｜ 视频库编目</div>
-				
+				<div>
+					{/* {this.props.catalog.roles[0].catalogue_name} */}
+					<ul>
+					{this.renderRightTreeNodes(this.props.catalog.roles[0].childs)}
+					</ul>
+					{/* </Tree> */}
+				</div>
 			
 			</div>
 	
