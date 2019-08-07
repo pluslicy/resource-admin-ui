@@ -73,7 +73,7 @@ class Check extends React.Component {
 	handleCancel2 = e => {
 		console.log(e);
 		this.setState({
-		visible2: false,
+			visible2: false,
 		});
 	};
 	// 一键通过
@@ -83,12 +83,12 @@ class Check extends React.Component {
 		this.props.dispatch({ type: 'word/passWord', payload: data })
 	}
 
-	// 视频通过审核
+	// 文档通过审核
 	pass = (record) => {
 		var obj = {
-			"vr_audit_status": "1",//通过
+			"dr_status": "1",//通过
 			"id": record.id,
-			"vr_audit_decs": "审核通过"
+			"dr_audit_desc": "1"
 		}
 		this.props.dispatch({ type: 'word/fetchCheck', payload: obj });
 	};
@@ -96,8 +96,8 @@ class Check extends React.Component {
     // 弹出拒绝理由
 	reject = (record) => {
 		this.setState({
-		visible: true,
-		id:record.id
+			visible: true,
+			id:record.id
 		});
 	};
  	 // 将子组件的引用在父组件中进行保存，方便后期调用
@@ -114,12 +114,12 @@ class Check extends React.Component {
 			if (!err) {
 				console.log('Received values of form: ', values);
 				var obj = {
-					"vr_audit_status": "2",//拒绝
+					"dr_status": "2",//拒绝
 					"id": this.state.id,
-					"vr_audit_decs": values.test
+					"dr_audit_desc": values.test
 				}
 			}
-			this.props.dispatch({ type: 'word/fetchCheck', payload: s });
+			this.props.dispatch({ type: 'word/fetchCheck', payload: obj });
 		});
 	};
 	// 关闭拒绝理由
@@ -151,7 +151,7 @@ class Check extends React.Component {
 			{ title: '类型', align: 'center', dataIndex: 'dr_owner', },
 			{ title: '权限', align: 'center', dataIndex: 'dr_permission', },
 			{ title: '日期', align: 'center', dataIndex: 'dr_created_time', },
-			{ title: '描述', align: 'center', dataIndex: 'dr_audit_decs', },
+			{ title: '描述', align: 'center', dataIndex: 'dr_audit_desc', },
 			{
 				title: '查看',
 				align: 'center',
@@ -169,13 +169,13 @@ class Check extends React.Component {
 				dataIndex: '',
 				render: (record) => {
 		
-				if (record.dr_audit_status === 1) {
+				if (record.dr_status === 1) {
 					return (
 					<div>
 						<span>已通过</span>
 					</div>
 					);
-				} else if (record.dr_audit_status === 2) {
+				} else if (record.dr_status === 2) {
 					return (
 					<div>
 						<span style={{ color: 'red' }}>已拒绝</span>
@@ -197,14 +197,17 @@ class Check extends React.Component {
 		return (
 			<div className={styles.content}>
 				<div className={styles.content_top}>
-				<RangePicker onChange={this.onChange} style={{ width: 300}} />
-				<Search onSearch={value => this.onSearch(value)} style={{ width: 200 }} placeholder={'根据名称搜索'} />
+					<RangePicker onChange={this.onChange} style={{ width: 300}} />
+					<Search 
+						onSearch={value => this.onSearch(value)} 
+						style={{ width: 200 }} 
+						placeholder={'根据名称搜索'} />
 				</div>
 			<div>
 			<Table
 				size="small"
 				bordered
-				rowSelection={{ rowSelection, columnTitle: '#' }}
+				rowSelection={rowSelection}
 				columns={columns}
 				dataSource={this.props.word.words}
 				/>

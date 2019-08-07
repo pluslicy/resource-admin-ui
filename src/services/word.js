@@ -1,17 +1,17 @@
 import request from '@/utils/request';
 
 export async function findAll() {
-  return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist',{}); 
+  return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist/',{}); 
 }
 
 
 export async function fetchCheck(param) {
-  return request('http://10.0.6.5:16012/mp_audit_res/audit_doc', {
+  return request('http://10.0.6.5:16012/mp_audit_res/audit_doc/', {
     method: 'post',
     data: {
 			...param,
     },
-		headers: { 'Content-Type': 'application/json' },    
+	headers: { 'Content-Type': 'application/json' },    
     getResponse: true,
   });
 }
@@ -28,14 +28,15 @@ export async function findByCondidtion(dateString) {
 	if (dateString[1] != undefined) {
 		value = dateString[1];
 	}
-	return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist/?search=' + value + '&vr_created_time_start=' + startDate + '&vr_created_time_end=' + endDate);
+	return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist/?search=' + value + '&dr_created_time_start=' + startDate + '&dr_created_time_end=' + endDate);
 }
 
 export async function passWord(ids) {
 	var obj = {
 		"ids": ids
 	}
-	return request('http://10.0.6.5:16012/mp_audit_res/audit_doc/', {
+	console.log(obj)
+	return request('http://10.0.6.5:16012/mp_audit_res/audit_docs/', {
 		method: 'post',
 		data: obj,
 		headers: { 'Content-Type': 'application/json' },

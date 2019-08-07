@@ -6,7 +6,7 @@ import { connect } from 'dva';
 import { Button, Table, Icon, DatePicker, Input, Modal, Form, Divider } from 'antd';
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
-const { Search, TextArea } = Input;
+const { Search } = Input;
 
 global.constants = {
 	//初始化批量删除id数组|全局变量
@@ -189,14 +189,16 @@ class Check extends React.Component {
 			<div className={styles.content}>
 				<div className={styles.content_top}>
 					<RangePicker onChange={this.onChange} style={{ width: 300 }} />
-					<Search onSearch={value => this.onSearch(value)} style={{ width: 200 }} placeholder={'根据名称搜索'} />
+					<Search 
+						onSearch={value => this.onSearch(value)}
+						style={{ width: 200 }} 
+						placeholder={'根据名称搜索'} />
 				</div>
 				<div>
 					<Table
 						size="small"
 						bordered
 						rowSelection={rowSelection}
-						// rowSelection={{ rowSelection, columnTitle: '#' }}
 						columns={columns}
 						dataSource={this.props.video.videos}
 					/>
@@ -204,7 +206,7 @@ class Check extends React.Component {
 				<div className={styles.content_bottom}>
 					<Button size="small" type="primary" onClick={this.passAll.bind(this)}>
 						一键通过
-						</Button>
+					</Button>
 				</div>
 				<VideoForm
 					title="拒绝的理由"
