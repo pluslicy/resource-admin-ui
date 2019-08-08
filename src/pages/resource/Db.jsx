@@ -4,6 +4,7 @@ import { Popover,Tooltip,Tree,Menu,message, Icon,DatePicker,Input,Progress,Table
 import styles from './db.less';
 
 import DbForm from './DbForm';
+import Db2Form from './Db2Form';
 import moment from 'moment'
 import $ from 'jquery'
 import Test from './test'
@@ -20,6 +21,7 @@ class Db extends React.Component {
     super(props);
     this.state={
       visible:false,
+      visible3:false,
       visible1:false,
       fileList: [],
       query:{
@@ -83,22 +85,44 @@ class Db extends React.Component {
       form
     })
   }
+  saveFormRef = formRef => {
+    this.formRef = formRef;
+  };
   //文件上传模态框
-  showModal=()=>{    
-    this.setState({
-      visible: true,
-    });
+  showModal=(file,fileList)=>{
+    let flag=1;
+    fileList.forEach((item,index)=>{
+      if(item.name.indexOf(".mp4")!=-1){
+        flag=1;
+      }else{
+        flag=2;
+      }
+    })
+   
+    if(flag==1)
+    {
+        this.setState({
+        visible: true,
+      });
+    }else{
+      this.setState({
+        visible3: true,
+      });
+    }
   }
   // 关闭模态框
   handleOk = e => {
     // 提交表单
     e.preventDefault();
-    // this.state.form.validateFields((err, values) => {
-    //   if (!err) {
-    //     console.log('Received values of form: ', values);
-    //     //this.props.dispatch(saveOrUpdateCourse(values));
-    //   }
-    // });
+    const { form } = this.formRef.props;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+
+      console.log('Received values of form: ', values);
+      form.resetFields();
+    });
     this.setState({
       visible:false,
       visible1:false
@@ -119,6 +143,7 @@ class Db extends React.Component {
     
     this.setState({
       visible: false,
+      visible3:false,
       filelist:[],
       percent:0,
       file:{}
@@ -151,24 +176,25 @@ class Db extends React.Component {
   handleChange2=(info)=>{
     
     this.setState({
-      percent:Math.round(info.file.percent),
-      filelist:info.fileList,
-      file:info.file
+      percent:Math.round(info.file.percent)
     })
     if (info.file.status == 'uploading') {
      
     }
     // this.showModal();
     if (info.file.status === 'done') {
+      let a=this.state.ok+1;
       this.setState({
-        ok:ok+1
+        ok:a
       })
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
     }
   }
- 
+  editFileName=(item,e)=>{
+    console.log(e.target.value,item)
+  }
   renderTreeNodes = data =>
   data.map(item => {
     if (item.childs) {
@@ -357,7 +383,7 @@ class Db extends React.Component {
     const props = {
       action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
       onChange: this.handleChange2,
-    
+      accept:".doc,.docx,.mp4"
     };
     //权限和类型
     
@@ -428,7 +454,11 @@ class Db extends React.Component {
           {/* 数据的展示 */}
           <div className="table">
             {/* 文件上传组件 */}
-            <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{this.showModal()}}>
+            <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{this.setState({
+              filelist:fileList,
+              file:file,
+              ok:0
+            });this.showModal(file,fileList)}}>
               <Button style={{width:"90px",top:"9em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"58.5%",marginTop:"0em"}} >
                 <Icon type="upload" />上传
               </Button>
@@ -469,32 +499,32 @@ class Db extends React.Component {
           </div>
          
           <Table 
-          className="video_table"
-          size="small" 
-          style={{marginLeft:"2em",marginTop:"2em",}} 
-          rowKey="id"
-          pagination={{
-            onChange: page => {
-              console.log(page);
-              let p = page - 1;
-              console.log(p);
-            },
-            pageSize: 1,
-            total:this.props.Db.videolist.count,
-            size:'small',
-            
-            hideOnSinglePage: false,
-            itemRender: (current, type, originalElement) => {
-              if (type === 'prev') {
-                return <Button size="small" style={{marginRight:"1em"}}>上一页shi</Button>;
-              }
-              if (type === 'next') {
-                return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
-              }
-              return originalElement;
-            },
-          }}
-          rowSelection={rowSelection} columns={columns} dataSource={this.props.Db.videolist.results} />
+            className="video_table"
+            size="small" 
+            style={{marginLeft:"2em",marginTop:"2em",}} 
+            rowKey="id"
+            pagination={{
+              onChange: page => {
+                console.log(page);
+                let p = page - 1;
+                console.log(p);
+              },
+              pageSize: 1,
+              total:this.props.Db.videolist.count,
+              size:'small',
+              
+              hideOnSinglePage: false,
+              itemRender: (current, type, originalElement) => {
+                if (type === 'prev') {
+                  return <Button size="small" style={{marginRight:"1em"}}>上一页shi</Button>;
+                }
+                if (type === 'next') {
+                  return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+                }
+                return originalElement;
+              },
+            }}
+            rowSelection={rowSelection} columns={columns} dataSource={this.props.Db.videolist.results} />
            <Table className="text_table"
           size="small" 
           style={{marginLeft:"2em",marginTop:"2em",display:"none"}} 
@@ -543,14 +573,14 @@ class Db extends React.Component {
           <Modal
           style={{top:"20px"}}
           title={
-            <div style={{width:"775px",height:"102px",backgroundColor:"#e8e8e8",borderRadius:"10px",marginLeft:"1em",boxShadow:"0px 0px 5px rgba(0, 0, 0, 0.349019607843137)",textAlign:"center",position:"relative"}}>
-           <span style={{fontWeight:"700",fontSize:"18px",position:"absolute",top:".5em",left:"252px"}}>您上传的视频：
+            <div style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",width:"775px",height:"102px",backgroundColor:"#e8e8e8",borderRadius:"10px",marginLeft:"1em",boxShadow:"0px 0px 5px rgba(0, 0, 0, 0.349019607843137)",textAlign:"center",position:"relative"}}>
+           <div style={{width:"400px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",fontWeight:"700",fontSize:"18px",position:"absolute",top:".5em",left:"252px",display:"flex"}}>您上传的视频：
            {
              this.state.filelist.map((item,index)=>{
-              return (item.name+"  ")
+              return <div style={{width:"80px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.name}</div>
             })
            }
-           </span>
+           </div>
            <Icon type="close-circle" onClick={this.handleCancel} style={{position:"absolute",left:"749px",top:"14px"}}/>
             <Progress
                 style={{width:"669px",height:"50px",marginTop:"2.5em"}}
@@ -576,8 +606,8 @@ class Db extends React.Component {
             <ol>
               {
                 this.state.filelist.map((item,index)=>{
-                  return (<li style={{marginLeft:"-10px",marginTop:".5em"}}>
-                  {item.name} 
+                  return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                   <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
                   <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span style={{fontSize:"12px",color:"#3585FE"}}>&nbsp;&nbsp;+文档</span>
                 </li>)
                 })
@@ -594,7 +624,63 @@ class Db extends React.Component {
             </p>
 
           </div>
-          <DbForm ref={this.saveorForm} flag={this.state.value}/>
+          <DbForm wrappedComponentRef={this.saveFormRef}  flag={this.state.value}/>
+          <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
+        </Modal>
+        <Modal
+          style={{top:"20px"}}
+          title={
+            <div style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",width:"775px",height:"102px",backgroundColor:"#e8e8e8",borderRadius:"10px",marginLeft:"1em",boxShadow:"0px 0px 5px rgba(0, 0, 0, 0.349019607843137)",textAlign:"center",position:"relative"}}>
+           <div style={{width:"400px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",fontWeight:"700",fontSize:"18px",position:"absolute",top:".5em",left:"252px",display:"flex"}}>您上传的文档：
+           {
+             this.state.filelist.map((item,index)=>{
+              return <div style={{width:"80px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.name}</div>
+            })
+           }
+           </div>
+           <Icon type="close-circle" onClick={this.handleCancel} style={{position:"absolute",left:"749px",top:"14px"}}/>
+            <Progress
+                style={{width:"669px",height:"50px",marginTop:"2.5em"}}
+                strokeColor={{
+                  '0%': '#108ee9',
+                  '100%': '#87d068',
+                }}
+                percent={this.state.percent}
+              />
+            
+          <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.filelist.length}</span>
+        
+        </div>
+          }
+          closable={false}
+          visible={this.state.visible3}
+          footer={null}
+          width={850}
+        >
+          <div className={styles.left}>
+           <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的文档:
+            <br/>
+            <ol>
+              {
+                this.state.filelist.map((item,index)=>{
+                  return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                  <Input onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}>修改</span>} defaultValue={item.name} />
+                </li>)
+                })
+              }
+             
+            </ol>
+           </span> <br/><br/>
+
+            <p style={{marginLeft:"30px",color:'red'}}>
+              当上传视频为一个时：<br/>
+              用户可以选择单视频或专辑<br/>
+              当上传视频为多个时：<br/>
+              默认为专辑，不可切换
+            </p>
+
+          </div>
+          <Db2Form wrappedComponentRef={this.saveFormRef}  flag={this.state.value}/>
           <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
         </Modal>
         

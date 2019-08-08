@@ -18,12 +18,12 @@ for (let i = 10; i < 36; i++) {
   children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
 }
 
-class DbForm extends React.Component{
+class Db2Form extends React.Component{
 
     constructor(props){
       super(props)
       this.state={
-        value:"视频"
+        value:"文档"
       }
     }
     componentWillMount(){
@@ -41,7 +41,7 @@ class DbForm extends React.Component{
     };
     onRadioChange = e => {
       console.log('radio checked', e.target.value);
-      if(e.target.value==="视频"){
+      if(e.target.value==="文档"){
         $('.video-form').css({"display":"block"})
         $('.album-form').css({"display":"none"})
       }else{
@@ -72,7 +72,7 @@ class DbForm extends React.Component{
             <div className={styles.DbForm}>
             {/* <div></div> */}
             <Radio.Group style={{position:"absolute",left:"33.5%",top:"11em"}} onChange={this.onRadioChange} value={this.state.value} >
-                <Radio value={"视频"}>视频</Radio>
+                <Radio value={"文档"}>文档</Radio>
                 <Radio value={"专辑"} style={{marginLeft:"2em"}}>专辑</Radio>
             </Radio.Group>
             <Form {...formItemLayout} className="video-form">
@@ -106,7 +106,7 @@ class DbForm extends React.Component{
                   <Checkbox style={{paddingLeft:"5em"}} value={1}> &nbsp;设置为vip</Checkbox>
                 )}
               </Form.Item>
-              <Form.Item  label="视频描述">
+              <Form.Item  label="文档描述">
                 {getFieldDecorator('description', {
                 
                 })(
@@ -191,4 +191,4 @@ const mapPropsToFields = (props) =>{
   }
 export default connect((state)=>state)(Form.create({
     mapPropsToFields}
-)(DbForm))
+)(Db2Form))
