@@ -34,7 +34,9 @@ class Db extends React.Component {
       percent:0,
       filelist:[],
       file:{},
-      ok:0
+      ok:0,
+      type:"视频",
+      ids:[]
     };
   }
   handleCancel1 = e => {
@@ -61,8 +63,24 @@ class Db extends React.Component {
         visible1: true,
       });
     }
-  handleChange(value) {
-      console.log(`selected ${value}`);
+  //修改文本资源权限
+  handleChange=(record,e)=>{
+     if(e._owner.key=="dr_permission"){
+       this.props.dispatch({
+         type:"Db/fetchPermissionText",payload:{
+          dr_permission: record,
+          id: e._owner.pendingProps.record.id
+        }
+       })
+     }else{
+      this.props.dispatch({
+        type:"Db/fetchEnableOrFreeze",
+        payload:{
+          dr_enable:record,
+          ids:[e._owner.pendingProps.record.id]
+        }
+      })
+     }
   }
   checkTimeChange=(e)=> {
     this.setState({
@@ -133,9 +151,17 @@ class Db extends React.Component {
     if(e.key==="视频"){
       $('.video_table').css({"display":"block"})
       $('.text_table').css({"display":"none"})
+      this.setState({
+        type:"视频",
+        ids:[]
+      })
     }else{
       $('.video_table').css({"display":"none"})
       $('.text_table').css({"display":"block"})
+      this.setState({
+        type:"文档",
+        ids:[]
+      })
     }
   }
   
@@ -183,10 +209,12 @@ class Db extends React.Component {
     }
     // this.showModal();
     if (info.file.status === 'done') {
+      alert(1)
       let a=this.state.ok+1;
       this.setState({
         ok:a
       })
+      // console.log(info.file.response)文件上传接口返回的响应
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
@@ -195,6 +223,61 @@ class Db extends React.Component {
   editFileName=(item,e)=>{
     console.log(e.target.value,item)
   }
+  //批量删除
+  batchDelete=()=>{
+    if(this.state.type=="文档"){
+      this.props.dispatch({
+        type:"Db/fetchDeleteText",
+        payload:this.state.ids
+      })
+    }else{
+      this.props.dispatch({
+        type:"Db/fetchDeleteVideo",
+        payload:this.state.ids
+      })
+    }
+  }
+  // 批量启用和冻结
+ batchEnableOrFreeze=(e)=>{
+  if(this.state.type=="文档"){
+    if(e.target.textContent=="冻 结"){
+      this.props.dispatch({
+        type:"Db/fetchEnableOrFreeze",
+        payload:{
+          dr_enable:0,
+          ids:this.state.ids
+        }
+      })
+    }else{
+      this.props.dispatch({
+        type:"Db/fetchEnableOrFreeze",
+        payload:{
+          dr_enable:1,
+          ids:this.state.ids
+        }
+      })
+    }
+  }else{
+    if(e.target.textContent=="冻 结"){
+      this.props.dispatch({
+        type:"Db/fetchEnableOrFreezeVideo",
+        payload:{
+          dr_enable:0,
+          ids:this.state.ids
+        }
+      })
+    }else{
+      this.props.dispatch({
+        type:"Db/fetchEnableOrFreezeVideo",
+        payload:{
+          dr_enable:1,
+          ids:this.state.ids
+        }
+      })
+    }
+  }
+  
+ }
   renderTreeNodes = data =>
   data.map(item => {
     if (item.childs) {
@@ -330,7 +413,7 @@ class Db extends React.Component {
         render: (text,record) => {
           return (
             <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
-                <Select defaultValue={text} style={{ width:"80px",marginLeft:"-2px",marginTop:"-5px"}} onChange={this.handleChange}>
+                <Select defaultValue={text} style={{ width:"80px",marginLeft:"-2px",marginTop:"-5px"}} onChange={this.handleChange.bind(record)}>
                   <Option  value={0}>vip</Option>
                   <Option value={1}>free</Option>
                   <Option value={2}>other</Option>
@@ -346,23 +429,29 @@ class Db extends React.Component {
       {
         title: '日期',
         dataIndex: 'dr_created_time',
+        render: (text,record) => {
+          var dateee = new Date(text).toJSON();
+          var date = new Date(+new Date(dateee)+8*3600*1000).toISOString().replace(/T/g,' ').replace(/\.[\d]{3}Z/,'');
+          return (date)
+        }
       },
       {
         title: '状态',
         dataIndex:'dr_enable',
-       
         render: (text,record) => {
           if(text==1){
             return (
               <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
-                  <Select defaultValue="启用中" style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange}>
-                   
+                  <Select defaultValue={text} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange.bind(record)}>
+                    <Option value={1} >启用中</Option>
                     <Option value={0} style={{color:"red"}}>冻结</Option>
                   </Select>
               </div>
             )
           }else{
-            <span style={{color:"red"}}>冻结</span>
+           return (
+                  <span style={{color:"red"}}>冻结</span>
+          )
           }
 
         },
@@ -374,8 +463,10 @@ class Db extends React.Component {
       columnTitle:"#",
       fixed:"left",
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-        
+       console.log(selectedRowKeys)
+        this.setState({
+          ids:selectedRowKeys
+        })
       },
     };
 
@@ -383,7 +474,8 @@ class Db extends React.Component {
     const props = {
       action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
       onChange: this.handleChange2,
-      accept:".doc,.docx,.mp4"
+      accept:".doc,.docx,.mp4",
+      // name:"hello" 文件上传的参数
     };
     //权限和类型
     
@@ -477,22 +569,21 @@ class Db extends React.Component {
             <br/>
           <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
           <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>权限 </span>
-          <Select size="small" defaultValue="lucy" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
-            {/* <Option value="jack">Jack</Option>
-            <Option value="lucy">全部</Option>
-            <Option value="Yiminghe">yiminghe</Option> */}
+          <Select size="small" placeholder="权限" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange}>
+            <Option style={{fontSize:"12px"}} value={0}>Vip</Option>
+            <Option style={{fontSize:"12px"}} value={1}>Free</Option>
+            <Option style={{fontSize:"12px"}} value={2}>Other</Option>
           </Select>
           <span style={{marginLeft:"2em",fontWeight:"700"}}>格式 </span>
-          <Select size="small" defaultValue="lucy" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange}>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">全部</Option>
-            <Option value="Yiminghe">yiminghe</Option>
+          <Select size="small" placeholder="格式" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange}>
+            <Option value="视频">视频</Option>
+            <Option value="专辑">专辑</Option>
+    
           </Select>
           <span style={{marginLeft:"2em",fontWeight:"700"}}>状态 </span>
-          <Select size="small" defaultValue="lucy" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange}>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">全部</Option>
-            <Option value="Yiminghe">yiminghe</Option>
+          <Select size="small" placeholder="状态" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange}>
+            <Option value={1}>启用中</Option>
+            <Option value={0}>冻结</Option>
           </Select>
           <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
           <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
@@ -509,7 +600,7 @@ class Db extends React.Component {
                 let p = page - 1;
                 console.log(p);
               },
-              pageSize: 1,
+              pageSize: 2,
               total:this.props.Db.videolist.count,
               size:'small',
               
@@ -535,7 +626,7 @@ class Db extends React.Component {
               let p = page - 1;
               console.log(p);
             },
-            pageSize: 1,
+            pageSize: 2,
             total:this.props.Db.textlist.count,
             size:'small',
             
@@ -551,9 +642,9 @@ class Db extends React.Component {
             },
           }}
           rowSelection={rowSelection} columns={columns2}  dataSource={this.props.Db.textlist.results} />
-          <Button type="primary" style={{marginLeft:"2em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}}>启用</Button>
-          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}}>冻结</Button>
-          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}}>删除</Button>
+          <Button type="primary" style={{marginLeft:"2em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
+          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
+          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
           <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>          
           <Modal
             onCancel={this.handleCancel1}
