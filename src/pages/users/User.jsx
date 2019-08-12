@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button,Input,Table,Icon,Select,Checkbox ,Modal,Radio,Upload,message ,Avatar,Dropdown,Menu, } from 'antd';
+import {Button,Input,Table,Icon,Select,Checkbox ,Modal,Radio,Upload,message ,Avatar,Dropdown,Menu,Tooltip } from 'antd';
 const {Search} = Input;
 const {Option} = Select;
 
@@ -18,7 +18,9 @@ class User extends React.Component {
       visible:false,
       visibleImport:false,
       visiblePermise:false,
-      visibleModify:false
+      visibleModify:false,
+      // 添加单选按钮
+      value:"",
     })
   }
 
@@ -35,6 +37,15 @@ class User extends React.Component {
       visible:true, 
     })
   }
+  // 导入的单选按钮
+  onChange = e => {
+    console.log('radio checked', e.target.value);
+    console.log(e.target.value);
+    this.setState({
+      value: e.target.value,
+    });
+  };
+
   handleOk = e => {
     console.log(e);
     this.setState({
@@ -55,18 +66,66 @@ class User extends React.Component {
       visibleImport:true, 
     })
   }
-  ImportOk = e => {
+  // 导入模态框 ok
+  handleOk = e => {
+    console.log(e);
+    this.setState({
+      value:""
+    })
+    if(this.state.value===1){
+      this.setState({
+        visibleStudent:true
+      })
+    }else if(this.state.value===""){
+        this.setState({
+          visible:"false"
+        })
+    }else{
+      this.setState({
+        visibleTeacher:true,
+      })
+    }
+    this.setState({
+      visible: false,
+    });
+  };
+  // 导入模态框关闭 
+  handleCancel1 = e => {
     console.log(e);
     this.setState({
       visibleImport: false,
     });
   };
-  ImportCancel = e => {
+  // 学生用户ok
+  handleOkStu = e => {
     console.log(e);
     this.setState({
-      visibleImport: false,
+      visibleStudent: false,
     });
-  };  
+  };
+  // 学生用户关闭
+  handleCancelStud = e => {
+    console.log(e);
+    this.setState({
+      visibleStudent: false,
+    });
+  };
+
+    // 教师用户ok
+    handleOkTea = e => {
+      console.log(e);
+      this.setState({
+        visibleTeacher: false,
+      });
+    };
+    // 教师用户关闭
+    handleCancelTea = e => {
+      console.log(e);
+      this.setState({
+        visibleTeacher: false,
+      });
+    };
+
 
   // 添加权限模态框
   showPermise =()=>{
@@ -124,7 +183,9 @@ class User extends React.Component {
     })
   }
  
-  render(){    
+  render(){   
+    // 导入悬浮按钮
+    const text = <span>导入时需要按模板填写,点击<a>下载</a></span>; 
     // 表格第一列选框
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -224,7 +285,9 @@ class User extends React.Component {
               style={{ marginLeft:"2em",width: "222px",height:"30px"}}
             />
             <br/>
-          <Button style={{position:'absolute',right:'5%'}} onClick={this.showImport}><Icon type="upload" />导入</Button>
+          <Tooltip placement="bottom" title={text}>
+            <Button style={{width:"80px",position:'absolute',right:'5%'}} onClick={this.showImport}><Icon type="upload" />导入</Button>
+          </Tooltip>
         </div>
         <div>
           <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>角色 </span>
@@ -292,16 +355,47 @@ class User extends React.Component {
         </Modal>
 
         {/* 导入按钮模态框 */}
+         {/* 显示学生、教师模态框 */}
         <Modal
-          width='600px'
-          title="导入用户"
-          visible={this.state.visibleImport}
-          onOk={this.ImportOk}
-          onCancel={this.ImportCancel}
-        >
+            title="导入用户"
+            visible={this.state.visibleImport}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel1}
+            // onCancel={this.handleCancel1}
+            footer={[
+            // 定义右下角按钮的地方
+            <Button key="ok" style={{marginRight:230}} onClick={this.handleOk}>ok</Button>,
+          ]}>
+              {/* 添加单选按钮 */}
+            <Radio.Group onChange={this.onChange} value={this.state.value}>
+                <Radio style={{margin:50,marginLeft:110}} value={1}>学生用户</Radio>
+                <Radio value={2}>教师用户</Radio>        
+            </Radio.Group>      
+           
+        </Modal>
+          {/* 学生用户模态框 */}
+       <Modal 
+            title="导入学生用户"
+            visible={this.state.visibleStudent}
+            onOk={this.handleOkStu}
+            onCancel={this.handleCancelStud}
+            width="600px"
+            height="400px"
+            >
           <UserForm />
         </Modal>
 
+        {/* 教师用户模态框 */}
+        <Modal
+            title="导入教师用户"
+            visible={this.state.visibleTeacher}
+            onOk={this.handleOkTea}
+            onCancel={this.handleCancelTea}
+            width="600px"
+            height="400px">
+              <UserForm />
+        </Modal>
+       
         {/* 添加权限模态框 */}
         <Modal
           width='600px'

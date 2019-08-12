@@ -2,7 +2,8 @@ import React from 'react';
 import { Form, Input,Select,Button,Upload,Icon} from 'antd';
 class UserForm extends React.Component {
   render() {
-    
+  
+   
     // 上传
     const props = {
       name: 'file',
@@ -31,7 +32,7 @@ class UserForm extends React.Component {
           <Form.Item>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: '请输入班级名称!' }],
-            })(<Button type='primary'>下载模板</Button>)}
+            })(<Button type='primary'style={{marginLeft:'32em'}}>下载模板</Button>)}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator('description')(

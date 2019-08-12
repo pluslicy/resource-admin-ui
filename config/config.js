@@ -254,7 +254,7 @@ export default {
         {
          path: '/catalog',
           name: 'catalog',
-          icon: 'user',
+          icon: 'menu',
           routes:[{
             path: '/catalog/Catalog',
             name: 'catalog',
