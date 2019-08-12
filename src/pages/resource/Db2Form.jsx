@@ -30,8 +30,9 @@ class Db2Form extends React.Component{
       console.log(this.props.flag)
     }
     handleChange(value) {
-      console.log(`selected ${value}`);
+      
     }
+
     normFile = e => {
       console.log('Upload event:', e);
       if (Array.isArray(e)) {
@@ -81,7 +82,7 @@ class Db2Form extends React.Component{
                     {
                         getFieldDecorator('id',{})
                         (
-                            <Select  placeholder="请选择方向" name='teacherId'  >
+                            <Select onChange={this.handleChange} placeholder="请选择方向" name='teacherId'  >
                             {
                                 this.props.Db.catalist[0].childs.map((item)=>{
                                     return <Option key={item.id} value={item.id}>{item.catalogue_name}</Option>
@@ -91,7 +92,7 @@ class Db2Form extends React.Component{
                         )
                     }
               </Form.Item>
-              <Form.Item label="技术" >
+              <Form.Item style={{top:"-1em"}} label="技术" >
                     {
                         getFieldDecorator('dd',{})
                         (
@@ -99,14 +100,14 @@ class Db2Form extends React.Component{
                         )
                     }
               </Form.Item>  
-              <Form.Item  label="">
+              <Form.Item style={{top:"-2em"}} label="">
                 {getFieldDecorator('name', {
                   })(
                 
                   <Checkbox style={{paddingLeft:"5em"}} value={1}> &nbsp;设置为vip</Checkbox>
                 )}
               </Form.Item>
-              <Form.Item  label="文档描述">
+              <Form.Item style={{top:"-2em"}} label="文档描述">
                 {getFieldDecorator('description', {
                 
                 })(
@@ -131,7 +132,7 @@ class Db2Form extends React.Component{
                         )
                     }
               </Form.Item>
-              <Form.Item label="方向">
+              <Form.Item style={{top:"-1em"}} label="方向">
                     {
                         getFieldDecorator('sd',{})
                         (
@@ -145,7 +146,7 @@ class Db2Form extends React.Component{
                         )
                     }
               </Form.Item>
-              <Form.Item label="技术" >
+              <Form.Item style={{top:"-2em"}} label="技术" >
                     {
                         getFieldDecorator('ad',{})
                         (
@@ -159,14 +160,14 @@ class Db2Form extends React.Component{
                         )
                     }
               </Form.Item>  
-              <Form.Item  label="">
+              <Form.Item style={{top:"-2.5em"}}  label="">
                 {getFieldDecorator('gg', {
                   })(
                 
                   <Checkbox style={{paddingLeft:"5em"}} value={1}> &nbsp;设置为vip</Checkbox>
                 )}
               </Form.Item>
-              <Form.Item  label="专辑描述">
+              <Form.Item  style={{top:"-2.5em"}} label="专辑描述">
                 {getFieldDecorator('adescription', {
                 
                 })(

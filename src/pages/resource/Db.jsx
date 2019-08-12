@@ -8,6 +8,7 @@ import Db2Form from './Db2Form';
 import moment from 'moment'
 import $ from 'jquery'
 import Test from './test'
+import { arch } from 'os';
 const { TreeNode } = Tree;
 const { SubMenu } = Menu;
 const {confirm} =Modal
@@ -21,7 +22,7 @@ class Db extends React.Component {
     super(props);
     this.state={
       visible:false,
-      visible3:false,
+      visible3:true,
       visible1:false,
       fileList: [],
       query:{
@@ -30,6 +31,18 @@ class Db extends React.Component {
         bytime:false,
         byhot:false,
         search:""
+      },
+      textQuery:{
+        dr_created_time_start:"",
+        dr_created_time_end:"",
+        bytime:false,
+        byhot:false,
+        search:"",
+        dr_permission:"",
+        dr_format:"",
+        dr_enable:"",
+        catalogue_path:"1.",
+        catalogue:""
       },
       percent:0,
       filelist:[],
@@ -45,7 +58,10 @@ class Db extends React.Component {
         visible1: false,
       });
   };
+
+  //根据日期查询
   onChange2=(date, dateString)=>{
+     if(this.state.type=="视频"){
       var par={
         vr_created_time_start:dateString[0],
         vr_created_time_end:dateString[1]
@@ -57,46 +73,100 @@ class Db extends React.Component {
       this.props.dispatch({
         type:"Db/fetchVideo",payload:this.state.query
       })
+     }else{
+      var par={
+        dr_created_time_start:dateString[0],
+        dr_created_time_end:dateString[1]
+      }
+      this.setState({
+        textQuery:{...this.state.textQuery,...{dr_created_time_start:par.dr_created_time_start,dr_created_time_end:par.dr_created_time_end}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchText",payload:this.state.textQuery
+      })
+     }
   }
+  //展示调整编目
   showModal1=()=>{
       this.setState({
         visible1: true,
       });
     }
-  //修改文本资源权限
+  //修改文本 视频资源权限(接口不行)
   handleChange=(record,e)=>{
-     if(e._owner.key=="dr_permission"){
+    if(this.state.type=="文档"){
+      if(e._owner.key=="dr_permission"){
+        this.props.dispatch({
+          type:"Db/fetchPermissionText",payload:{
+           dr_permission: record,
+           id: e._owner.pendingProps.record.id
+         }
+        })
+      }else{
        this.props.dispatch({
-         type:"Db/fetchPermissionText",payload:{
-          dr_permission: record,
-          id: e._owner.pendingProps.record.id
-        }
+         type:"Db/fetchEnableOrFreeze",
+         payload:{
+           dr_enable:record,
+           ids:[e._owner.pendingProps.record.id]
+         }
        })
-     }else{
-      this.props.dispatch({
-        type:"Db/fetchEnableOrFreeze",
-        payload:{
-          dr_enable:record,
-          ids:[e._owner.pendingProps.record.id]
-        }
-      })
-     }
+      }
+    }else{
+      if(e._owner.key=="vr_permission"){
+        this.props.dispatch({
+          type:"Db/fetchPermissionVideo",payload:{
+           vr_permission: record,
+           id: e._owner.pendingProps.record.id
+         }
+        })
+      }else{
+       this.props.dispatch({
+         type:"Db/fetchEnableOrFreezeVideo",
+         payload:{
+           vr_enable:record,
+           ids:[e._owner.pendingProps.record.id]
+         }
+       })
+      }
+    }
+   
   }
+  //根据时间排序(完毕)
   checkTimeChange=(e)=> {
-    this.setState({
-      query:{...this.state.query,...{bytime:`${e.target.checked}`}}
-    })
-    this.props.dispatch({
-      type:"Db/fetchVideo",payload:this.state.query
-    })
+    if(this.state.type=="视频"){
+      this.setState({
+        query:{...this.state.query,...{bytime:`${e.target.checked}`}}
+      })
+      this.props.dispatch({
+        type:"Db/fetchVideo",payload:this.state.query
+      })
+    }else{
+      this.setState({
+        textQuery:{...this.state.textQuery,...{bytime:`${e.target.checked}`}}
+      })
+      this.props.dispatch({
+        type:"Db/fetchText",payload:this.state.textQuery
+      })
+    }
   }
+  //根据热度排序(完毕)
   checkHotChange=(e)=>{
-    this.setState({
-      query:{...this.state.query,...{byhot:`${e.target.checked}`}}
-    })
-    this.props.dispatch({
-      type:"Db/fetchVideo",payload:this.state.query
-    })
+    if(this.state.type=="视频"){
+      this.setState({
+        query:{...this.state.query,...{byhot:`${e.target.checked}`}}
+      })
+      this.props.dispatch({
+        type:"Db/fetchVideo",payload:this.state.query
+      })
+    }else{
+      this.setState({
+        textQuery:{...this.state.textQuery,...{byhot:`${e.target.checked}`}}
+      })
+      this.props.dispatch({
+        type:"Db/fetchText",payload:this.state.textQuery
+      })
+    }
   }
   saveorForm=(form)=>{
     this.setState({
@@ -145,22 +215,63 @@ class Db extends React.Component {
       visible:false,
       visible1:false
     })
+    if(this.state.file.status=='done'){
+      alert(1)
+    }
   };
-  //切换视频和文档
+  //切换视频和文档（完毕）
   handleClick2=(e)=>{
     if(e.key==="视频"){
       $('.video_table').css({"display":"block"})
       $('.text_table').css({"display":"none"})
+      $('.video_select').css({"display":"inline-block"})
+      $('.text_select').css({"display":"none"})
       this.setState({
         type:"视频",
-        ids:[]
+        ids:[],
+        query:{
+          vr_created_time_start:"",
+          vr_created_time_end:"",
+          bytime:false,
+          byhot:false,
+          search:""
+        },
+        textQuery:{
+          dr_created_time_start:"",
+          dr_created_time_end:"",
+          bytime:false,
+          byhot:false,
+          search:"",
+          dr_permission:"",
+          dr_format:"",
+          dr_enable:""
+        },
       })
     }else{
       $('.video_table').css({"display":"none"})
       $('.text_table').css({"display":"block"})
+      $('.video_select').css({"display":"none"})
+      $('.text_select').css({"display":"inline-block"})
       this.setState({
         type:"文档",
-        ids:[]
+        ids:[],
+        query:{
+          vr_created_time_start:"",
+          vr_created_time_end:"",
+          bytime:false,
+          byhot:false,
+          search:""
+        },
+        textQuery:{
+          dr_created_time_start:"",
+          dr_created_time_end:"",
+          bytime:false,
+          byhot:false,
+          search:"",
+          dr_permission:"",
+          dr_format:"",
+          dr_enable:""
+        },
       })
     }
   }
@@ -175,10 +286,7 @@ class Db extends React.Component {
       file:{}
     });
   };
-  //选择时间的
-  // onChange2=(date, dateString)=>{
-  //   console.log(date, dateString);
-  // }
+
   componentDidMount() {
     this.props.dispatch({
       type:"Db/fetchCata"
@@ -212,18 +320,20 @@ class Db extends React.Component {
       alert(1)
       let a=this.state.ok+1;
       this.setState({
-        ok:a
+        ok:a,
+        file:info.file
       })
-      // console.log(info.file.response)文件上传接口返回的响应
+      console.log(info.file.response)//文件上传接口返回的响应
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
     }
   }
+  //修改文档名字
   editFileName=(item,e)=>{
     console.log(e.target.value,item)
   }
-  //批量删除
+  //批量删除 视频和文档完成
   batchDelete=()=>{
     if(this.state.type=="文档"){
       this.props.dispatch({
@@ -237,8 +347,8 @@ class Db extends React.Component {
       })
     }
   }
-  // 批量启用和冻结
- batchEnableOrFreeze=(e)=>{
+  // 批量启用和冻结 视频和文档完成
+  batchEnableOrFreeze=(e)=>{
   if(this.state.type=="文档"){
     if(e.target.textContent=="冻 结"){
       this.props.dispatch({
@@ -262,7 +372,7 @@ class Db extends React.Component {
       this.props.dispatch({
         type:"Db/fetchEnableOrFreezeVideo",
         payload:{
-          dr_enable:0,
+          vr_enable:0,
           ids:this.state.ids
         }
       })
@@ -270,23 +380,91 @@ class Db extends React.Component {
       this.props.dispatch({
         type:"Db/fetchEnableOrFreezeVideo",
         payload:{
-          dr_enable:1,
+          vr_enable:1,
           ids:this.state.ids
         }
       })
     }
   }
   
- }
+  }
+  //根据权限查询（完成）
+  handleChange3=(value)=>{
+    if(this.state.type=="文档"){
+      this.setState({
+        textQuery:{...this.state.textQuery,...{dr_permission:value}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchText",payload:this.state.textQuery
+      })
+    }else{
+      this.setState({
+        query:{...this.state.query,...{vr_permission:value}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchVideo",payload:this.state.query
+      })
+    }
+  }
+  //根据格式查询(完成)
+  handleChange4=(value)=>{
+    if(this.state.type=="文档"){
+      this.setState({
+        textQuery:{...this.state.textQuery,...{dr_format:value}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchText",payload:this.state.textQuery
+      })
+    }else{
+      this.setState({
+        query:{...this.state.query,...{vr_format:value}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchVideo",payload:this.state.query
+      })
+    }
+  }
+  //根据状态查询(完成)
+  handleChange5=(value)=>{
+    if(this.state.type=="文档"){
+      this.setState({
+        textQuery:{...this.state.textQuery,...{dr_enable:value}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchText",payload:this.state.textQuery
+      })
+    }else{
+      this.setState({
+        query:{...this.state.query,...{vr_enable:value}}
+      })
+      
+      this.props.dispatch({
+        type:"Db/fetchVideo",payload:this.state.query
+      })
+    }
+  }
+  //选中树节点的回调
+  selectTree(selectedKeys,e){
+    console.log(selectedKeys[0])
+  }
+  //生成树
   renderTreeNodes = data =>
   data.map(item => {
     if (item.childs) {
       return (
         <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
-          {this.renderTreeNodes(item.childs)}
+          { 
+            this.renderTreeNodes(item.childs)
+          }
         </TreeNode>
       );
     }
+   
     return <TreeNode {...item} />;
   }); 
   render() {
@@ -356,6 +534,11 @@ class Db extends React.Component {
       {
         title: '日期',
         dataIndex: 'vr_created_time',
+        render: (text,record) => {
+          var dateee = new Date(text).toJSON();
+          var date = new Date(+new Date(dateee)+8*3600*1000).toISOString().replace(/T/g,' ').replace(/\.[\d]{3}Z/,'');
+          return (date)
+        }
       },
       {
         title: '状态',
@@ -364,24 +547,37 @@ class Db extends React.Component {
           if(text==1){
             return (
               <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
-                  <Select defaultValue="启用中" style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange}>
-                   
+                  <Select defaultValue={text} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange.bind(record)}>
+                    <Option value={1} >启用中</Option>
                     <Option value={0} style={{color:"red"}}>冻结</Option>
                   </Select>
               </div>
             )
           }else{
-            <span style={{color:"red"}}>冻结</span>
+           return (
+                  <span style={{color:"red"}}>冻结</span>
+          )
           }
 
         },
+
       },
     ];
     const columns2 = [
       {
         title: '名称',
         dataIndex: 'dr_name',
-        render: text => <a href="javascript:;">{text}</a>,
+        render: (text,record) => 
+        <Popover overlayStyle={{maxHeight:"10px"}} placement="bottomLeft" trigger="hover" content={[
+          <div style={{maxHeight:"10px",marginTop:"-13px"}} key="id" >
+              <img  src={require('./u483.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_play_times}</span>
+              <img style={{marginLeft:"5px"}} src={require('./u486.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_favor_num}</span>
+              <img style={{marginLeft:"5px"}} src={require('./u489.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_collection_num}</span>
+              <img style={{marginLeft:"5px"}} src={require('./u492.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_comment_num}</span>
+          </div>
+        ]} >
+          <span style={{cursor:"pointer"}}>{text}</span>
+        </Popover>
       },
       {
         title: '作者',
@@ -472,10 +668,15 @@ class Db extends React.Component {
 
     //文件上传的地址与配置
     const props = {
-      action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+     // action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+       action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
       onChange: this.handleChange2,
       accept:".doc,.docx,.mp4",
-      // name:"hello" 文件上传的参数
+      data:{
+        file:this.state.file,
+        token:"dddd",
+        resource_name:"test3"
+      }
     };
     //权限和类型
     
@@ -523,13 +724,11 @@ class Db extends React.Component {
          {this.props.Db.catalist[0].catalogue_name}
       </div>
         <div style={{marginTop:"3em",marginLeft:".2em"}}>
-            <Tree>
+            <Tree onSelect={this.selectTree}>
               {this.renderTreeNodes(childs)}
             </Tree>
         </div>
-
-
-          </div>
+        </div>
            
           <div  className="right-div" style={{flex:"6",overflow:"hidden"}}>
           {/* 视频和文档的切换 */}
@@ -569,19 +768,23 @@ class Db extends React.Component {
             <br/>
           <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
           <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>权限 </span>
-          <Select size="small" placeholder="权限" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange}>
+          <Select  size="small" placeholder="权限" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange3}>
             <Option style={{fontSize:"12px"}} value={0}>Vip</Option>
             <Option style={{fontSize:"12px"}} value={1}>Free</Option>
             <Option style={{fontSize:"12px"}} value={2}>Other</Option>
           </Select>
           <span style={{marginLeft:"2em",fontWeight:"700"}}>格式 </span>
-          <Select size="small" placeholder="格式" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange}>
+          <Select className="video_select" size="small" placeholder="格式" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
             <Option value="视频">视频</Option>
             <Option value="专辑">专辑</Option>
     
           </Select>
+          <Select className="text_select" size="small" placeholder="格式" style={{display:"none",width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
+            <Option value="视频">文档</Option>
+            <Option value="专辑">专辑</Option>
+          </Select>
           <span style={{marginLeft:"2em",fontWeight:"700"}}>状态 </span>
-          <Select size="small" placeholder="状态" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange}>
+          <Select size="small" placeholder="状态" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
             <Option value={1}>启用中</Option>
             <Option value={0}>冻结</Option>
           </Select>
@@ -643,9 +846,9 @@ class Db extends React.Component {
           }}
           rowSelection={rowSelection} columns={columns2}  dataSource={this.props.Db.textlist.results} />
           <Button type="primary" style={{marginLeft:"2em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
-          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
-          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
-          <Button type="primary" style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>          
+          <Button  style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
+          <Button  style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
+          <Button  style={{marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>          
           <Modal
             onCancel={this.handleCancel1}
             title="请选择资源所在编目"

@@ -65,3 +65,12 @@ export async function PermissionText(param) {
     getResponse: true,
   })
 }
+//设置视频资源权限
+export async function PermissionVideo(param) {
+  return request('/api/mp_man_res/set_video_permis/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}

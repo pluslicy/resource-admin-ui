@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import { findAllCata, findAllVideo, findAllText,DeleteAllText,EnableOrFreeze,EnableOrFreezeVideo,DeleteAllVideo,
-PermissionText} from '@/services/Db';
+PermissionText,PermissionVideo} from '@/services/Db';
 
 const DbModel = {
   namespace: 'Db',
@@ -62,10 +62,18 @@ const DbModel = {
         type: 'fetchVideo'
       });
     },
+    //设置文本权限
     *fetchPermissionText(_, { call, put }) {
       const response = yield call(PermissionText,_.payload);
       yield put({
         type: 'fetchText'
+      });
+    },
+    //设置视频权限
+    *fetchPermissionVideo(_, { call, put }) {
+      const response = yield call(PermissionVideo,_.payload);
+      yield put({
+        type: 'fetchVideo'
       });
     },
   },
