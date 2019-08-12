@@ -1,10 +1,18 @@
 import React from 'react';
 import styles from './Welcome.less';
-import { Table, Tabs } from 'antd';
+import { Table, Tabs, Button } from 'antd';
 import { Bar, TimelineChart } from 'ant-design-pro/lib/Charts';
+import $ from 'jquery'
 const { TabPane } = Tabs;
 class index extends React.Component {
 	render() {
+		function test() {
+			// alert('成功test')
+			// var script = document.createElement('script');
+			// script.type = 'text/jacascript';
+			// script.src = './lib/req/require.js';
+			// $('body').append(script);
+		}
 		// 切换标签页回调函数
 		function callback(key) {
 			console.log(key);
@@ -79,7 +87,7 @@ class index extends React.Component {
 				<div className={styles.audit}>
 					<div>
 						<span className={styles.span1}>待审核</span>
-						<div className={styles.link} onClick={()=>window.location.href='resource/Check/video'}><a>去审核>></a></div>
+						<div className={styles.link} onClick={() => window.location.href = 'resource/Check/video'}><a>去审核>></a></div>
 						<br />
 						<hr />
 						<Tabs defaultActiveKey="1" onChange={callback}>
@@ -107,7 +115,7 @@ class index extends React.Component {
 									rowKey="id"
 									size="small"
 									columns={columns}
-								// dataSource={this.props.create.creates}
+								// dataSource={this.props.create.creates}					
 								/>
 							</TabPane>
 						</Tabs>
