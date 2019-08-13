@@ -22,7 +22,7 @@ class Check extends React.Component {
 			visible2: false,
 			form: {},
 			selectedRowKeys: [],
-			date: [],
+			date: ['',''],
 			name: []
 		};
 	}
@@ -40,13 +40,23 @@ class Check extends React.Component {
 		this.props.dispatch({ type: 'word/findByCondidtion', payload: values });
 	};
 	// 名称搜索框
+	// onSearch = (value) => {
+	// 	// console.log('1'+value);
+	// 	this.setState({
+	// 		name: value,
+	// 	});
+	// 	var values1 = this.state.date;
+	// 	var values2 = value;
+	// 	var values = new Array();
+	// 	values.push(values1,values2)
+	// 	console.log(values)
+	// 	this.props.dispatch({ type: 'word/findByCondidtion', payload: values });
+	// }
 	onSearch = (value) => {
-		console.log(value);
 		this.setState({
 			name: value,
 		});
 		var values = [this.state.date, value];
-		console.log(values)
 		this.props.dispatch({ type: 'word/findByCondidtion', payload: values });
 	}
 	// 改变多选框
