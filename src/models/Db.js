@@ -7,7 +7,8 @@ const DbModel = {
   state: {
     catalist: [{childs:[]}],
     videolist:{},
-    textlist:{}
+    textlist:{},
+   
   },
   effects: {
     // 获取所有编目
@@ -76,6 +77,7 @@ const DbModel = {
         type: 'fetchVideo'
       });
     },
+  
   },
   reducers: {
     // 更新状态中的catalist
