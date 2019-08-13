@@ -16,29 +16,37 @@ const CatalogModel = {
         type: 'reloadCatalogs',
         payload: response});
     },
-
+    *fetchCatalogs(_, { call, put }) {
+     
+    //   console.log(JSON.stringify(response.results))
+      yield put({
+        type: 'reloadCata',
+        payload: _.payload});
+    },
     // 修改编目
-    *updateRoles(_, { call, put }) {
-      const response = yield call(UpdateCatalog, _.payload);
-      message.success(response.message);
-      yield put({ type: 'changeVisible', payload: false });
-      yield put({ type: 'reloadCatalogs'});
-  },
+      *UpdateCatalogs(_, { call, put }) {
+        const response = yield call(UpdateCatalog, _.payload);
+        message.success(response.message);
+        yield put({ type: 'changeVisible', payload: false });
+        yield put({ type: 'fetchCatalog'});
+    },
 
     //删除编目   
     *fetchDeleteRoles(_, { call, put }) {
         yield call(deleteCatalog, {id: _.payload});
         yield put({ type: 'reloadCatalogs' });
     },
+    // 新增编目
+    *fetchAddCatalog(_, { call, put }) {
+      console.log(_.payload)
+      yield call(AddCatalog, _.payload);
+      yield put({ type: 'changeVisible', payload: false });
+      yield put({ type: 'fetchCatalog'});
+  },
     },
 
     // 添加编目
-    *fetchAddCatalog(_, { call, put }) {
-      const response = yield call(AddCatalog, _.payload);
-      message.success(response.message);
-      yield put({ type: 'changeVisible', payload: false });
-      yield put({ type: 'reloadCatalogs'});
-  },
+   
   reducers: {
     // 更改模态框的显示状态
     changeVisible(state, action) {
@@ -52,6 +60,12 @@ const CatalogModel = {
       return {
         ...state,
         roles: action.payload.data,
+      };
+    },
+    reloadCata(state, action) {
+      return {
+        ...state,
+        roles: action.payload,
       };
     },
   },

@@ -21,8 +21,8 @@ export async function UpdateCatalog(param) {
 export async function AddCatalog(param) {
   return request('/api/mp_man_catalog/cre_cata/', {
     method: 'post',
-    data: qs.stringify(param),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+    data: param,
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
