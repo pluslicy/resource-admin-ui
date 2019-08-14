@@ -10,10 +10,18 @@ export async function queryCatalog() {
 
 //修改编目
 export async function UpdateCatalog(param) {
+  return request('/api/mp_man_catalog/mod_cataname/', {
+    method: 'post',
+    data: param,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+// 修改编目层级
+export async function UpdataCatalogCen(param) {
   return request('/api/mp_man_catalog/mod_catalevel/', {
     method: 'post',
-    data: qs.stringify(param),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+    data: param,
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
@@ -28,7 +36,11 @@ export async function AddCatalog(param) {
 
 // 删除编目
 export async function deleteCatalog(id) {
-    return request('/api/mp_man_catalog/del_cata/', { params: id });
+    return request('/api/mp_man_catalog/del_cata/',{ method: 'post',
+        data: id,
+        headers: { 'Content-Type': 'application/json' },
+        getResponse:true
+      })
 }
 
  

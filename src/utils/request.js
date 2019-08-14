@@ -3,7 +3,7 @@
  * 更详细的 api 文档: https://github.com/umijs/umi-request
  */
 import { extend } from 'umi-request';
-import { notification } from 'antd';
+import { notification,message} from 'antd';
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -27,7 +27,7 @@ const codeMessage = {
 
 const errorHandler = error => {
   const { response } = error;
-
+ 
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
@@ -35,6 +35,7 @@ const errorHandler = error => {
       message: `请求错误 ${status}: ${url}`,
       description: errorText,
     });
+    
   }
 };
 /**
