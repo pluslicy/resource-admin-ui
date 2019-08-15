@@ -12,7 +12,15 @@ export async function queryUsers() {
 export async function queryRoles() {
     return request('/api/mp_man_users/rolelist/');
   }
-
+// 删除用户
+export async function DeleteAllUsers(param) {
+  return request('/api/mp_man_users/del_user/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}
 // 添加用户
 export async function AddRole(param) {
   return request('/api/mp_man_users/cre_user/', {
@@ -23,14 +31,14 @@ export async function AddRole(param) {
 }
 
 // 设置用户启用/冻结
-export async function forzenUsers(param) {
+export async function EnableOrFreeze(param) {
   return request('/api/mp_man_users/set_frozen/', {
     method: 'post',
-    data: qs.stringify(param),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-  });
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
 }
-
 
 
  

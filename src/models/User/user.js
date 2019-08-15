@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import {queryUsers,queryRoles,AddRole,forzenUsers } from '@/services/User/user';
+import {queryUsers,queryRoles,DeleteAllUsers,AddRole,EnableOrFreeze } from '@/services/User/user';
 
 const UserModel = {
   namespace: 'users',
@@ -9,31 +9,38 @@ const UserModel = {
   },
   effects: {
     // 获取所有用户信息
-    *fetchUser(_, { call, put }) {
+   *fetchUser(_, { call, put }) {
       const response = yield call(queryUsers);
-      // console.log(JSON.stringify(response.data))
-      // alert(JSON.stringify(response.data))
       yield put({
         type: 'reloadUsers',
         payload: response});
         },
-    },
+    
 
-     // 获取所有角色信息
-     *fetchRole(_, { call, put }) {
+    // 获取所有角色信息
+   *fetchRole(_, { call, put }) {
         const response = yield call(queryRoles);
         yield put({
-          type: 'reloadUsers',
+          type: 'fetchUser',
           payload: response});
       },
 
-    *UserForzen(_, { call, put }) {
-      const response = yield call(forzenUsers, _.payload);
-      message.success(response.message);
-      yield put({ type: 'changeVisible', payload: false });
-      yield put({ type: 'fetchUser'});
-  },
+   //批量设置用户状态
+    *fetchEnableOrFreeze(_, { call, put }) {
+      const response = yield call(EnableOrFreeze,_.payload);
+      yield put({
+        type: 'fetchUser'
+      });
+    },
+   //批量删除用户
+    *fetchDeleteUsers(_, { call, put }) {
+      const response = yield call(DeleteAllUsers,{ids:_.payload});
+      yield put({
+        type: 'fetchUser'
+      });
+    },
 
+  },
   reducers: {
     // 更改模态框的显示状态
     changeVisible(state, action) {

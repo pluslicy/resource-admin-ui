@@ -14,6 +14,7 @@ class User extends React.Component {
   constructor (props){
     super(props);
     this.state =({
+      ids:[],
       query:{},
       visible:false,
       visibleImport:false,
@@ -21,6 +22,16 @@ class User extends React.Component {
       visibleModify:false,
       // 添加单选按钮
       value:"",
+      textQuery:{
+        dr_created_time_start:"",
+        dr_created_time_end:"",
+        bytime:false,
+        byhot:false,
+        search:"",
+        dr_permission:"",
+        dr_format:"",
+        is_active:"",
+    },
     })
   }
 
@@ -30,6 +41,58 @@ class User extends React.Component {
     })
   }
 
+   //批量删除用户
+   batchDelete=()=>{
+    this.props.dispatch({
+        type:"users/fetchDeleteUsers",
+        payload:this.state.ids
+    })
+    
+}
+    // 批量启用和冻结
+    batchEnableOrFreeze=(e)=>{
+      // console.log(this.props.dispatch)
+        if(e.target.textContent=="冻 结"){
+        this.props.dispatch({
+            type:"users/fetchEnableOrFreeze",
+            payload:{
+            is_active:false,
+            ids:this.state.ids,
+        
+            }
+        })
+        }else{
+        this.props.dispatch({
+            type:"users/fetchEnableOrFreeze",
+            payload:{
+            is_active:true,
+            ids:this.state.ids,
+            
+            }
+        }) }
+    }
+    //根据状态查询(完成)
+    handleChange5=(value)=>{
+      this.setState({
+          textQuery:{...this.state.textQuery,...{is_active:value}}
+      })
+      this.props.dispatch({
+      type:"users/fetchUser",payload:{...this.state.textQuery,...{is_active:value}}
+      })
+
+    }
+    handleChange=(record,e)=>{
+
+           this.props.dispatch({
+               type:"users/fetchEnableOrFreeze",
+               payload:{
+               is_active:record,
+               ids:[e._owner.pendingProps.record.id]
+               }
+           })
+       
+   }
+    
 
   // 添加用户模态框
   showModal =()=>{
@@ -164,24 +227,7 @@ class User extends React.Component {
       visibleModify: false,
     });
   };  
-  //按时间查询
-  checkTimeChange=(e)=> {
-    this.setState({
-      query:{...this.state.query,...{bytime:`${e.target.checked}`}}
-    })
-    this.props.dispatch({
-      type:"users/fetchUser",payload:this.state.query
-    })
-  }
-  // 按热度查询
-  checkHotChange=(e)=>{
-    this.setState({
-      query:{...this.state.query,...{byhot:`${e.target.checked}`}}
-    })
-    this.props.dispatch({
-      type:"users/fetchUser",payload:this.state.query
-    })
-  }
+
  
   render(){   
     // 导入悬浮按钮
@@ -189,20 +235,12 @@ class User extends React.Component {
     // 表格第一列选框
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
+        this.setState({
+          ids:selectedRowKeys
+        })
         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       }
     };
-
-    // 状态栏
-    const menu = (
-      <Menu>
-        <Menu.Item>
-          <a target="_blank" rel="noopener noreferrer" href="">
-           冻结
-          </a>
-        </Menu.Item>
-      </Menu>
-    );
 
     // 表格第一行
     const columns = [
@@ -261,17 +299,25 @@ class User extends React.Component {
       },
       {
         title: '状态',
-        dataIndex: 'status',
-        render:()=>{
-          return(
-            <Dropdown overlay={menu}>
-              <a className="ant-dropdown-link" href="#">
-                启用中 <Icon type="down" />
-              </a>
-            </Dropdown>
+        dataIndex:'is_active',
+        render: (text,record) => {
+          if(text==true){
+            return (
+              <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
+                  <Select defaultValue={text} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange.bind(record)}>
+                    <Option value={true} >启用中</Option>
+                    <Option value={false} style={{color:"red"}}>冻结</Option>
+                  </Select>
+              </div>
+            )
+          }else{
+           return (
+                  <span style={{color:"red"}}>冻结</span>
           )
-        }
-      },
+          }
+
+        },
+      }
     
     ];
 
@@ -302,10 +348,10 @@ class User extends React.Component {
             <Option value="all">全部</Option>
           </Select>
           <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>状态 </span>
-          <Select size="small" defaultValue="lucy" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
-            <Option value="forzen">冻结</Option>
-            <Option value="lucy">全部</Option>
-            <Option value="noforzen">未冻结</Option>
+          <Select value={this.props.users.user.is_active} size="small" placeholder="状态" defaultValue="" style={{width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
+              <Option value="">状态</Option>
+              <Option value={true}>启用中</Option>
+              <Option value={false}>冻结</Option>
           </Select>
           <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
           <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
@@ -337,12 +383,14 @@ class User extends React.Component {
               return originalElement;
             },
           }}
-          rowSelection={rowSelection} columns={columns}  dataSource={this.props.users.user} />
-          
-            <Button type="primary" size="small">启用</Button>&nbsp;
-            <Button type="danger" size="small">冻结</Button>&nbsp;
-            <Button type="delete" size="small">删除</Button>
 
+          rowSelection={rowSelection} columns={columns}  dataSource={this.props.users.user} 
+          />
+
+            <Button type="primary" size="small" onClick={this.batchEnableOrFreeze}>启用</Button>&nbsp;
+            <Button type="danger" size="small" onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp;
+            <Button type="delete" size="small" onClick={this.batchDelete}>删除</Button>
+        
         {/* 添加用户模态框 */}
         <Modal
           title='添加角色'

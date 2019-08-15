@@ -46,7 +46,7 @@ const CatalogModel = {
     *fetchEditCatalogCen(_, { call, put }) {
       // console.log(_.payload)
       yield call(UpdataCatalogCen, _.payload);
-      yield put({ type: 'changeVisible', payload: false });
+      // yield put({ type: 'changeVisible', payload: false });
       yield put({ type: 'fetchCatalog'});
   },
    
