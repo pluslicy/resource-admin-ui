@@ -18,13 +18,15 @@ class Catalog extends React.Component {
 			new_name:"",
 			value:"",
 			moveCenId:"",
+			target_id:"",
 		};
 	}
 		
 	// 迁移目录级联选项
 	 onChange2=(value)=> {
 		this.setState({
-			moveCenId:parseInt(value.length+1)
+			moveCenId:parseInt(value.length+1),
+			target_id:value
 		})
 	  }
 	
@@ -153,10 +155,11 @@ class Catalog extends React.Component {
 	 // 迁移目录ok
 	 // 迁移模态框
 	 handleOkQY = e => {
-		console.log(this.state.id,this.state.moveCenId);
+		 let length=this.state.target_id.length;
+		console.log(this.state.id,this.state.target_id[length-1]);
 		let move={
 			id: this.state.id,
-			cata_level_id: this.state.moveCenId
+			target_id: this.state.target_id[length-1]
 		}
 		this.setState({
 		 	 visibleQY: false,
@@ -194,7 +197,7 @@ class Catalog extends React.Component {
 	}
 
 	onSelect=(selectedKeys,e)=>{
-		if(e.selectedNodes[0]){
+		if(e.selectedNodes[0]!=null){
 			
 			// console.log(e.selectedNodes[0].props.dataRef)
 			let str=e.selectedNodes[0].props.dataRef.catalogue_path;
@@ -309,7 +312,9 @@ class Catalog extends React.Component {
 						</Modal>
 
 						<div>
-						<Tree onSelect={this.onSelect} style={{marginLeft:"3em"}}>
+						<Tree onSelect={this.onSelect} style={{marginLeft:"3em"}}
+							defaultExpandParent
+							>
 							{this.renderTreeNodes(this.props.catalog.roles)}
 						</Tree>
 						</div>

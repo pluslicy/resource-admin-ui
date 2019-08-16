@@ -18,7 +18,7 @@ export async function UpdateCatalog(param) {
 }
 // 修改编目层级
 export async function UpdataCatalogCen(param) {
-  return request('/api/mp_man_catalog/mod_catalevel/', {
+  return request('/api/mp_man_catalog/mod_catapath/', {
     method: 'post',
     data: param,
     headers: { 'Content-Type': 'application/json' },

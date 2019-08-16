@@ -37,8 +37,13 @@ class User extends React.Component {
 
   componentDidMount(){
     this.props.dispatch({
-      type:'users/fetchUser'
+      type:'users/fetchUser',
+     
     })
+    // this.props.dispatch({
+    //   type:'users/fetchRole',
+     
+    // })
   }
 
    //批量删除用户
@@ -81,6 +86,7 @@ class User extends React.Component {
       })
 
     }
+    // 冻结状态改变
     handleChange=(record,e)=>{
 
            this.props.dispatch({
@@ -92,7 +98,32 @@ class User extends React.Component {
            })
        
    }
-    
+  //添加模态框 
+   saveFormRef = formRef => {
+    this.formRef = formRef;
+  };
+  handleOkModal = e => {
+    // 提交表单
+    e.preventDefault();
+    const { form } = this.formRef.props;
+    form.validateFields((err, values) => {
+        if (err) {
+        return;
+        }
+
+        console.log('Received values of form: ', values);
+        this.props.dispatch({
+          type:"users/AddUsers",
+          payload:values
+      })
+        form.resetFields();
+
+    });
+      this.setState({
+        visible:false
+      })
+     
+    };
 
   // 添加用户模态框
   showModal =()=>{
@@ -396,10 +427,10 @@ class User extends React.Component {
           title='添加角色'
           width='600px'
           visible={this.state.visible}
-          onOk={this.handleOk}
+          onOk={this.handleOkModal}
           onCancel={this.handleCancel}
         >
-          <AddForm />
+          <AddForm wrappedComponentRef={this.saveFormRef}/>
         </Modal>
 
         {/* 导入按钮模态框 */}
@@ -455,11 +486,7 @@ class User extends React.Component {
           <div style={{height:'100px'}}>
             <ul>
                 <li style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'1em'}}>杰普教师</li>  
-                <li style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'1em'}}>杰普学生</li>  
-                <li style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'1em'}}>院校教师</li>  
-                <li style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'2em'}}>角色</li>  
-                <li style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'2em'}}>角色</li>  
-                <li style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'2em'}}>角色</li>  
+              
             </ul>  
           </div>
         </Modal>

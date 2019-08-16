@@ -1,11 +1,12 @@
 import { message } from 'antd';
-import {queryUsers,queryRoles,DeleteAllUsers,AddRole,EnableOrFreeze } from '@/services/User/user';
+import {queryUsers,queryRoles,DeleteAllUsers,AddUser,EnableOrFreeze } from '@/services/User/user';
 
 const UserModel = {
   namespace: 'users',
   state: {
     user: [],
     visible: false,
+    roles:[]
   },
   effects: {
     // 获取所有用户信息
@@ -21,7 +22,7 @@ const UserModel = {
    *fetchRole(_, { call, put }) {
         const response = yield call(queryRoles);
         yield put({
-          type: 'fetchUser',
+          type: 'reloadRoles',
           payload: response});
       },
 
@@ -39,6 +40,13 @@ const UserModel = {
         type: 'fetchUser'
       });
     },
+    //添加用户
+    *AddUsers(_, { call, put }) {
+      const response = yield call(AddUser,_.payload);
+      yield put({
+        type: 'fetchUser'
+      });
+    },
 
   },
   reducers: {
@@ -51,10 +59,15 @@ const UserModel = {
     },
     // 更新状态中的users
     reloadUsers(state, action) {
-        
       return {
         ...state,
         user: action.payload.results,
+      };
+    },
+    reloadRoles(state, action) {
+      return {
+        ...state,
+        roles: action.payload.results,
       };
     },
   },

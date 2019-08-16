@@ -22,11 +22,11 @@ export async function DeleteAllUsers(param) {
   })
 }
 // 添加用户
-export async function AddRole(param) {
+export async function AddUser(param) {
   return request('/api/mp_man_users/cre_user/', {
     method: 'post',
-    data: qs.stringify(param),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+    data: param,
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
