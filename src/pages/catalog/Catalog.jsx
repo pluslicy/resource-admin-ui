@@ -93,6 +93,9 @@ class Catalog extends React.Component {
 		visibleEdit: false,
 		
 	});
+	this.setState({
+		new_name:""
+	})
 	};
 	
 	handleCancelEditName = e => {
@@ -307,7 +310,9 @@ class Catalog extends React.Component {
 								fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}
 								expandTrigger="hover"
 								onChange={this.onChange2}
+								changeOnSelect
 							/>
+							
 							</div>
 						</Modal>
 
