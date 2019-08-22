@@ -27,8 +27,11 @@ class TextForm extends React.Component{
           key:this.props.flag
       }
     }
-    componentWillMount(){
-      
+    componentDidMount(){
+     
+      this.props.dispatch({
+        type:'Db/fetchTextDalBum'
+      })
     }
     handleChange(value) {
       console.log(`selected ${value}`);
@@ -83,7 +86,7 @@ class TextForm extends React.Component{
               </Radio.Group>
               <TabPane style={{bottom:"none"}} key="文档">
               <Form style={{marginLeft:"-2.1em",marginTop:"2em"}} {...formItemLayout} className="video-form">
-                    
+                   
                     <Form.Item label="方向">
                           {
                               getFieldDecorator('id',{})
@@ -123,17 +126,19 @@ class TextForm extends React.Component{
                   </Form>
               </TabPane>
               <TabPane style={{bottom:"none"}} key="专辑">
+                
               <Form style={{marginLeft:"-1.5em",marginTop:"2em"}} {...formItemLayout} className="album-form" >
                   <Form.Item label="所属专辑">
                           {
+                            
                               getFieldDecorator('teacherId',{})
                               (
-                                  <Select  placeholder="请选择专辑" name='teacherId'  >
-                                  {/* {
-                                      this.props.teacherState.teachers.map((item)=>{
-                                          return <Option key={item.id} value={item.id}>{item.realname}</Option>
+                                  <Select  placeholder="请选择专辑" name='id'  >
+                                  {
+                                      this.props.Db.textdalbum.map((item)=>{
+                                          return <Option key={item.id} value={item.id}>{item.da_name}</Option>
                                       })
-                                  } */}
+                                  }
                                   </Select>
                               )
                           }

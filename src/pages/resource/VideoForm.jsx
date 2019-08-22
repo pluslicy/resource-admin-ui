@@ -28,7 +28,9 @@ class VideoForm extends React.Component{
       }
     }
     componentWillMount(){
-      
+      this.props.dispatch({
+        type:'Db/fetchVideoDalBum'
+      })
     }
     handleChange(value) {
       console.log(`selected ${value}`);
@@ -129,11 +131,11 @@ class VideoForm extends React.Component{
                               getFieldDecorator('teacherId',{})
                               (
                                   <Select  placeholder="请选择专辑" name='teacherId'  >
-                                  {/* {
-                                      this.props.teacherState.teachers.map((item)=>{
-                                          return <Option key={item.id} value={item.id}>{item.realname}</Option>
+                                  {
+                                      this.props.Db.videodalbum.map((item)=>{
+                                          return <Option key={item.id} value={item.id}>{item.va_name}</Option>
                                       })
-                                  } */}
+                                  }
                                   </Select>
                               )
                           }

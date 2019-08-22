@@ -12,6 +12,7 @@ class TextModel extends React.Component{
     constructor(props){
         super(props);
         this.state={
+            childs:[],
             fileList: [],
             filelist:[],
             file:{},
@@ -20,6 +21,8 @@ class TextModel extends React.Component{
             visible3: false,
             percent:0,
             ok:0,
+            value:"请选择方向",
+            catalogue:"",
             textQuery:{
                 dr_created_time_start:"",
                 dr_created_time_end:"",
@@ -177,6 +180,8 @@ class TextModel extends React.Component{
     showModal1=()=>{
         this.setState({
         visible1: true,
+        childs:"",
+        value:"请选择方向"
         });
     }
     showModal=(file,fileList)=>{
@@ -207,9 +212,20 @@ class TextModel extends React.Component{
         visible3:false
     })
     if(this.state.file.status=='done'){
-        alert(1)
+        
     }
     };
+    closeTiaoZheng=()=>{
+      this.props.dispatch({
+        type:"Db/fetchUpdateText",payload:{ids:this.state.ids,catalogue:this.state.catalogue}
+      })
+      this.props.dispatch({
+        type:"Db/fetchText",payload:this.state.textQuery
+      })
+      this.setState({
+        visible1:false
+      })
+    }
      //修改文档名字
     editFileName=(item,e)=>{
         console.log(e.target.value,item)
@@ -224,7 +240,7 @@ class TextModel extends React.Component{
         }
         // this.showModal();
         if (info.file.status === 'done') {
-          alert(1)
+        
           let a=this.state.ok+1;
           this.setState({
             ok:a,
@@ -239,7 +255,21 @@ class TextModel extends React.Component{
     componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
       this.setState({textQuery:{...this.state.textQuery,...{catalogue_path:nextProps.treekey}}});
     }
+    selectFang(value){ 
+      var a=this.props.Db.catalist[0].childs.filter((item,index)=>{
+        if(item.id==value) return item;
+      })
+      this.setState({
+        childs:a[0].childs,
+        value
+      })
      
+    }
+    setBianMu=(value, selectedOptions)=>{
+      this.setState({
+        catalogue:value[value.length-1]
+      })
+    }
     render(){
         const columns2 = [
             {
@@ -434,17 +464,17 @@ class TextModel extends React.Component{
                         visible={this.state.visible1}
                         style={{display:"flex",justifyContent:"space-around"}}
                         footer={[
-                            <Button onClick={this.handleOk} style={{marginRight:"40%"}}>确认</Button>
+                            <Button onClick={this.closeTiaoZheng} style={{marginRight:"40%"}}>确认</Button>
                         ]}
                         >
-                        <Select style={{width:"180px",height:"40px"}}   placeholder="请选择方向">
+                        <Select onChange={this.selectFang.bind(this)} style={{width:"180px",height:"40px"}} value={this.state.value} placeholder="请选择方向">
                                         {
                                             this.props.Db.catalist[0].childs.map((item)=>{
                                                 return <Option key={item.id} value={item.id}>{item.catalogue_name}</Option>
                                             })
                                         }
                         </Select>
-                        <Cascader style={{marginLeft:"1em"}} onChange={this.casonChange1} placeholder="请选择" />
+                        <Cascader onChange={this.setBianMu} style={{marginLeft:"1em"}} options={this.state.childs} fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择方向"/>
                     </Modal>
                     <Modal
                     style={{top:"20px"}}

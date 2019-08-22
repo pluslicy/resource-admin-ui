@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import { findAllCata, findAllVideo, findAllText,DeleteAllText,EnableOrFreeze,EnableOrFreezeVideo,DeleteAllVideo,
-PermissionText,PermissionVideo} from '@/services/Db';
+PermissionText,PermissionVideo,findAllTextDalBum,findAllVideoDalBum,UpdateTextBian,UpdateVideoBian} from '@/services/Db';
 
 const DbModel = {
   namespace: 'Db',
@@ -8,7 +8,8 @@ const DbModel = {
     catalist: [{childs:[]}],
     videolist:{},
     textlist:{},
-   
+    textdalbum:[],
+    videodalbum:[]
   },
   effects: {
     // 获取所有编目
@@ -77,7 +78,30 @@ const DbModel = {
         type: 'fetchVideo'
       });
     },
-  
+     //查询视频专辑
+     *fetchVideoDalBum(_, { call, put }) {
+      const response = yield call(findAllVideoDalBum);
+      yield put({
+        type: 'reloadVideoDalBum',payload:response.results
+      });
+    },
+     //查询文档专辑
+     *fetchTextDalBum(_, { call, put }) {
+      const response = yield call(findAllTextDalBum);
+      console.log(response.results)
+      yield put({
+        type: 'reloadTextDalBum',payload:response.results
+      });
+    },
+     //修改文档编目
+     *fetchUpdateText(_, { call, put }) {
+      const response = yield call(UpdateTextBian,_.payload);
+    
+    },
+    //修改视频编目
+    *fetchUpdateVideo(_, { call, put }) {
+      const response = yield call(UpdateVideoBian,_.payload);
+    },
   },
   reducers: {
     // 更新状态中的catalist
@@ -98,6 +122,18 @@ const DbModel = {
       return {
         ...state,
         textlist: action.payload,
+      };
+    },
+    reloadVideoDalBum(state, action) {
+      return {
+        ...state,
+        videodalbum: action.payload,
+      };
+    },
+    reloadTextDalBum(state, action) {
+      return {
+        ...state,
+        textdalbum: action.payload,
       };
     }
   },

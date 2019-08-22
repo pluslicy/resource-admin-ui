@@ -4,6 +4,12 @@ import qs from 'qs';
 export async function findAllCata() {
   return request('/api/mp_man_catalog/catanestlist/');
 }
+export async function findAllVideoDalBum() {
+  return request('/api/up_man_perres/up_valbum/');
+}
+export async function findAllTextDalBum() {
+  return request('/api/up_man_perres/up_dalbum/');
+}
 
 export async function findAllVideo(param) {
   return request('/api/mp_man_res/videolist/', {
@@ -22,6 +28,24 @@ export async function findAllText(param) {
 export async function DeleteAllText(param) {
 
   return request('/api/mp_man_res/del_docs/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}
+export async function UpdateTextBian(param) {
+
+  return request('/api/mp_man_res/set_docs_cata/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}
+export async function UpdateVideoBian(param) {
+
+  return request('/api/mp_man_res/set_video_cata/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
