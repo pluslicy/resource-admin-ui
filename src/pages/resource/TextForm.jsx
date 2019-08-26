@@ -24,11 +24,15 @@ class TextForm extends React.Component{
     constructor(props){
       super(props)
       this.state={
-          key:this.props.flag
+          key:"",
+          childs:[]
       }
     }
     componentDidMount(){
-     
+      
+     this.setState({
+       key:this.props.flag
+     })
       this.props.dispatch({
         type:'Db/fetchTextDalBum'
       })
@@ -57,8 +61,25 @@ class TextForm extends React.Component{
             value: e.target.value,
           });
     };
+    selectFang(value){ 
+      var a=this.props.Db.catalist[0].childs.filter((item,index)=>{
+        if(item.id==value) return item;
+      })
+      this.setState({
+        childs:a[0].childs,
+        value
+      })
+     
+    }
     callback=(key)=>{
       console.log(key)
+    }
+    loadRadio(){
+      if(this.props.text.flag=="文档"){
+        return (<span><Radio value={"文档"}>文档</Radio><Radio disabled={true} value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
+      }else{
+       return  <span><Radio disabled={true} value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>
+      }
     }
     render(){
         const { getFieldDecorator } = this.props.form;
@@ -78,20 +99,27 @@ class TextForm extends React.Component{
           
             // <div className="DbForm" style={{width:"800px",height:"550px",}}>
             <div className={styles.DbForm}>
-            {/* <div></div> */}
-            <Tabs  tabBarStyle={{bottom:"none"}} style={{marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.state.key} onChange={this.callback}>
-              <Radio.Group defaultValue={this.state.key} style={{marginLeft:".5em"}} onChange={this.onRadioChange} >
-                  <Radio value={"文档"}>文档</Radio>
-                  <Radio value={"专辑"} style={{marginLeft:"2em"}}>专辑</Radio>
-              </Radio.Group>
-              <TabPane style={{bottom:"none"}} key="文档">
-              <Form style={{marginLeft:"-2.1em",marginTop:"2em"}} {...formItemLayout} className="video-form">
+         
+            <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.props.text.flag} onChange={this.callback}>
+                <Form.Item>
+                              {
+                                  getFieldDecorator('flag',{})
+                                  (
+                                    <Radio.Group defaultValue={this.state.key} style={{marginLeft:".5em"}} onChange={this.onRadioChange} >
+                                        {this.loadRadio()}
+                                    </Radio.Group>
+                                  )
+                              }
+                </Form.Item>
+              
+              <TabPane className={styles.tb} style={{bottom:"none"}} key="文档">
+              <Form style={{marginLeft:"-2.1em"}} {...formItemLayout} className="video-form">
                    
                     <Form.Item label="方向">
                           {
                               getFieldDecorator('id',{})
                               (
-                                  <Select  placeholder="请选择方向" name='teacherId'  >
+                                  <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}} onChange={this.selectFang.bind(this)} placeholder="请选择方向" name='teacherId'  >
                                   {
                                       this.props.Db.catalist[0].childs.map((item)=>{
                                           return <Option key={item.id} value={item.id}>{item.catalogue_name}</Option>
@@ -105,7 +133,7 @@ class TextForm extends React.Component{
                           {
                               getFieldDecorator('dd',{})
                               (
-                                <Cascader options={this.props.Db.catalist[0].childs} fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择方向"/>
+                                <Cascader  options={this.state.childs}  fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择技术"/>
                               )
                           }
                     </Form.Item>  
@@ -125,15 +153,15 @@ class TextForm extends React.Component{
                     </Form.Item>
                   </Form>
               </TabPane>
-              <TabPane style={{bottom:"none"}} key="专辑">
+              <TabPane className={styles.tb} style={{bottom:"none"}} key="专辑">
                 
-              <Form style={{marginLeft:"-1.5em",marginTop:"2em"}} {...formItemLayout} className="album-form" >
+              <Form style={{marginLeft:"-1.5em"}} {...formItemLayout} className="album-form" >
                   <Form.Item label="所属专辑">
                           {
                             
                               getFieldDecorator('teacherId',{})
                               (
-                                  <Select  placeholder="请选择专辑" name='id'  >
+                                  <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}}  placeholder="请选择专辑" name='id'  >
                                   {
                                       this.props.Db.textdalbum.map((item)=>{
                                           return <Option key={item.id} value={item.id}>{item.da_name}</Option>
@@ -147,12 +175,13 @@ class TextForm extends React.Component{
                           {
                               getFieldDecorator('sd',{})
                               (
-                                  <Select  placeholder="请选择方向" name='teacherId'  >
-                                  {/* {
-                                      this.props.teacherState.teachers.map((item)=>{
-                                          return <Option key={item.id} value={item.id}>{item.realname}</Option>
+                                 
+                                  <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}} onChange={this.selectFang.bind(this)} placeholder="请选择方向" name='sd'  >
+                                  {
+                                      this.props.Db.catalist[0].childs.map((item)=>{
+                                          return <Option key={item.id} value={item.id}>{item.catalogue_name}</Option>
                                       })
-                                  } */}
+                                  }
                                   </Select>
                               )
                           }
@@ -161,13 +190,7 @@ class TextForm extends React.Component{
                           {
                               getFieldDecorator('ad',{})
                               (
-                                  <Select  placeholder="请选择技术" name='teacherId'  >
-                                  {/* {
-                                      this.props.teacherState.teachers.map((item)=>{
-                                          return <Option key={item.id} value={item.id}>{item.realname}</Option>
-                                      })
-                                  } */}
-                                  </Select>
+                                <Cascader  options={this.state.childs}  fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择技术"/>
                               )
                           }
                     </Form.Item>  
@@ -196,9 +219,9 @@ class TextForm extends React.Component{
 const mapPropsToFields = (props) =>{
 
     let obj = {};
-    for(let key in props.course){
+    for(let key in props.text){
       obj[key] = Form.createFormField({
-        value: props.course[key]
+        value: props.text[key]
       })
     }
     return obj;

@@ -12,7 +12,9 @@ class TextModel extends React.Component{
     constructor(props){
         super(props);
         this.state={
+            names:[],
             childs:[],
+            flag:"",
             fileList: [],
             filelist:[],
             file:{},
@@ -227,8 +229,22 @@ class TextModel extends React.Component{
       })
     }
      //修改文档名字
-    editFileName=(item,e)=>{
-        console.log(e.target.value,item)
+    editFileName=(aa,e)=>{
+        var arr=[];
+        var brr=this.state.names;
+        this.state.filelist.forEach((item)=>{
+          arr.push(item.uid)
+        })
+        arr.forEach((item,index)=>{
+            if(item===aa.uid){
+                 brr[index]=e.target.value;
+            }
+        })
+
+        this.setState({
+          names:brr
+        })
+       
     }
     handleChange2=(info)=>{
     
@@ -236,7 +252,7 @@ class TextModel extends React.Component{
           percent:Math.round(info.file.percent)
         })
         if (info.file.status == 'uploading') {
-         
+          
         }
         // this.showModal();
         if (info.file.status === 'done') {
@@ -269,6 +285,9 @@ class TextModel extends React.Component{
       this.setState({
         catalogue:value[value.length-1]
       })
+    }
+    updateFileName(e){
+      console.log(this.state.names)
     }
     render(){
         const columns2 = [
@@ -374,8 +393,8 @@ class TextModel extends React.Component{
         },
         };
         const props = {
-            //  action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
-              action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+             action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+              // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
               onChange: this.handleChange2,
               accept:".doc,.docx,.mp4",
               data:{
@@ -387,10 +406,26 @@ class TextModel extends React.Component{
         return (
             <div className="table">
                 {/* 文件上传组件 */}
-                <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{this.setState({
+                <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
+                  
+                  if(fileList.length==1){
+                    this.setState({
+                      flag:"文档"
+                    })
+                  }else{
+                    this.setState({
+                      flag:"专辑"
+                    })
+                  }
+                var b=[];
+                fileList.forEach((item)=>{
+                    b.push(item.name);
+                })
+                this.setState({
                 filelist:fileList,
                 file:file,
-                ok:0
+                ok:0,
+                names:b
                 });this.showModal(file,fileList)}}>
                 <Button style={{width:"90px",top:"1em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"89.5%",marginTop:"0em"}} >
                     <Icon type="upload" />上传
@@ -474,7 +509,7 @@ class TextModel extends React.Component{
                                             })
                                         }
                         </Select>
-                        <Cascader onChange={this.setBianMu} style={{marginLeft:"1em"}} options={this.state.childs} fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择方向"/>
+                        <Cascader onChange={this.setBianMu} style={{marginLeft:"1em"}} options={this.state.childs} fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择技术"/>
                     </Modal>
                     <Modal
                     style={{top:"20px"}}
@@ -513,7 +548,7 @@ class TextModel extends React.Component{
                         {
                             this.state.filelist.map((item,index)=>{
                             return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                            <Input onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}>修改</span>} defaultValue={item.name} />
+                            <Input onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}} onClick={this.updateFileName.bind(this)}>修改</span>} defaultValue={item.name} />
                             </li>)
                             })
                         }
@@ -529,7 +564,8 @@ class TextModel extends React.Component{
                         </p>
 
                     </div>
-                   <TextForm wrappedComponentRef={this.saveFormRef}  flag="文档"/> 
+                    
+                   <TextForm wrappedComponentRef={this.saveFormRef} text={{flag:this.state.flag}} flag={this.state.flag}/> 
                     <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
                     </Modal>      
           </div>
