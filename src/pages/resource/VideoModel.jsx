@@ -20,6 +20,7 @@ class VideoModel extends React.Component{
             ids:[],
             catalogue:"",
             value:"请选择方向",
+            flag:"",
             visible1:false,
             visible:false,
             query:{
@@ -229,7 +230,7 @@ class VideoModel extends React.Component{
         }
         // this.showModal();
         if (info.file.status === 'done') {
-          alert(1)
+
           let a=this.state.ok+1;
           this.setState({
             ok:a,
@@ -397,7 +398,17 @@ class VideoModel extends React.Component{
             <div className="table">
                     {/* 文件上传组件 */}
                    
-                    <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{this.setState({
+                    <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
+                      if(fileList.length==1){
+                      this.setState({
+                        flag:"视频"
+                      })
+                    }else{
+                      this.setState({
+                        flag:"专辑"
+                      })
+                    }
+                    this.setState({
                     filelist:fileList,
                     file:file,
                     ok:0
@@ -488,7 +499,7 @@ class VideoModel extends React.Component{
                                             })
                                         }
                         </Select>
-                        <Cascader onChange={this.setBianMu} style={{marginLeft:"1em"}} options={this.state.childs} fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择方向"/>
+                        <Cascader onChange={this.setBianMu} style={{marginLeft:"1em"}} options={this.state.childs} fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}   changeOnSelect placeholder="请选择技术"/>
                     </Modal>
                     <Modal
                         style={{top:"20px"}}
@@ -511,7 +522,7 @@ class VideoModel extends React.Component{
                                 percent={this.state.percent}
                             />
                             
-                        <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.fileList.length}</span>
+                        <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.filelist.length}</span>
                         
                         </div>
                         }
@@ -544,7 +555,8 @@ class VideoModel extends React.Component{
                             </p>
 
                         </div>
-                        <VideoForm wrappedComponentRef={this.saveFormRef}  flag="视频"/>
+
+                        <VideoForm wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag}} flag={this.state.flag}/>
                         <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
                         </Modal>        
             </div>
