@@ -1,7 +1,11 @@
 import React from 'react';
-import {Button,Input,Table,Icon,Select,Checkbox ,Modal,Radio,Upload,message ,Avatar,Dropdown,Menu,Tooltip } from 'antd';
+import {Button,Input,Table,Icon,Select,Checkbox ,Modal,Radio,Upload,message ,Avatar,Dropdown,Menu,Tooltip,Tabs,} from 'antd';
+import _ from 'lodash'
 const {Search} = Input;
 const {Option} = Select;
+// tabs用户
+const { TabPane } = Tabs;
+
 
 // 引入自定义组件
 import style from './User.less'
@@ -9,6 +13,9 @@ import UserForm from './UserForm';
 import AddForm from './AddForm';
 import ModifyForm from './ModifyForm'
 import {connect} from 'dva'
+import index from '../Welcome';
+
+
 
 class User extends React.Component { 
   constructor (props){
@@ -16,10 +23,11 @@ class User extends React.Component {
     this.state =({
       ids:[],
       query:{},
-      visible:false,
-      visibleImport:false,
-      visiblePermise:false,
-      visibleModify:false,
+      groups:[],
+      // visible:false,
+      // visibleImport:false,
+      // visiblePermise:false,
+      // visibleModify:false,
       // 添加单选按钮
       value:"",
       textQuery:{
@@ -40,10 +48,10 @@ class User extends React.Component {
       type:'users/fetchUser',
      
     })
-    // this.props.dispatch({
-    //   type:'users/fetchRole',
+    this.props.dispatch({
+      type:'users/fetchRole',
      
-    // })
+    })
   }
 
    //批量删除用户
@@ -106,23 +114,27 @@ class User extends React.Component {
     // 提交表单
     e.preventDefault();
     const { form } = this.formRef.props;
-    form.validateFields((err, values) => {
+    form.validateFields(['username','password','user_phone','user_gender','groups'],(err, values) => {
         if (err) {
-        return;
+          console.log(err)
+          this.setState({
+            visible:true
+          })
+        return ;
         }
-
+        this.setState({
+          visible:false
+        })
+       
         console.log('Received values of form: ', values);
         this.props.dispatch({
           type:"users/AddUsers",
           payload:values
       })
-        form.resetFields();
+        // form.resetFields();
 
     });
-      this.setState({
-        visible:false
-      })
-     
+      
     };
 
   // 添加用户模态框
@@ -131,6 +143,13 @@ class User extends React.Component {
       visible:true, 
     })
   }
+
+  handleCancelModal = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };  
   // 导入的单选按钮
   onChange = e => {
     console.log('radio checked', e.target.value);
@@ -221,21 +240,29 @@ class User extends React.Component {
     };
 
 
-  // 添加权限模态框
-  showPermise =()=>{
+  // 添加角色模态框
+  showPermise =(record)=>{
+    var arr=record.groups.map((item)=>{
+      return item.id;
+    })
+    console.log(arr)
     this.setState({
-      visiblePermise:true, 
+      visiblePermise:true,
+      groups:arr
     })
   }
+  // 添加角色ok
   AddPermiseOk = e => {
     console.log(e);
     this.setState({
       visiblePermise: false,
     });
   };
+  // 添加角色取消
   AddPermiseCancel = e => {
     console.log(e);
     this.setState({
+      groups:[],
       visiblePermise: false,
     });
   };  
@@ -258,9 +285,26 @@ class User extends React.Component {
       visibleModify: false,
     });
   };  
-
+  handleChangeRole(value) {
+    console.log(`selected ${value}`);
+    console.log("--",this.state.groups)
+    var arr=[];
+    arr.push(value)
+    // _.pull(arr,parseInt(value));
+    this.setState({
+        groups:arr
+    })
+  }
  
   render(){   
+    
+    // 添加角色的下拉
+    const children = [];
+    for (let i = 0; i < this.props.users.roles.length; i++) {
+      children.push(<Option value={this.props.users.roles[i].name} key={this.props.users.roles[i].id}>{this.props.users.roles[i].name}</Option>);
+    }
+
+   
     // 导入悬浮按钮
     const text = <span>导入时需要按模板填写,点击<a>下载</a></span>; 
     // 表格第一列选框
@@ -296,11 +340,21 @@ class User extends React.Component {
       },
       {
         title: '角色',
-        dataIndex: 'role',
+        dataIndex: 'groups',
         render:(text,record)=>{
+        
+         var str=" ";
+         record.groups.forEach((item)=>{
+           str=str+item.name+","
+         })
+       
+
+        str=str.slice(0,str.length-1)
           return(
             <div>
-              {text}<Icon type="plus" onClick={this.showPermise.bind(this)}/>
+              <Input style={{width:"100px"}} size="small" disabled={true} defaultValue={str} />
+
+              <Icon type="plus" style={{color:'skyblue',marginLeft:"5px"}} onClick={this.showPermise.bind(this,record)}/>
             </div>
           )
         }
@@ -354,6 +408,9 @@ class User extends React.Component {
 
     return (
       <div className={style.Back}>
+        <Tabs defaultActiveKey="1">
+              <TabPane tab="用户" key="1"> </TabPane>
+        </Tabs>
         <div className={style.btn}>
           <Button className={style.btn} style={{width:'80px'}} type='primary' onClick={this.showModal}>添加</Button>
           <Search
@@ -400,7 +457,7 @@ class User extends React.Component {
               let p = page - 1;
               console.log(p);
             },
-            pageSize: 10,
+            pageSize: 6,
             size:'small',
             
             hideOnSinglePage: false,
@@ -424,11 +481,11 @@ class User extends React.Component {
         
         {/* 添加用户模态框 */}
         <Modal
-          title='添加角色'
+          title='添加用户'
           width='600px'
           visible={this.state.visible}
           onOk={this.handleOkModal}
-          onCancel={this.handleCancel}
+          onCancel={this.handleCancelModal}
         >
           <AddForm wrappedComponentRef={this.saveFormRef}/>
         </Modal>
@@ -475,20 +532,27 @@ class User extends React.Component {
               <UserForm />
         </Modal>
        
-        {/* 添加权限模态框 */}
+        {/* 添加角色模态框 */}
         <Modal
           width='600px'
+          height='800px'
           title="为该用户选择角色"
           visible={this.state.visiblePermise}
           onOk={this.AddPermiseOk}
           onCancel={this.AddPermiseCancel}
-        >
-          <div style={{height:'100px'}}>
-            <ul>
-                <li style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'1em'}}>杰普教师</li>  
-              
-            </ul>  
-          </div>
+         >
+              {console.log("++",this.state.groups)}
+                <Select
+                  mode="multiple"
+                  style={{ width: '100%' }}
+                  placeholder="Please select"
+                  value={this.state.groups}
+                  onChange={this.handleChangeRole.bind(this)}
+                >
+                  {
+                    children                   
+                  }
+                </Select>
         </Modal>
 
         {/* 修改模态框 */}
