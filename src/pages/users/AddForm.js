@@ -1,7 +1,10 @@
 import React from 'react';
-import { Form, Input,Button,Radio} from 'antd';
+import { Form, Input,Button,Radio,Select} from 'antd';
 import {connect}  from 'dva'
 import $ from 'jquery'
+
+
+
 class AddForm extends React.Component {
   constructor(props){
     super(props)
@@ -15,76 +18,83 @@ class AddForm extends React.Component {
      
     })
   }
-  xiugai=(event)=>{
-    this.state.arr.remove(event.target.value)
-    this.props.form.setFieldsValue({des:this.state.arr})
-    $("."+event.target.value).css({background:"none"})
-  }
-  addRole=(event)=>{
-    // this.props.form.validateFields((err, values) => {
-    //   if (err) {
-    //   return;
-    //   }
-
-    //   console.log('Received values of form: ', values);
-    // })
-    // this.setState({
-    //   arr:this.state.arr.push(event.target.value)
-    // })
-    this.state.arr.push(event.target.value)
-    this.props.form.setFieldsValue({groups:this.state.arr})
-    $("."+event.target.value).css({background:"green"})
-    //console.log(this.state.arr)
-  }
+  
   render() {
+
+    const formLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 6 },
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 },
+      },
+    };
+    const { Option } = Select;
+
+    const children = [];
+    for (let i = 10; i < 36; i++) {
+      children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
+    }
+    
+    function handleChange(value) {
+      console.log(`selected ${value}`);
+    }
+    
+    
     const { getFieldDecorator } = this.props.form;
     getFieldDecorator('id');
     return (
       <div>
-        <Form className="login-form">
-          <Form.Item>
+         <Form layout="vertical" {...formLayout}>
+          <Form.Item label="用户名">
             {getFieldDecorator('username', {
               rules: [{ required: true, message: '请输入用户名!' }],
-            })(<Input style={{marginBottom:'1em'}} placeholder='输入用户名' />)}
+            })(<Input />)}
           </Form.Item>
-          <Form.Item>
+          <Form.Item label="密码">
             {getFieldDecorator('password', {
               rules: [{ required: true, message: '请输入密码!' }],
-            })(<Input style={{marginBottom:'1em'}} placeholder='输入密码' />)}
+            })(<Input />)}
           </Form.Item>
-          
-          <Form.Item>
+          <Form.Item label="联系方式">
             {getFieldDecorator('user_phone', {
               rules: [{ required: true, message: '请输入联系方式!' }],
-            })(<Input style={{marginBottom:'1em'}} placeholder='输入联系方式' />)}
+            })(<Input />)}
           </Form.Item>
-          <Form.Item>
-            {getFieldDecorator('user_gender')(
-              <div>
-                性别：
-                <Radio.Group >
+          
+          <Form.Item label="性别">
+            {getFieldDecorator('user_gender',
+               { rules: [{ required: true,message: '请选择性别!'}],})
+               (
+                <Radio.Group name="user_gender">
                   <Radio value={1}>男</Radio>
                   <Radio value={2}>女</Radio>
-        
                </Radio.Group>
-              </div> 
             )}
           </Form.Item>
-          <Form.Item>
-          {getFieldDecorator('groups')(
-              <div style={{height:'100px'}}>
-                添加角色
-                <ul>
-                 
-                   {
-                      this.props.users.roles.map((item,index,arr)=>{
-               
-                          return ( <li onDoubleClick={this.xiugai} className={item.id} value={item.id} onClick={this.addRole.bind(item)} style={{float:'left',width:'80px',height:'30px',border:'1px solid #ccc',lineHeight:'30px',marginRight:'1em',paddingLeft:'1em'}} key={item.id}>{item.name}</li>  )
-                      })
-                   }
-                </ul>  
-              </div>
-              )}
+
+          <Form.Item label="角色">
+           {getFieldDecorator('groups',
+            { rules: [{ required: true,message: '请选择角色!'}],})
+              (
+              
+              <Select
+                showArrow={true}
+                mode="multiple"
+                style={{ width: '100%' }}
+                placeholder="请选择角色"
+                name="groups"
+              >
+                {
+                   this.props.users.roles.map((item,index,arr)=>{
+                    return ( <Option value={item.id}   key={item.id}>{item.name}</Option>  )
+                })
+                }
+              </Select>
+              
+           )}
           </Form.Item>
         </Form>
       </div>
