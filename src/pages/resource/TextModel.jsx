@@ -13,6 +13,7 @@ class TextModel extends React.Component{
         super(props);
         this.state={
             names:[],
+            arr:[],
             childs:[],
             flag:"",
             fileList: [],
@@ -207,15 +208,67 @@ class TextModel extends React.Component{
         }
 
         console.log('Received values of form: ', values);
+        console.log('up values',this.state.arr)
+       
+        var saveArr=[];
+        if(values.flag=="专辑"){
+          
+          this.state.arr.forEach((item,index)=>{
+            var b={
+              da:"",
+              catalogue:"",
+              user: 1,
+              dr_name:"",
+              dr_url:"",
+              dr_desc:"",
+              dr_permission: 1,
+              dr_owner: 1,
+              dr_format:"",
+              dr_size:"",
+              dr_page:0
+            }
+            b.da=values.da;b.catalogue=parseInt(values.zj_ad[values.zj_ad.length-1]);b.dr_name=item.resource_name;b.dr_url=item.resource_url;
+            b.dr_desc=values.zj_description;b.dr_format=item.resource_type;b.dr_size=item.resource_size;
+            if(values.zj_vip==true){
+              b.dr_permission=0;
+            }
+            saveArr.push(b)
+          })
+         
+        }
+        else{
+          this.state.arr.forEach((item,index)=>{
+            var b={
+              da:"",
+              catalogue:"",
+              user: 1,
+              dr_name:"",
+              dr_url:"",
+              dr_desc:"",
+              dr_permission: 1,
+              dr_owner: 1,
+              dr_format:"",
+              dr_size:"",
+              dr_page:0
+            }
+            b.da=values.da;b.catalogue=parseInt(values.text_js[values.text_js.length-1]);b.dr_name=item.resource_name;b.dr_url=item.resource_url;
+            b.dr_desc=values.description;b.dr_format=item.resource_type;b.dr_size=item.resource_size;
+            if(values.name==true){
+              b.dr_permission=0;
+            }
+            saveArr.push(b)
+          })
+          
+        }
+        this.props.dispatch({
+          type:"Db/fetchUploadOneOrMore",payload:saveArr
+        })
         form.resetFields();
     });
-    this.setState({
-        visible1:false,
-        visible3:false
-    })
-    if(this.state.file.status=='done'){
-        
-    }
+      this.setState({
+          visible1:false,
+          visible3:false
+      })
     };
     closeTiaoZheng=()=>{
       this.props.dispatch({
@@ -244,10 +297,22 @@ class TextModel extends React.Component{
         this.setState({
           names:brr
         })
-       
+        
     }
     handleChange2=(info)=>{
-    
+       
+        var upobj={
+          resource_id:"",
+          resource_name:"",
+          resource_url:"",
+          resource_enable:"",
+          resource_type:"",
+          resource_size:"",
+          created_time:""
+        }
+        this.setState({
+          file:info.file
+        })
         this.setState({
           percent:Math.round(info.file.percent)
         })
@@ -256,17 +321,27 @@ class TextModel extends React.Component{
         }
         // this.showModal();
         if (info.file.status === 'done') {
-        
+          var arr=this.state.arr;
+          const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
+          upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
           let a=this.state.ok+1;
+          arr.push(upobj)
           this.setState({
             ok:a,
-            file:info.file
+            file:info.file,
+            arr:arr
           })
-          console.log(info.file.response)//文件上传接口返回的响应
           message.success(`${info.file.name} file uploaded successfully`);
         } else if (info.file.status === 'error') {
+          var arr=this.state.names;
+          arr.forEach((item,index,arr)=>{
+            if(item==info.file.name){
+              arr.splice(index,index)
+            }
+          })
           message.error(`${info.file.name} file upload failed.`);
         }
+        
       }
     componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
       this.setState({textQuery:{...this.state.textQuery,...{catalogue_path:nextProps.treekey}}});
@@ -288,6 +363,8 @@ class TextModel extends React.Component{
     }
     updateFileName(e){
       console.log(this.state.names)
+      console.log(this.state.arr)
+
     }
     render(){
         const columns2 = [
@@ -400,14 +477,16 @@ class TextModel extends React.Component{
               data:{
                 file:this.state.file,
                 token:"dddd",
-                resource_name:this.state.file.name
+                resource_name:this.state.names.map((item)=>{
+                  if(item===this.state.file.name) return item;
+                })
               }
         };
         return (
             <div className="table">
                 {/* 文件上传组件 */}
                 <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
-                  
+                  console.log(file)
                   if(fileList.length==1){
                     this.setState({
                       flag:"文档"
@@ -425,7 +504,8 @@ class TextModel extends React.Component{
                 filelist:fileList,
                 file:file,
                 ok:0,
-                names:b
+                names:b,
+                arr:[]
                 });this.showModal(file,fileList)}}>
                 <Button style={{width:"90px",top:"1em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"89.5%",marginTop:"0em"}} >
                     <Icon type="upload" />上传
@@ -565,7 +645,7 @@ class TextModel extends React.Component{
 
                     </div>
                     
-                   <TextForm wrappedComponentRef={this.saveFormRef} text={{flag:this.state.flag}} flag={this.state.flag}/> 
+                    <TextForm wrappedComponentRef={this.saveFormRef} text={{flag:this.state.flag}} flag={this.state.flag}/> 
                     <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
                     </Modal>      
           </div>

@@ -101,6 +101,7 @@ class TextForm extends React.Component{
             <div className={styles.DbForm}>
          
             <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.props.text.flag} onChange={this.callback}>
+            <Button style={{position:"absolute",left:"80%",top:"3.8em"}}>创建专辑</Button>
                 <Form.Item>
                               {
                                   getFieldDecorator('flag',{})
@@ -131,7 +132,7 @@ class TextForm extends React.Component{
                     </Form.Item>
                     <Form.Item label="技术" >
                           {
-                              getFieldDecorator('dd',{})
+                              getFieldDecorator('text_js',{})
                               (
                                 <Cascader  options={this.state.childs}  fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择技术"/>
                               )
@@ -159,7 +160,7 @@ class TextForm extends React.Component{
                   <Form.Item label="所属专辑">
                           {
                             
-                              getFieldDecorator('teacherId',{})
+                              getFieldDecorator('da',{})
                               (
                                   <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}}  placeholder="请选择专辑" name='id'  >
                                   {
@@ -173,7 +174,7 @@ class TextForm extends React.Component{
                     </Form.Item>
                     <Form.Item label="方向">
                           {
-                              getFieldDecorator('sd',{})
+                              getFieldDecorator('zj_fid',{})
                               (
                                  
                                   <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}} onChange={this.selectFang.bind(this)} placeholder="请选择方向" name='sd'  >
@@ -188,21 +189,21 @@ class TextForm extends React.Component{
                     </Form.Item>
                     <Form.Item label="技术" >
                           {
-                              getFieldDecorator('ad',{})
+                              getFieldDecorator('zj_ad',{})
                               (
                                 <Cascader  options={this.state.childs}  fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择技术"/>
                               )
                           }
                     </Form.Item>  
                     <Form.Item  label="">
-                      {getFieldDecorator('gg', {
+                      {getFieldDecorator('zj_vip', {
                         })(
                       
                         <Checkbox style={{paddingLeft:"5em"}} value={1}> &nbsp;设置为vip</Checkbox>
                       )}
                     </Form.Item>
                     <Form.Item style={{marginTop:"-1em"}} label="专辑描述">
-                      {getFieldDecorator('adescription', {
+                      {getFieldDecorator('zj_description', {
                       
                       })(
                         <TextArea rows={3} />

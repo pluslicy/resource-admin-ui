@@ -7,12 +7,16 @@ const {RangePicker} = DatePicker;
 const { Option } = Select;
 import VideoForm from './VideoForm'
 import styles from './db.less'
+import AddTextForm from './addTextForm';
 var treeKey="";
 class VideoModel extends React.Component{
     constructor(props){
         super(props);
        
         this.state={
+            names:[],
+            add:false,
+            arr:[],
             childs:[],
             fileList: [],
             filelist:[],
@@ -23,6 +27,7 @@ class VideoModel extends React.Component{
             flag:"",
             visible1:false,
             visible:false,
+            vtext:{},
             query:{
                 vr_created_time_start:"",
                 vr_created_time_end:"",
@@ -30,7 +35,7 @@ class VideoModel extends React.Component{
                 byhot:false,
                 search:"",
                 vr_format:"",
-                dr_permission:"",
+                vr_permission:"",
                 vr_enable:'',
                 catalogue_path:"",
                 catalogue:""
@@ -55,6 +60,7 @@ class VideoModel extends React.Component{
     handleCancel1 = e => {
         this.setState({
           visible1: false,
+          add:false
         });
     };
     //根据日期查询
@@ -85,7 +91,7 @@ class VideoModel extends React.Component{
     }
     //批量删除 视频和文档完成
     batchDelete=()=>{
-        this.props.dispatch({
+      this.props.dispatch({
             type:"Db/fetchDeleteVideo",
             payload:this.state.ids
         })
@@ -194,56 +200,138 @@ class VideoModel extends React.Component{
         });
     }
     showModal=(file,fileList)=>{
-        
+      if(add_text!=null){
+        var add_text=document.getElementById("add_text")
+        console.log(add_text.style)
+        add_text.style.display="none"
+        var btn=document.getElementById("submit_btn")
+        btn.style.opacity="1";
+        btn.style.pointerEvents="auto"
+        btn.style.background="rgba(22, 155, 213, 1)"
+      }
+       
         this.setState({
             visible: true,
         });
         
     }
     handleOk = e => {
-      // 提交表单
       e.preventDefault();
       const { form } = this.formRef.props;
       form.validateFields((err, values) => {
-        if (err) {
+          if (err) {
           return;
-        }
+          }
   
-        console.log('Received values of form: ', values);
-        form.resetFields();
+          console.log('Received values of form: ', values);
+          console.log('up values',this.state.arr)
+         
+          var saveArr=[];
+          if(values.flag=="专辑"){
+            
+            this.state.arr.forEach((item,index)=>{
+              var b={
+                va:"",
+                catalogue:"",
+                user: 1,
+                vr_name:"",
+                vr_url:"",
+                vr_desc:"",
+                vr_permission: 1,
+                vr_owner: 1,
+                vr_format:"",
+                vr_size:"",
+                vr_time:''
+              }
+              b.va=values.da;b.catalogue=parseInt(values.zj_ad[values.zj_ad.length-1]);b.vr_name=item.resource_name;b.vr_url=item.resource_url;
+              b.vr_desc=values.zj_description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;b.vr_time=item.created_time;
+              if(values.zj_vip==true){
+                b.vr_permission=0;
+              }
+              saveArr.push(b)
+            })
+           
+          }
+          else{
+            this.state.arr.forEach((item,index)=>{
+              var b={
+                va:"",
+                catalogue:"",
+                user: 1,
+                vr_name:"",
+                vr_url:"",
+                vr_desc:"",
+                vr_permission: 1,
+                vr_owner: 1,
+                vr_format:"",
+                vr_size:"",
+                vr_time:''
+              }
+              b.va=values.da;b.catalogue=parseInt(values.video_js[values.video_js.length-1]);b.vr_name=item.resource_name;b.vr_url=item.resource_url;
+              b.vr_desc=values.description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;b.vr_time=item.created_time
+              if(values.name==true){
+                b.vr_permission=0;
+              }
+              saveArr.push(b)
+            })
+            
+          }
+          this.props.dispatch({
+            type:"Db/fetchUploadVideoOneOrMore",payload:saveArr
+          })
+          form.resetFields();
       });
+      
       this.setState({
         visible:false,
         visible1:false
       })
-      if(this.state.file.status=='done'){
-        
-      }
+      
     };
     handleChange2=(info)=>{
     
+      var upobj={
+        resource_id:"",
+        resource_name:"",
+        resource_url:"",
+        resource_enable:"",
+        resource_type:"",
+        resource_size:"",
+        created_time:""
+      }
+      this.setState({
+        file:info.file
+      })
+      this.setState({
+        percent:Math.round(info.file.percent)
+      })
+      if (info.file.status == 'uploading') {
+        
+      }
+      // this.showModal();
+      if (info.file.status === 'done') {
+        var arr=this.state.arr;
+        const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
+        upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
+        let a=this.state.ok+1;
+        arr.push(upobj)
         this.setState({
-          percent:Math.round(info.file.percent)
+          ok:a,
+          file:info.file,
+          arr:arr
         })
-        if (info.file.status == 'uploading') {
-         
-        }
-        // this.showModal();
-        if (info.file.status === 'done') {
-
-          let a=this.state.ok+1;
-          this.setState({
-            ok:a,
-            file:info.file
-          })
-          console.log(info.file.response)//文件上传接口返回的响应
-          message.success(`${info.file.name} file uploaded successfully`);
-        } else if (info.file.status === 'error') {
-          message.error(`${info.file.name} file upload failed.`);
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        var arr=this.state.names;
+        arr.forEach((item,index,arr)=>{
+          if(item==info.file.name){
+            arr.splice(index,index)
+          }
+        })
+        message.error(`${info.file.name} file upload failed.`);
         }
       }
     handleCancel = e => {
-    
         this.setState({
           visible1: false,
           visible:false,
@@ -251,9 +339,29 @@ class VideoModel extends React.Component{
           percent:0,
           file:{}
         });
+        this.props.dispatch({
+          type:"Db/fetchUpdateFlag",payload:""
+        })
     };
      //修改文档名字
-     closeTiaoZheng=()=>{
+    editFileName=(aa,e)=>{
+      var arr=[];
+      var brr=this.state.names;
+      this.state.filelist.forEach((item)=>{
+        arr.push(item.uid)
+      })
+      arr.forEach((item,index)=>{
+          if(item===aa.uid){
+               brr[index]=e.target.value;
+          }
+      })
+
+      this.setState({
+        names:brr
+      })
+      
+    }
+    closeTiaoZheng=()=>{
       this.props.dispatch({
         type:"Db/fetchUpdateVideo",payload:{ids:this.state.ids,catalogue:this.state.catalogue}
       })
@@ -263,6 +371,11 @@ class VideoModel extends React.Component{
       this.setState({
         visible1:false
       })
+    }
+    updateFileName(e){
+      console.log(this.state.names)
+      console.log(this.state.arr)
+
     }
     selectFang(value){
       var a=this.props.Db.catalist[0].childs.filter((item,index)=>{
@@ -277,6 +390,22 @@ class VideoModel extends React.Component{
       this.setState({
         catalogue:value[value.length-1]
       })
+    }
+    uptext(e){
+      if(e.target.__reactInternalInstance$q2jug5y2evp)
+           console.log(e.target.__reactInternalInstance$q2jug5y2evp.key);
+      var add_text=document.getElementById("add_text")
+      console.log(add_text.style)
+      add_text.style.display="block"
+      add_text.style.zIndex="1";
+      var btn=document.getElementById("submit_btn")
+      btn.style.opacity="0.5";
+      btn.style.pointerEvents="none"
+      btn.style.background="grey"
+      console.log(btn)
+      // this.setState({
+      //   vtext:e.target.__reactInternalInstance$htlud7b3i2u
+      // })
     }
     render(){
         const columns = [
@@ -383,14 +512,16 @@ class VideoModel extends React.Component{
             },
         };
         const props = {
-            //  action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+              // action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
               action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
               onChange: this.handleChange2,
               accept:".doc,.docx,.mp4",
               data:{
                 file:this.state.file,
                 token:"dddd",
-                resource_name:"test3"
+                resource_name:this.state.names.map((item)=>{
+                  if(item===this.state.file.name) return item;
+                })
               }
         };
        
@@ -399,25 +530,37 @@ class VideoModel extends React.Component{
                     {/* 文件上传组件 */}
                    
                     <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
-                      if(fileList.length==1){
-                      this.setState({
-                        flag:"视频"
+                        console.log(file)
+                        if(fileList.length==1){
+                          this.setState({
+                            flag:"视频"
+                          })
+                          this.props.dispatch({
+                            type:"Db/fetchUpdateFlag",payload:"视频"
+                          })
+                        }else{
+                          this.setState({
+                            flag:"专辑"
+                          })
+                          this.props.dispatch({
+                            type:"Db/fetchUpdateFlag",payload:"视频"
+                          })
+                        }
+                      var b=[];
+                      fileList.forEach((item)=>{
+                          b.push(item.name);
                       })
-                    }else{
                       this.setState({
-                        flag:"专辑"
-                      })
-                    }
-                    this.setState({
-                    filelist:fileList,
-                    file:file,
-                    ok:0
-                    });this.showModal(file,fileList)}}>
+                      filelist:fileList,
+                      file:file,
+                      ok:0,
+                      names:b,
+                      arr:[]
+                      });this.showModal(file,fileList)}}>
                     <Button style={{width:"90px",top:"1em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"89.5%",marginTop:"0em"}} >
                         <Icon type="upload" />上传
                     </Button>
                     </Upload>
-                    {this.props.someThings}
                     <RangePicker  onChange={this.onChange2} style={{width:"220px"}} defaultValue={[moment('2018/12/11', dateFormat), moment('2018/12/12', dateFormat)]}
                     format={dateFormat} />
                     {JSON.stringify(this.props.treeKey)}
@@ -539,7 +682,7 @@ class VideoModel extends React.Component{
                                 this.state.filelist.map((item,index)=>{
                                 return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
                                 <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
-                                <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span style={{fontSize:"12px",color:"#3585FE"}}>&nbsp;&nbsp;+文档</span>
+                                <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.name}>&nbsp;&nbsp;+文档</span>
                                 </li>)
                                 })
                             }
@@ -555,10 +698,14 @@ class VideoModel extends React.Component{
                             </p>
 
                         </div>
-
-                        <VideoForm wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag}} flag={this.state.flag}/>
-                        <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
-                        </Modal>        
+                        
+                        <VideoForm id="v_form" wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag,name:this.state.vtext.key}} add={this.state.add} flag={this.state.flag}/>
+                        <div id="add_text" style={{display:"none",width:"570px",height:"405px",left:"260px",top:"150px",position:"absolute",background:"#fff",overflowY:"auto"}}>
+                          <AddTextForm></AddTextForm>
+                        </div>
+                        <Button id="submit_btn" onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
+                        </Modal>   
+                        
             </div>
         );
     }

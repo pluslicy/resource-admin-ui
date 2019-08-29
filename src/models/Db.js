@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import { findAllCata, findAllVideo, findAllText,DeleteAllText,EnableOrFreeze,EnableOrFreezeVideo,DeleteAllVideo,
-PermissionText,PermissionVideo,findAllTextDalBum,findAllVideoDalBum,UpdateTextBian,UpdateVideoBian} from '@/services/Db';
+PermissionText,PermissionVideo,findAllTextDalBum,findAllVideoDalBum,UpdateTextBian,UpdateVideoBian,UploadOneOrMore,UploadVideoOneOrMore} from '@/services/Db';
 
 const DbModel = {
   namespace: 'Db',
@@ -9,7 +9,8 @@ const DbModel = {
     videolist:{},
     textlist:{},
     textdalbum:[],
-    videodalbum:[]
+    videodalbum:[],
+    flag:""
   },
   effects: {
     // 获取所有编目
@@ -19,6 +20,14 @@ const DbModel = {
         type: 'reloadCatalist',
         payload: response.data,
       });
+    },
+    //访问后台接口，上传文档
+    *fetchUploadOneOrMore(_, { call, put }) {
+      yield call(UploadOneOrMore,_.payload);
+    },
+    //访问后台接口，上传视频
+    *fetchUploadVideoOneOrMore(_, { call, put }) {
+      yield call(UploadVideoOneOrMore,_.payload);
     },
     //获取所有视频列表
     *fetchVideo(_, { call, put }) {
@@ -102,6 +111,11 @@ const DbModel = {
     *fetchUpdateVideo(_, { call, put }) {
       const response = yield call(UpdateVideoBian,_.payload);
     },
+    *fetchUpdateFlag(_, { call, put }) {
+      yield put({
+        type: 'loadFlag',payload:_.payload
+      });
+    },
   },
   reducers: {
     // 更新状态中的catalist
@@ -112,7 +126,6 @@ const DbModel = {
       };
     },
     reloadVideolist(state, action) {
-      
       return {
         ...state,
        videolist:action.payload
@@ -134,6 +147,12 @@ const DbModel = {
       return {
         ...state,
         textdalbum: action.payload,
+      };
+    },
+    loadFlag(state,action){
+      return {
+        ...state,
+        flag: action.payload,
       };
     }
   },

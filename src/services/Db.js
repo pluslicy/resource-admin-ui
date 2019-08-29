@@ -98,3 +98,20 @@ export async function PermissionVideo(param) {
     getResponse: true,
   })
 }
+//上传文档资源
+export async function UploadOneOrMore(param) {
+  return request('/api/up_man_perres/up_docsupload/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}
+export async function UploadVideoOneOrMore(param) {
+  return request('/api/up_man_perres/up_videoupload/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}
