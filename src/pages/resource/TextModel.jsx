@@ -522,23 +522,25 @@ class TextModel extends React.Component{
                     <br/>
                     <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
                         <span style={{marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>权限 </span>
-                        <Select value={this.state.textQuery.dr_permission}  size="small" placeholder="权限"  style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange3}>
+                        <Select  size="small" placeholder="权限" defaultValue="" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange3}>
                             <Option style={{fontSize:"12px"}} value="">权限</Option>
                             <Option style={{fontSize:"12px"}} value={0}>Vip</Option>
                             <Option style={{fontSize:"12px"}} value={1}>Free</Option>
                             <Option style={{fontSize:"12px"}} value={2}>Other</Option>
                         </Select>
-                        
-                        <Select value={this.state.textQuery.dr_format} className="text_select" size="small" defaultValue="" style={{display:"none",width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
-                            <Option value="">格式</Option>
-                            <Option value="视频">文档</Option>
-                            <Option value="专辑">专辑</Option>
+                        <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>格式 </span>
+                        <Select className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
+                            <Option style={{fontSize:"12px"}} value="">格式</Option>
+                            <Option style={{fontSize:"12px"}} value="视频">视频</Option>
+                            <Option style={{fontSize:"12px"}} value="专辑">专辑</Option>
+                    
                         </Select>
-                        <span style={{marginLeft:"2em",fontWeight:"700"}}>状态 </span>
-                        <Select value={this.state.textQuery.dr_enable} size="small" placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
-                            <Option value="">状态</Option>
-                            <Option value={1}>启用中</Option>
-                            <Option value={0}>冻结</Option>
+                       
+                        <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>状态 </span>
+                        <Select size="small" placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
+                            <Option style={{fontSize:"12px"}} value="">状态</Option>
+                            <Option style={{fontSize:"12px"}} value={1}>启用中</Option>
+                            <Option style={{fontSize:"12px"}} value={0}>冻结</Option>
                         </Select>
                         <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} value={this.state.textQuery.bytime} style={{fontSize:"12px"}} >按时间</Checkbox></span>
                         <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} value={this.state.textQuery.byhot} style={{fontSize:"12px"}} >按热度</Checkbox></span>
@@ -569,10 +571,10 @@ class TextModel extends React.Component{
                         },
                     }}
                     rowSelection={rowSelection} columns={columns2}  dataSource={this.props.Db.textlist.results} />
-                    <Button type="primary" style={{top:"-3em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
-                    <Button  style={{top:"-3em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
-                    <Button  style={{top:"-3em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
-                    <Button  style={{top:"-3em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
+                    <Button type="primary" style={{top:"0em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
+                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
+                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
+                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
                     <Modal
                         onCancel={this.handleCancel1}
                         title="请选择资源所在编目"

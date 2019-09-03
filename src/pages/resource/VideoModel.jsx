@@ -14,6 +14,18 @@ class VideoModel extends React.Component{
         super(props);
        
         this.state={
+              query:{
+                vr_created_time_start:"",
+                vr_created_time_end:"",
+                bytime:false,
+                byhot:false,
+                search:"",
+                vr_format:"",
+                vr_permission:"",
+                vr_enable:'',
+                catalogue_path:"",
+                catalogue:""
+              },
             names:[],
             add:false,
             arr:[],
@@ -28,20 +40,9 @@ class VideoModel extends React.Component{
             visible1:false,
             visible:false,
             vtext:{},
-            query:{
-                vr_created_time_start:"",
-                vr_created_time_end:"",
-                bytime:false,
-                byhot:false,
-                search:"",
-                vr_format:"",
-                vr_permission:"",
-                vr_enable:'',
-                catalogue_path:"",
-                catalogue:""
-            },
             percent:0,
-            ok:0
+            ok:0,
+            textname:""
         }
     }
     componentDidMount(){
@@ -119,28 +120,34 @@ class VideoModel extends React.Component{
     }
   //根据权限查询（完成）
     handleChange3=(value)=>{
-       
+        // console.log(value)
+        var qu={...this.state.query,...{vr_permission:value}};
         this.setState({
-            query:{...this.state.query,...{vr_permission:value}}
-        }) 
+          query:qu
+        });
+        console.log(qu)
         this.props.dispatch({
-        type:"Db/fetchVideo",payload:{...this.state.query,...{vr_permission:value}}
-        })
+            type:"Db/fetchVideo",payload:qu
+        });
     }
     //根据格式查询(完成)
     handleChange4=(value)=>{
       
+        var qu={...this.state.query,...{vr_format:value}};
         this.setState({
-            query:{...this.state.query,...{vr_format:value}}
-        })
+            query:qu
+        });
+        console.log(qu)
         this.props.dispatch({
             type:"Db/fetchVideo",payload:{...this.state.query,...{vr_format:value}}
-        })   
+        });
     }
     //根据状态查询(完成)
     handleChange5=(value)=>{
+      console.log(this.state.query)
+      var qu={...this.state.query,...{vr_enable:value}}
         this.setState({
-            query:{...this.state.query,...{vr_enable:value}}
+            query:qu
         })
         this.props.dispatch({
         type:"Db/fetchVideo",payload:{...this.state.query,...{vr_enable:value}}
@@ -342,6 +349,13 @@ class VideoModel extends React.Component{
         this.props.dispatch({
           type:"Db/fetchUpdateFlag",payload:""
         })
+        var add_text=document.getElementById("add_text")
+        console.log(add_text.style)
+        add_text.style.display="none"
+        var btn=document.getElementById("submit_btn")
+        btn.style.opacity="1";
+        btn.style.pointerEvents="auto"
+        btn.style.background="rgba(22, 155, 213, 1)"
     };
      //修改文档名字
     editFileName=(aa,e)=>{
@@ -392,17 +406,19 @@ class VideoModel extends React.Component{
       })
     }
     uptext(e){
-      if(e.target.__reactInternalInstance$q2jug5y2evp)
-           console.log(e.target.__reactInternalInstance$q2jug5y2evp.key);
+      // if(e.target.__reactInternalInstance$q2jug5y2evp)
+      // console.log(e.target.previousElementSibling.previousElementSibling.innerText);
       var add_text=document.getElementById("add_text")
-      console.log(add_text.style)
+      
       add_text.style.display="block"
       add_text.style.zIndex="1";
       var btn=document.getElementById("submit_btn")
       btn.style.opacity="0.5";
       btn.style.pointerEvents="none"
       btn.style.background="grey"
-      console.log(btn)
+      this.setState({
+        textname:e.target.previousElementSibling.previousElemntSibling.innerText
+      })
       // this.setState({
       //   vtext:e.target.__reactInternalInstance$htlud7b3i2u
       // })
@@ -578,19 +594,19 @@ class VideoModel extends React.Component{
                             <Option style={{fontSize:"12px"}} value={1}>Free</Option>
                             <Option style={{fontSize:"12px"}} value={2}>Other</Option>
                         </Select>
-                        <span style={{marginLeft:"2em",fontWeight:"700"}}>格式 </span>
+                        <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>格式 </span>
                         <Select className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
-                            <Option value="">格式</Option>
-                            <Option value="视频">视频</Option>
-                            <Option value="专辑">专辑</Option>
+                            <Option style={{fontSize:"12px"}} value="">格式</Option>
+                            <Option style={{fontSize:"12px"}} value="视频">视频</Option>
+                            <Option style={{fontSize:"12px"}} value="专辑">专辑</Option>
                     
                         </Select>
                        
-                        <span style={{marginLeft:"2em",fontWeight:"700"}}>状态 </span>
+                        <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>状态 </span>
                         <Select size="small" placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
-                            <Option value="">状态</Option>
-                            <Option value={1}>启用中</Option>
-                            <Option value={0}>冻结</Option>
+                            <Option style={{fontSize:"12px"}} value="">状态</Option>
+                            <Option style={{fontSize:"12px"}} value={1}>启用中</Option>
+                            <Option style={{fontSize:"12px"}} value={0}>冻结</Option>
                         </Select>
                         <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
                         <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
@@ -622,10 +638,10 @@ class VideoModel extends React.Component{
                         },
                         }}
                         rowSelection={rowSelection} columns={columns} dataSource={this.props.Db.videolist.results} />
-                    <Button type="primary" style={{top:"-3em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
-                    <Button  style={{top:"-3em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
-                    <Button  style={{top:"-3em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
-                    <Button  style={{top:"-3em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
+                    <Button type="primary" style={{top:"0em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
+                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
+                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
+                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
                     <Modal
                         onCancel={this.handleCancel1}
                         title="请选择资源所在编目"
@@ -701,7 +717,7 @@ class VideoModel extends React.Component{
                         
                         <VideoForm id="v_form" wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag,name:this.state.vtext.key}} add={this.state.add} flag={this.state.flag}/>
                         <div id="add_text" style={{display:"none",width:"570px",height:"405px",left:"260px",top:"150px",position:"absolute",background:"#fff",overflowY:"auto"}}>
-                          <AddTextForm></AddTextForm>
+                          <AddTextForm textname={this.state.textname}></AddTextForm>
                         </div>
                         <Button id="submit_btn" onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
                         </Modal>   

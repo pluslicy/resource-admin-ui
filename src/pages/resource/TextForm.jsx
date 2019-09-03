@@ -5,7 +5,7 @@ import {
     Select,
     Upload,Button,Icon,Checkbox,Radio,
     Cascader,
-    Tabs
+    Tabs,Modal
   } from 'antd'
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -25,8 +25,25 @@ class TextForm extends React.Component{
       super(props)
       this.state={
           key:"",
-          childs:[]
+          childs:[],
+          visible:false,
+          bumName:""
       }
+    }
+    showBum(){
+        this.setState({
+          visible:true
+        })
+    }
+    closeBum(){
+      this.setState({
+        visible:false
+      })
+    }
+    setBumName(e){
+      this.setState({
+        bumName:e.target.value
+      })
     }
     componentDidMount(){
       
@@ -99,9 +116,9 @@ class TextForm extends React.Component{
           
             // <div className="DbForm" style={{width:"800px",height:"550px",}}>
             <div className={styles.DbForm}>
-         
+            
             <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.props.text.flag} onChange={this.callback}>
-            <Button style={{position:"absolute",left:"80%",top:"3.8em"}}>创建专辑</Button>
+            
                 <Form.Item>
                               {
                                   getFieldDecorator('flag',{})
@@ -155,7 +172,7 @@ class TextForm extends React.Component{
                   </Form>
               </TabPane>
               <TabPane className={styles.tb} style={{bottom:"none"}} key="专辑">
-                
+              <Button style={{position:"absolute",left:"80%",top:"3.8em"}} onClick={this.showBum.bind(this)}>创建专辑</Button>
               <Form style={{marginLeft:"-1.5em"}} {...formItemLayout} className="album-form" >
                   <Form.Item label="所属专辑">
                           {
@@ -212,7 +229,16 @@ class TextForm extends React.Component{
                   </Form>
               </TabPane>
             </Tabs>
-            
+            <Modal
+                        onCancel={this.handleCancel1}
+                        title="自定义创建专辑"
+                        visible={this.state.visible}
+                        footer={[
+                            <Button onClick={this.closeBum.bind(this)} style={{marginRight:"40%"}}>确认</Button>
+                        ]}
+                        >
+                      <Input value={this.state.bumName} onChange={this.setBumName.bind(this)}></Input>
+            </Modal>
             </div>
         );
     }
