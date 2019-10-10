@@ -87,7 +87,7 @@ class User extends React.Component {
             type:"users/fetchEnableOrFreeze",
             payload:{
               status:{
-                  is_active:false,
+                  is_active:true,
                   ids:this.state.ids,
               },
               page:this.state.page,
@@ -288,11 +288,18 @@ class User extends React.Component {
   };  
 
   // 修改模态框
-  showModify =()=>{
-    this.setState({
-      visibleModify:true, 
-    })
-  }
+  // showModify =()=>{
+  //   this.setState({
+  //     visibleModify:true, 
+  //   })
+  // }
+  showModify = record => {
+		this.setState({
+			form: record,
+		});
+		this.props.dispatch({ type: 'create/changeVisible', payload: true });
+  };
+  
   ModifyOk = e => {
     console.log(e);
     this.setState({
@@ -305,6 +312,7 @@ class User extends React.Component {
       visibleModify: false,
     });
   };  
+  
   handleChangeRole(value) {
     console.log(`selected ${value}`);
     console.log("--",this.state.groups)
@@ -397,7 +405,7 @@ class User extends React.Component {
         render:(text,record)=>{
           return(
             <div>
-               <Icon type="form" onClick={this.showModify.bind(this)}/>
+               <Icon type="form" onClick={this.showModify.bind(this,record)}/>
             </div> 
           )
         },
