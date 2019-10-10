@@ -4,8 +4,11 @@ import qs from 'qs';
 /* 封装所有的异步请求 */
 
 // 查询所有用户
-export async function queryUsers() {
-  return request('/api/mp_man_users/userlist/');
+export async function queryUsers(param) {
+  return request('/api/mp_man_users/userlist/',{
+    method:'get',
+    params:param
+  });
 }
 
 // 查询所有角色

@@ -6,12 +6,13 @@ const UserModel = {
   state: {
     user: [],
     visible: false,
-    roles:[]
+    roles:[],
+    count:""
   },
   effects: {
     // 获取所有用户信息
    *fetchUser(_, { call, put }) {
-      const response = yield call(queryUsers);
+      const response = yield call(queryUsers,_.payload);
       yield put({
         type: 'reloadUsers',
         payload: response});
@@ -28,9 +29,13 @@ const UserModel = {
 
    //批量设置用户状态
     *fetchEnableOrFreeze(_, { call, put }) {
-      const response = yield call(EnableOrFreeze,_.payload);
+      const response = yield call(EnableOrFreeze,_.payload.status);
       yield put({
-        type: 'fetchUser'
+        type: 'fetchUser',
+        payload:{
+          page:_.payload.page,
+          pageSize:_.payload.pageSize
+        }
       });
     },
    //批量删除用户
@@ -62,6 +67,7 @@ const UserModel = {
       return {
         ...state,
         user: action.payload.results,
+        count:action.payload.count,
       };
     },
     reloadRoles(state, action) {

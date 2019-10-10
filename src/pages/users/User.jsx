@@ -30,6 +30,7 @@ class User extends React.Component {
       // visibleModify:false,
       // 添加单选按钮
       value:"",
+      page:1,
       textQuery:{
         dr_created_time_start:"",
         dr_created_time_end:"",
@@ -46,7 +47,10 @@ class User extends React.Component {
   componentDidMount(){
     this.props.dispatch({
       type:'users/fetchUser',
-     
+      payload:{
+        page:1,
+        pageSize:10,
+      }
     })
     this.props.dispatch({
       type:'users/fetchRole',
@@ -69,8 +73,12 @@ class User extends React.Component {
         this.props.dispatch({
             type:"users/fetchEnableOrFreeze",
             payload:{
-            is_active:false,
-            ids:this.state.ids,
+            status:{
+                is_active:false,
+                ids:this.state.ids,
+            },
+            page:this.state.page,
+            pageSize:10,
         
             }
         })
@@ -78,10 +86,14 @@ class User extends React.Component {
         this.props.dispatch({
             type:"users/fetchEnableOrFreeze",
             payload:{
-            is_active:true,
-            ids:this.state.ids,
-            
-            }
+              status:{
+                  is_active:false,
+                  ids:this.state.ids,
+              },
+              page:this.state.page,
+              pageSize:10,
+          
+              }
         }) }
     }
     //根据状态查询(完成)
@@ -96,14 +108,22 @@ class User extends React.Component {
     }
     // 冻结状态改变
     handleChange=(record,e)=>{
-
-           this.props.dispatch({
-               type:"users/fetchEnableOrFreeze",
-               payload:{
-               is_active:record,
-               ids:[e._owner.pendingProps.record.id]
-               }
-           })
+      if(e._owner){
+        this.props.dispatch({
+          type:"users/fetchEnableOrFreeze",
+          payload:{
+           status:{
+               is_active:false,
+               ids:[e._owner.pendingProps.record.id],
+           },
+           page:this.state.page,
+           pageSize:10,
+       
+           }
+       })
+      }
+          
+           
        
    }
   //添加模态框 
@@ -454,10 +474,21 @@ class User extends React.Component {
           pagination={{
             onChange: page => {
               console.log(page);
-              let p = page - 1;
-              console.log(p);
+              // let p = page - 1;
+              // console.log(p);
+              this.props.dispatch({
+                type:"users/fetchUser",
+                payload:{
+                  page:page,
+                  pageSize:10,
+                }
+              })
+              this.setState({
+                page:page
+              })
             },
-            pageSize: 6,
+            total:this.props.users.count,
+            pageSize: 10,
             size:'small',
             
             hideOnSinglePage: false,
