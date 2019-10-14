@@ -14,18 +14,6 @@ class VideoModel extends React.Component{
         super(props);
        
         this.state={
-              query:{
-                vr_created_time_start:"",
-                vr_created_time_end:"",
-                bytime:false,
-                byhot:false,
-                search:"",
-                vr_format:"",
-                vr_permission:"",
-                vr_enable:'',
-                catalogue_path:"",
-                catalogue:""
-              },
             names:[],
             add:false,
             arr:[],
@@ -50,11 +38,6 @@ class VideoModel extends React.Component{
             type:"Db/fetchVideo",payload:this.state.query
          })
     }
-    // shouldComponentUpdate(nextProps){ // 应该使用这个方法，否则无论props是否有变化都将会导致组件跟着重新渲染
-    //   if(nextProps.treeKey === this.props.treeKey){
-    //     return false
-    //   }
-    // }
     saveFormRef = formRef => {
         this.formRef = formRef;
       };
@@ -70,25 +53,24 @@ class VideoModel extends React.Component{
            vr_created_time_start:dateString[0],
            vr_created_time_end:dateString[1]
          }
-         this.setState({
-           query:{...this.state.query,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end}}
-         })
+       var vq={...this.props.vt.vq,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end}};
+        this.props.dispatch({
+          type:"vt/fetchVideoQuery",payload:vq
+        })
        this.props.dispatch({
-         type:"Db/fetchVideo",payload:{...this.state.query,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end}}
+         type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end}}
         })
     }
     //根据名字查询
     searchName=(value)=>{
-
-          this.setState({
-            query:{...this.state.query,...{search:value}}
-          })
-          
-          this.props.dispatch({
-            type:"Db/fetchVideo",payload:{...this.state.query,...{search:value}}
-          })
-    
-      
+      console.log(this.props.vt.vq)
+      var vq={...this.props.vt.vq,...{search:value}};
+      this.props.dispatch({
+        type:"vt/fetchVideoQuery",payload:vq
+      })
+      this.props.dispatch({
+        type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{search:value}}
+      })
     }
     //批量删除 视频和文档完成
     batchDelete=()=>{
@@ -121,36 +103,32 @@ class VideoModel extends React.Component{
   //根据权限查询（完成）
     handleChange3=(value)=>{
         // console.log(value)
-        var qu={...this.state.query,...{vr_permission:value}};
-        this.setState({
-          query:qu
-        });
-        console.log(qu)
+        var vq={...this.props.vt.vq,...{vr_permission:value}};
         this.props.dispatch({
-            type:"Db/fetchVideo",payload:qu
+          type:"vt/fetchVideoQuery",payload:vq
+        })
+        this.props.dispatch({
+            type:"Db/fetchVideo",payload:vq
         });
     }
     //根据格式查询(完成)
     handleChange4=(value)=>{
-      
-        var qu={...this.state.query,...{vr_format:value}};
-        this.setState({
-            query:qu
-        });
-        console.log(qu)
+        var vq={...this.props.vt.vq,...{vr_format:value}};
         this.props.dispatch({
-            type:"Db/fetchVideo",payload:{...this.state.query,...{vr_format:value}}
+          type:"vt/fetchVideoQuery",payload:vq
+        })
+        this.props.dispatch({
+            type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{vr_format:value}}
         });
     }
     //根据状态查询(完成)
     handleChange5=(value)=>{
-      console.log(this.state.query)
-      var qu={...this.state.query,...{vr_enable:value}}
-        this.setState({
-            query:qu
+        var vq={...this.props.vt.vq,...{vr_enable:value}};
+        this.props.dispatch({
+          type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-        type:"Db/fetchVideo",payload:{...this.state.query,...{vr_enable:value}}
+        type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{vr_enable:value}}
         })
     }
     //修改权限和状态
@@ -174,23 +152,25 @@ class VideoModel extends React.Component{
     }
     //根据时间排序(完毕)
     checkTimeChange=(e)=> {  
-        this.setState({
-            query:{...this.state.query,...{bytime:`${e.target.checked}`}}
+      
+        var vq={...this.props.vt.vq,...{bytime:`${e.target.checked}`}};
+        this.props.dispatch({
+          type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-        type:"Db/fetchVideo",payload:{...this.state.query,...{bytime:`${e.target.checked}`}}
+        type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{bytime:`${e.target.checked}`}}
         })
 
     }
     //根据热度排序(完毕)
     checkHotChange=(e)=>{
        
-        this.setState({
-            query:{...this.state.query,...{byhot:`${e.target.checked}`}}
-        })
-        
+        var vq={...this.props.vt.vq,...{byhot:`${e.target.checked}`}};
         this.props.dispatch({
-        type:"Db/fetchVideo",payload:{...this.state.query,...{byhot:`${e.target.checked}`}}
+          type:"vt/fetchVideoQuery",payload:vq
+        })
+        this.props.dispatch({
+          type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{byhot:`${e.target.checked}`}}
         })
         
     }

@@ -47,15 +47,18 @@ class Db extends React.Component{
         treekey:e.selectedNodes[0].props.dataRef.catalogue_path
       })
       
-        this.setState({
-          query:{...this.state.query,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}}
+        
+        var vq={...this.props.vt.vq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}};
+        this.props.dispatch({
+          type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-          type:"Db/fetchVideo",payload:{...this.state.query,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}}
+          type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}}
         })
-     
-        this.setState({
-          textQuery:{...this.state.textQuery,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}}
+        
+        var tq={...this.props.vt.tq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}};
+        this.props.dispatch({
+          type:"vt/fetchTextQuery",payload:tq
         })
         this.props.dispatch({
           type:"Db/fetchText",payload:{...this.state.textQuery,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}}

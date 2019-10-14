@@ -26,18 +26,7 @@ class TextModel extends React.Component{
             ok:0,
             value:"请选择方向",
             catalogue:"",
-            textQuery:{
-                dr_created_time_start:"",
-                dr_created_time_end:"",
-                bytime:false,
-                byhot:false,
-                search:"",
-                dr_permission:"",
-                dr_format:"",
-                dr_enable:"",
-                catalogue_path:"",
-                catalogue:""
-            },
+      
         }
     }
     handleCancel = e => {
@@ -67,20 +56,22 @@ class TextModel extends React.Component{
            dr_created_time_start:dateString[0],
            dr_created_time_end:dateString[1]
          }
-         this.setState({
-           textQuery:{...this.state.textQuery,...{dr_created_time_start:par.dr_created_time_start,dr_created_time_end:par.dr_created_time_end}}
+         var tq={...this.props.vt.tq,...{dr_created_time_start:par.dr_created_time_start,dr_created_time_end:par.dr_created_time_end}};
+         this.props.dispatch({
+           type:"vt/fetchTextQuery",payload:tq
          })
-       this.props.dispatch({
-         type:"Db/fetchText",payload:{...this.state.textQuery,...{dr_created_time_start:par.dr_created_time_start,dr_created_time_end:par.dr_created_time_end}}
-       })
+        this.props.dispatch({
+          type:"Db/fetchText",payload:tq
+        })
     }
     //根据名字查询
     searchName=(value)=>{
-          this.setState({
-            textQuery:{...this.state.textQuery,...{search:value}}
+          var tq={...this.props.vt.tq,...{search:value}};
+          this.props.dispatch({
+            type:"vt/fetchTextQuery",payload:tq
           })
           this.props.dispatch({
-            type:"Db/fetchText",payload:{...this.state.textQuery,...{search:value}}
+            type:"Db/fetchText",payload:tq
           }) 
     }
     //批量删除文档完成
@@ -113,33 +104,35 @@ class TextModel extends React.Component{
   //根据权限查询（完成）
     handleChange3=(value)=>{
         
-        this.setState({
-            textQuery:{...this.state.textQuery,...{dr_permission:value}}
-        })
-       
+        var tq={...this.props.vt.tq,...{dr_permission:value}};
         this.props.dispatch({
-        type:"Db/fetchText",payload:{...this.state.textQuery,...{dr_permission:value}}
+          type:"vt/fetchTextQuery",payload:tq
+        })
+        this.props.dispatch({
+        type:"Db/fetchText",payload:tq
         })
     
     }
     //根据格式查询(完成)
     handleChange4=(value)=>{
       
-        this.setState({
-            textQuery:{...this.state.textQuery,...{dr_format:value}}
+        var tq={...this.props.vt.tq,...{dr_format:value}};
+        this.props.dispatch({
+          type:"vt/fetchTextQuery",payload:tq
         })
         this.props.dispatch({
-            type:"Db/fetchText",payload:{...this.state.textQuery,...{dr_format:value}}
+            type:"Db/fetchText",payload:tq
         })   
     }
     //根据状态查询(完成)
     handleChange5=(value)=>{
       
-        this.setState({
-            textQuery:{...this.state.textQuery,...{dr_enable:value}}
-        })
+      var tq={...this.props.vt.tq,...{dr_enable:value}};
+      this.props.dispatch({
+        type:"vt/fetchTextQuery",payload:tq
+      })
         this.props.dispatch({
-        type:"Db/fetchText",payload:{...this.state.textQuery,...{dr_enable:value}}
+        type:"Db/fetchText",payload:tq
         })
 
     }
@@ -163,20 +156,22 @@ class TextModel extends React.Component{
     }
       //根据时间排序(完毕)
     checkTimeChange=(e)=> { 
-        this.setState({
-            textQuery:{...this.state.textQuery,...{bytime:`${e.target.checked}`}}
+        var tq={...this.props.vt.tq,...{bytime:`${e.target.checked}`}};
+        this.props.dispatch({
+          type:"vt/fetchTextQuery",payload:tq
         })
         this.props.dispatch({
-        type:"Db/fetchText",payload:{...this.state.textQuery,...{bytime:`${e.target.checked}`}}
+        type:"Db/fetchText",payload:tq
         })
     }
     //根据热度排序(完毕)
     checkHotChange=(e)=>{
-        this.setState({
-            textQuery:{...this.state.textQuery,...{byhot:`${e.target.checked}`}}
+        var tq={...this.props.vt.tq,...{byhot:`${e.target.checked}`}};
+        this.props.dispatch({
+          type:"vt/fetchTextQuery",payload:tq
         })
         this.props.dispatch({
-        type:"Db/fetchText",payload:{...this.state.textQuery,...{byhot:`${e.target.checked}`}}
+        type:"Db/fetchText",payload:tq
         })
     }
     //展示调整编目
@@ -531,7 +526,7 @@ class TextModel extends React.Component{
                         <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>格式 </span>
                         <Select className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
                             <Option style={{fontSize:"12px"}} value="">格式</Option>
-                            <Option style={{fontSize:"12px"}} value="视频">视频</Option>
+                            <Option style={{fontSize:"12px"}} value="文档">文档</Option>
                             <Option style={{fontSize:"12px"}} value="专辑">专辑</Option>
                     
                         </Select>
@@ -542,8 +537,8 @@ class TextModel extends React.Component{
                             <Option style={{fontSize:"12px"}} value={1}>启用中</Option>
                             <Option style={{fontSize:"12px"}} value={0}>冻结</Option>
                         </Select>
-                        <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} value={this.state.textQuery.bytime} style={{fontSize:"12px"}} >按时间</Checkbox></span>
-                        <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} value={this.state.textQuery.byhot} style={{fontSize:"12px"}} >按热度</Checkbox></span>
+                        <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
+                        <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange}  style={{fontSize:"12px"}} >按热度</Checkbox></span>
                 </div>
                 <Table className="text_table"
                     size="small" 

@@ -65,6 +65,8 @@ class TextForm extends React.Component{
       return e && e.fileList;
     };
     onRadioChange = e => {
+
+      console.log(e.target.value)
         if(e.target.value==="文档"){
             this.setState({
                 key:"文档"
@@ -93,7 +95,7 @@ class TextForm extends React.Component{
     }
     loadRadio(){
       if(this.props.text.flag=="文档"){
-        return (<span><Radio value={"文档"}>文档</Radio><Radio disabled={true} value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
+        return (<span><Radio value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
       }else{
        return  <span><Radio disabled={true} value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>
       }
@@ -117,7 +119,7 @@ class TextForm extends React.Component{
             // <div className="DbForm" style={{width:"800px",height:"550px",}}>
             <div className={styles.DbForm}>
             
-            <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.props.text.flag} onChange={this.callback}>
+            <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.state.key} onChange={this.callback}>
             
                 <Form.Item>
                               {
