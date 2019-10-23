@@ -288,17 +288,17 @@ class User extends React.Component {
   };  
 
   // 修改模态框
-  // showModify =()=>{
-  //   this.setState({
-  //     visibleModify:true, 
-  //   })
-  // }
-  showModify = record => {
-		this.setState({
-			form: record,
-		});
-		this.props.dispatch({ type: 'create/changeVisible', payload: true });
-  };
+  showModify =record=>{
+    this.setState({
+      visibleModify:true, 
+    })
+  }
+  // showModify = record => {
+	// 	this.setState({
+	// 		form: record,
+	// 	});
+	// 	this.props.dispatch({ type: 'users/changeVisible', payload: true });
+  // };
   
   ModifyOk = e => {
     console.log(e);
@@ -312,7 +312,7 @@ class User extends React.Component {
       visibleModify: false,
     });
   };  
-  
+
   handleChangeRole(value) {
     console.log(`selected ${value}`);
     console.log("--",this.state.groups)

@@ -8,3 +8,15 @@ export async function queryPrivilege() {
   return request('/api/mp_man_permissions/permislist/');
 }
 
+// 设置用户启用/冻结
+export async function EnableOrFreeze(param) {
+  return request('/api/mp_man_permissions/frozen_permis/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}
+
+
+

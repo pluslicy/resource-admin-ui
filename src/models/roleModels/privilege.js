@@ -15,6 +15,18 @@ const PrivilegeModel = {
         type: 'reloadPrivilege',
         payload: response});
     },
+    
+    //批量设置用户状态
+    *fetchEnableOrFreeze(_, { call, put }) {
+      const response = yield call(EnableOrFreeze,_.payload.status);
+      yield put({
+        type: 'reloadPrivilege',
+        payload:{
+          page:_.payload.page,
+          pageSize:_.payload.pageSize
+        }
+      });
+    },
 },
   reducers: {
     // 更改模态框的显示状态
