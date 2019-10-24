@@ -31,13 +31,15 @@ export async function AddRole(param) {
   });
 }
 
-// 设置角色启用/冻结
-export async function forzenRole(param) {
+
+// 设置用户启用/冻结
+export async function EnableOrFreeze(param) {
   return request('/api/mp_man_roles/set_frozen/', {
     method: 'post',
-    data: qs.stringify(param),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-  });
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
 }
 
 // 设置角色权限
@@ -48,10 +50,16 @@ export async function rolePerms(param) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
   });
 }
-  // 删除角色
-  export async function deleteRole(id) {
-    return request('/api/mp_man_roles/del_role', { params: id });
-  }
+
+// 删除用户
+export async function DeleteAll(param) {
+  return request('/api/mp_man_roles/del_role/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}
 
  
 

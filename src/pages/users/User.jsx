@@ -109,6 +109,7 @@ class User extends React.Component {
     // 冻结状态改变
     handleChange=(record,e)=>{
       if(e._owner){
+        // console.log("---------------",this.props.dispatch)
         this.props.dispatch({
           type:"users/fetchEnableOrFreeze",
           payload:{
@@ -127,7 +128,7 @@ class User extends React.Component {
        
    }
   //添加模态框 
-   saveFormRef = formRef => {
+  saveFormRef = formRef => {
     this.formRef = formRef;
   };
   handleOkModal = e => {
@@ -472,7 +473,7 @@ class User extends React.Component {
           <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
           <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
         </div>
-        {console.log(this.props.users.user)}
+        {/* {console.log(this.props.users.user)} */}
        
         <Table 
           className="video_table"

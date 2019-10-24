@@ -1,11 +1,12 @@
 import { message } from 'antd';
-import {queryPrivilege} from '@/services/rolesServices/privilege';
+import {queryPrivilege,EnableOrFreeze} from '@/services/rolesServices/privilege';
 
 const PrivilegeModel = {
   namespace: 'privilege',
   state: {
     privileges: [],
     visible: false,
+    count:"",
   },
   effects: {
     // 获取所有权限信息
@@ -20,7 +21,7 @@ const PrivilegeModel = {
     *fetchEnableOrFreeze(_, { call, put }) {
       const response = yield call(EnableOrFreeze,_.payload.status);
       yield put({
-        type: 'reloadPrivilege',
+        type: 'fetchPrivi',
         payload:{
           page:_.payload.page,
           pageSize:_.payload.pageSize
@@ -41,6 +42,7 @@ const PrivilegeModel = {
       return {
         ...state,
         privileges: action.payload.results,
+        count:action.payload.count,
       };
     },
   },

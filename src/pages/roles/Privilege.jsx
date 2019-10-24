@@ -42,8 +42,10 @@ class Privilege extends React.Component {
    // 冻结状态改变
    handleChange=(record,e)=>{
     if(e._owner){
+      // console.log("---------------",this.props.dispatch)
       this.props.dispatch({
-        type:"privileges/fetchEnableOrFreeze",
+        type:"privilege/fetchEnableOrFreeze",
+        
         payload:{
          status:{
              enable:0,
@@ -57,34 +59,34 @@ class Privilege extends React.Component {
     }
 
    // 批量启用和冻结
-   batchEnableOrFreeze=(e)=>{
-    console.log("------------",this.props.dispatch)
-      if(e.target.textContent=="冻 结"){
-      this.props.dispatch({
-          type:"privileges/fetchEnableOrFreeze",
-          payload:{
-          status:{
-              enable:0,
-              ids:this.state.ids,
-          },
-          page:this.state.page,
-          pageSize:10,
+  //  batchEnableOrFreeze=(e)=>{
+  //   console.log("------------",this.props.dispatch)
+  //     if(e.target.textContent=="冻 结"){
+  //     this.props.dispatch({
+  //         type:"privilege/fetchEnableOrFreeze",
+  //         payload:{
+  //         status:{
+  //             enable:0,
+  //             ids:this.state.ids,
+  //         },
+  //         page:this.state.page,
+  //         pageSize:10,
       
-          }
-      })
-      }else{
-      this.props.dispatch({
-          type:"privileges/fetchEnableOrFreeze",
-          payload:{
-            status:{
-                enable:1,
-                ids:this.state.ids,
-            },
-            page:this.state.page,
-            pageSize:10,
+  //         }
+  //     })
+  //     }else{
+  //     this.props.dispatch({
+  //       type:"privilege/fetchEnableOrFreeze",
+  //         payload:{
+  //           status:{
+  //               enable:1,
+  //               ids:this.state.ids,
+  //           },
+  //           page:this.state.page,
+  //           pageSize:10,
         
-            }
-      }) }}
+  //           }
+  //     }) }}
   }
 
 
@@ -110,6 +112,7 @@ class Privilege extends React.Component {
         title: '状态',
         dataIndex:'enable',
         render: (text,record) => {
+          // console.log(text)
           if(text==1){
             return (
               <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
@@ -170,8 +173,8 @@ class Privilege extends React.Component {
                 },
               }}
           />
-          <Button type="primary" size="small" onClick={this.batchEnableOrFreeze}>启用</Button>&nbsp;
-          <Button type="danger" size="small" onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp;
+          {/* <Button type="primary" size="small" onClick={this.batchEnableOrFreeze}>启用</Button>&nbsp;
+          <Button type="danger" size="small" onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp; */}
       </div>
     );
   }

@@ -1,9 +1,15 @@
 import React from 'react';
 import {Button,Table,Modal,Radio,Menu,
-          menu1,Dropdown,Icon,Input,} from 'antd';
+          menu1,Dropdown,Icon,Input,Select,
+          
+        } from 'antd';
+
+const {Option} = Select;
+        
 import styles from './role.less'
 // import RoleForm from './RoleForm'
 import {connect} from 'dva'
+
 
 
 class Role extends React.Component {
@@ -17,13 +23,78 @@ class Role extends React.Component {
       
       // 添加单选按钮
       value:"",
+      ids:[],
+      page:1,
+
     };
   }
   componentDidMount(){
     this.props.dispatch({
-      type:'role/fetchRoles'
+      type:'role/fetchRoles',
+      payload:{
+        page:1,
+        pageSize:10,
+      }
     })
+    
   }
+
+   // 冻结状态改变
+   handleChange=(record,e)=>{
+    if(e._owner){
+      // console.log("---------------",this.props.dispatch)
+      this.props.dispatch({
+        type:"role/fetchEnableOrFreeze",
+        payload:{
+         status:{
+             rp_enable:0,
+             ids:[e._owner.pendingProps.record.id],
+         },
+         page:this.state.page,
+         pageSize:10, 
+         }
+     })
+    }   
+ }
+   // 批量启用和冻结
+   batchEnableOrFreeze=(e)=>{
+    console.log(this.props.dispatch)
+      if(e.target.textContent=="冻 结"){
+      this.props.dispatch({
+          type:"role/fetchEnableOrFreeze",
+          payload:{
+          status:{
+            rp_enable:0,
+            ids:this.state.ids,
+          },
+          page:this.state.page,
+          pageSize:10,
+      
+          }
+      })
+      }else{
+      this.props.dispatch({
+          type:"role/fetchEnableOrFreeze",
+          payload:{
+            status:{
+                rp_enable:1,
+                ids:this.state.ids,
+            },
+            page:this.state.page,
+            pageSize:10,
+        
+            }
+      }) }
+  }
+
+  //批量删除用户
+  batchDelete=()=>{
+    console.log(this.state.ids)
+    this.props.dispatch({
+        type:"role/fetchDelete",
+        payload:this.state.ids
+    })
+  } 
 
   // 添加展示模态框
   showModal = () => {
@@ -128,6 +199,14 @@ class Role extends React.Component {
 
 
   render(){ 
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        this.setState({
+          ids:selectedRowKeys
+        })
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      }
+    };
     // 新增
     const columns = [
       {
@@ -144,48 +223,38 @@ class Role extends React.Component {
           </div>
           )}
       },
-        
       {
         title: '状态',
+        dataIndex:'role_profile.rp_enable',
         render: (text,record) => {
-          return (
-            <div>
-             {/*下拉菜单*/}
-              <Dropdown overlay={menu1}>
-              <a className="ant-dropdown-link" href="#">
-                启用中 <Icon type="down" />
-              </a>
-            </Dropdown>
-            </div>
-          );
-        },
-      },
-    ];
-    
-   
-    // 表格
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      getCheckboxProps: record => ({
-        disabled: record.name === 'Disabled Role', // Column configuration not to be checked
-        name: record.name,
-      }),
-    };
+          // console.log(typeof text)
+          if(text==1){
 
-    // 状态的下拉菜单
-    const menu1 = (
-      <Menu>
-        <Menu.Item style={{color:'red'}}>冻结</Menu.Item>
-      </Menu>
-    );
+            return (
+              <div style={{width:"75px",height:"20px",overflow:"hidden"}}>
+                  <Select defaultValue={text} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px"}} onChange={this.handleChange.bind(record)}>
+                    <Option value={1} >启用中</Option>
+                    <Option value={0} style={{color:"red"}}>冻结</Option>
+                  </Select>
+              </div>
+            )
+          }else{
+           return (
+                  <span style={{color:"red"}}>冻结</span>
+          )
+          }
+        },
+      }
+    
+    ];
+
+
     
   
     return (
       <div className={styles.content}>
         <div className="btn1">
-           <Button type="primary" onClick={this.showModal} size="small">+添加</Button>
+           <Button type="primary" onClick={this.showModal} size="small">添加</Button>
         </div>
 
         {/* 添加模态框 */}
@@ -202,8 +271,8 @@ class Role extends React.Component {
           ]}>
               {/* 添加单选按钮 */}
             <Radio.Group onChange={this.onChange} value={this.state.value}>
-                <Radio style={{margin:50,marginLeft:110}} value={1}>网站用户</Radio>
-                <Radio value={2}>后台管理</Radio>        
+                <Radio style={{margin:50,marginLeft:110}} value={0}>网站用户</Radio>
+                <Radio value={1}>后台管理</Radio>        
             </Radio.Group>      
             
         </Modal>
@@ -276,18 +345,50 @@ class Role extends React.Component {
            <Table
               rowKey="id"
               size="small"
-              rowSelection={{rowSelection,columnTitle:"#"}} 
+              // rowSelection={{rowSelection,columnTitle:"#"}} 
+              rowSelection={rowSelection} 
               columns={columns} 
               dataSource={this.props.role.roles}
+              pagination={{
+                onChange: page => {
+                  console.log(page);
+                  // let p = page - 1;
+                  // console.log(p);
+                  this.props.dispatch({
+                    type:"role/fetchRoles",
+                    payload:{
+                      page:page,
+                      pageSize:10,
+                    }
+                  })
+                  this.setState({
+                    page:page
+                  })
+                },
+                total:this.props.role.count,
+                pageSize: 10,
+                size:'small',
+                
+                hideOnSinglePage: false,
+                itemRender: (current, type, originalElement) => {
+                  if (type === 'prev') {
+                    return <Button size="small" style={{marginRight:"1em"}}>上一页</Button>;
+                  }
+                  if (type === 'next') {
+                    return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+                  }
+                  return originalElement;
+                },
+              }}
               />
         
         </div>
 
         {/* 底部按钮 */}
-        <div className="btn1">
-            <Button type="primary" size="small">启用</Button>&nbsp;
-            <Button type="danger" size="small">冻结</Button>&nbsp;
-            <Button type="delete" size="small">删除</Button>
+        <div >
+            <Button type="primary" size="small"  onClick={this.batchEnableOrFreeze}>启用</Button>&nbsp;
+            <Button type="danger" size="small"  onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp;
+            <Button type="delete" size="small" onClick={this.batchDelete}>删除</Button>
         </div>
        
 
