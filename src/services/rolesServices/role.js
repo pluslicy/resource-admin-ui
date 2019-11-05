@@ -7,7 +7,14 @@ import qs from 'qs';
 export async function queryRole() {
   return request('/api/mp_man_roles/rolelist/');
 }
-
+// 查询所有编目
+export async function queryCatalog() {
+  return request('/api/mp_man_catalog/catanestlist/');
+}
+// 查询单个角色列表
+export async function queryOnlyRole() {
+  return request('/api/mp_man_roles/rolepermslist/');
+}
 // 查询所有权限
 export async function queryPer() {
   return request('api/mp_man_roles/permlist/');

@@ -1,11 +1,10 @@
 import React from 'react';
-import {Button,Table,Modal,Radio,Menu,
+import {Button,Table,Modal,Radio,Menu,Tree,
           menu1,Dropdown,Icon,Input,Select,
-          
         } from 'antd';
 
 const {Option} = Select;
-        
+const { TreeNode } = Tree;
 import styles from './role.less'
 // import RoleForm from './RoleForm'
 import {connect} from 'dva'
@@ -35,10 +34,13 @@ class Role extends React.Component {
         page:1,
         pageSize:10,
       }
-    })
-    
+    }),
+    this.props.dispatch({
+			type: 'role/fetchCatalog'
+		})
   }
-
+  
+  
    // 冻结状态改变
    handleChange=(record,e)=>{
     if(e._owner){
@@ -96,65 +98,68 @@ class Role extends React.Component {
     })
   } 
 
-  // 添加展示模态框
-  showModal = () => {
-    this.setState({
-      visible: true,
-      // visibleWeb:false,
-    });
-  };
-  //配置模态框 
-  configHandle= () => {
-    this.setState({
-      visibleConfig: true,
-    });
-  };
+    // 添加展示模态框
+    showModal = () => {
+      this.setState({
+        visible: true,
+        // visibleWeb:false,
+      });
+    };
+    //配置模态框 
+    configHandle= () => {
+      this.setState({
+        visibleConfig: true,
+      });
+    };
 
-  // 添加模态框 ok
-  handleOk = e => {
-    console.log(e);
-    this.setState({
-      value:""
-    })
-    if(this.state.value===1){
+    // 添加模态框 ok
+    handleOk = e => {
+      // console.log(e);
+      // this.props.dispatch({
+      //   type:'role/fetchOnlyRole'})
+
       this.setState({
-        visibleWeb:true
+        value:""
       })
-    }else if(this.state.value===""){
+      if(this.state.value===1){
         this.setState({
-          visible:"false"
+          visibleWeb:true
         })
-    }else{
+      }else if(this.state.value===""){
+          this.setState({
+            visible:"false"
+          })
+      }else{
+        this.setState({
+          visibleBack:true,
+        })
+      }
       this.setState({
-        visibleBack:true,
-      })
-    }
-    this.setState({
-      visible: false,
-    });
-  };
-  // 添加模态框关闭 
-  handleCancel = e => {
-    console.log(e);
-    this.setState({
-      visible: false,
-    });
-  };
- 
-  // 网络用户ok
-  handleOkWeb = e => {
-    console.log(e);
-    this.setState({
-      visibleWeb: false,
-    });
-  };
-  // 网络用户关闭
-  handleCancelWeb = e => {
-    console.log(e);
-    this.setState({
-      visibleWeb: false,
-    });
-  };
+        visible: false,
+      });
+    };
+    // 添加模态框关闭 
+    handleCancel = e => {
+      console.log(e);
+      this.setState({
+        visible: false,
+      });
+    };
+  
+    // 网络用户ok
+    handleOkWeb = e => {
+      // console.log(e);
+      this.setState({
+        visibleWeb: false,
+      });
+    };
+    // 网络用户关闭
+    handleCancelWeb = e => {
+      // console.log(e);
+      this.setState({
+        visibleWeb: false,
+      });
+    };
 
     // 后台用户ok
     handleOkBack = e => {
@@ -171,8 +176,8 @@ class Role extends React.Component {
       });
     };
 
-     // 配置ok
-     handleOkConfig = e => {
+    // 配置ok
+    handleOkConfig = e => {
       console.log(e);
       this.setState({
         visibleConfig: false,
@@ -187,15 +192,36 @@ class Role extends React.Component {
     };
   
 
-  // 添加单选按钮
-  onChange = e => {
-    console.log('radio checked', e.target.value);
-    console.log(e.target.value);
-    this.setState({
-      value: e.target.value,
-    });
+    // 添加单选按钮
+    onChange = e => {
+      // console.log('radio checked', e.target.value);
+      console.log(e.target.value);
+      console.log(e.target.value.type)
+      this.setState({
+        value: e.target.value,
+      });
+    };
+ 
+    // 遍历网站用户树
+    renderTreeNodes = data =>
+    {
+      data.map(item => {
+        // console.log("-----------------",this.props.role.roleCata)
+        if (item.childs) {
+          return (
+            <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
+              {this.renderTreeNodes(item.childs)}
+            </TreeNode>
+          );
+        }
+        return <TreeNode {...item} />;
+      });
+      
+    }
+  onSelect = (selectedKeys, info) => {
+    console.log('onSelect', info);
+    this.setState({ selectedKeys });
   };
-
 
 
   render(){ 
@@ -204,7 +230,7 @@ class Role extends React.Component {
         this.setState({
           ids:selectedRowKeys
         })
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       }
     };
     // 新增
@@ -249,14 +275,11 @@ class Role extends React.Component {
     ];
 
 
-    
-  
     return (
       <div className={styles.content}>
         <div className="btn1">
            <Button type="primary" onClick={this.showModal} size="small">添加</Button>
         </div>
-
         {/* 添加模态框 */}
         <div>
          <Modal
@@ -273,54 +296,54 @@ class Role extends React.Component {
             <Radio.Group onChange={this.onChange} value={this.state.value}>
                 <Radio style={{margin:50,marginLeft:110}} value={0}>网站用户</Radio>
                 <Radio value={1}>后台管理</Radio>        
-            </Radio.Group>      
-            
-        </Modal>
+            </Radio.Group>        
+         </Modal>
         </div>
 
-       {/* 网站用户模态框 */}
-       <Modal 
+        {/* 网站用户模态框 */}
+        <Modal   
+              visible={this.state.visibleWeb}
+              onOk={this.handleOkWeb}
+              onCancel={this.handleCancelWeb}
+              width="600px"
+              height="400px"
+              >
+            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
             
-            visible={this.state.visibleWeb}
-            onOk={this.handleOkWeb}
-            onCancel={this.handleCancelWeb}
-            width="600px"
-            height="400px"
-            >
-           <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
-          
-           <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
-           <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+            <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
 
-           </div>
-           <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
-
-           </div>
-           </div>
+            </div>
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+              <Tree>
+                {this.renderTreeNodes(this.props.role.roleCata[0].childs)}
+              </Tree>
+            </div>
+            </div>
         </Modal>
 
-        {/* 后台用户模态框 */}
-       <Modal
-            visible={this.state.visibleBack}
-            onOk={this.handleOkBack}
-            onCancel={this.handleCancelBack}
-            width="600px"
-            height="400px">
-          <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
-          
-          <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
-          <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+          {/* 后台用户模态框 */}
+        <Modal
+              visible={this.state.visibleBack}
+              onOk={this.handleOkBack}
+              onCancel={this.handleCancelBack}
+              width="600px"
+              height="400px">
+            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
+            
+            <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
 
-          </div>
-          <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+            </div>
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
 
-          </div>
-          </div>
+            </div>
+            </div>
 
-        </Modal>
+          </Modal>
 
-         {/* 配置模态框 */}
-       <Modal
+          {/* 配置模态框 */}
+        <Modal
             visible={this.state.visibleConfig}
             onOk={this.handleOkConfig}
             onCancel={this.handleCancelConfig}
@@ -339,50 +362,50 @@ class Role extends React.Component {
 
         </Modal>
 
-       {/* 数据表格 */}
+        {/* 数据表格 */}
         <div>
         <br></br>
-           <Table
-              rowKey="id"
-              size="small"
-              // rowSelection={{rowSelection,columnTitle:"#"}} 
-              rowSelection={rowSelection} 
-              columns={columns} 
-              dataSource={this.props.role.roles}
-              pagination={{
-                onChange: page => {
-                  console.log(page);
-                  // let p = page - 1;
-                  // console.log(p);
-                  this.props.dispatch({
-                    type:"role/fetchRoles",
-                    payload:{
-                      page:page,
-                      pageSize:10,
-                    }
-                  })
-                  this.setState({
-                    page:page
-                  })
-                },
-                total:this.props.role.count,
-                pageSize: 10,
-                size:'small',
-                
-                hideOnSinglePage: false,
-                itemRender: (current, type, originalElement) => {
-                  if (type === 'prev') {
-                    return <Button size="small" style={{marginRight:"1em"}}>上一页</Button>;
+          <Table
+            rowKey="id"
+            size="small"
+            // rowSelection={{rowSelection,columnTitle:"#"}} 
+            rowSelection={rowSelection} 
+            columns={columns} 
+            dataSource={this.props.role.roles}
+            pagination={{
+              onChange: page => {
+                console.log(page);
+                // let p = page - 1;
+                // console.log(p);
+                this.props.dispatch({
+                  type:"role/fetchRoles",
+                  payload:{
+                    page:page,
+                    pageSize:10,
                   }
-                  if (type === 'next') {
-                    return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
-                  }
-                  return originalElement;
-                },
-              }}
-              />
+                })
+                this.setState({
+                  page:page
+                })
+              },
+              total:this.props.role.count,
+              pageSize: 10,
+              size:'small',
+              
+              hideOnSinglePage: false,
+              itemRender: (current, type, originalElement) => {
+                if (type === 'prev') {
+                  return <Button size="small" style={{marginRight:"1em"}}>上一页</Button>;
+                }
+                if (type === 'next') {
+                  return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+                }
+                return originalElement;
+              },
+            }}
+            />
         
-        </div>
+       </div>
 
         {/* 底部按钮 */}
         <div >
@@ -390,8 +413,14 @@ class Role extends React.Component {
             <Button type="danger" size="small"  onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp;
             <Button type="delete" size="small" onClick={this.batchDelete}>删除</Button>
         </div>
+        {/* {console.log(this.props.role.roleCata[0].childs)} */}
+        {console.log(this.props.role.roleCata)}
        
-
+        {/* <Tree onSelect={this.onSelect} style={{marginLeft:"3em"}}
+							defaultExpandParent
+							>
+							{this.renderTreeNodes(this.props.role.roleCata)}
+				</Tree> */}
       </div>
       
     );

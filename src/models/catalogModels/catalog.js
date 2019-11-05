@@ -24,7 +24,7 @@ const CatalogModel = {
         payload: _.payload});
     },
     // 修改编目名称
-      *UpdateCatalogs(_, { call, put }) {
+    *UpdateCatalogs(_, { call, put }) {
         yield call(UpdateCatalog,_.payload);
         yield put({ type: 'changeVisible', payload: false });
         yield put({ type: 'fetchCatalog'});

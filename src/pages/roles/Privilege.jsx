@@ -138,6 +138,7 @@ class Privilege extends React.Component {
          <Table
               rowKey="id"
               size="small"
+              width="400px"
               rowSelection={{rowSelection,columnTitle:"#"}} 
               columns={columns} 
               dataSource={this.props.privilege.privileges}

@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { queryRole,UpdateRole,DeleteAll,EnableOrFreeze} from '@/services/rolesServices/role';
+import { queryRole,UpdateRole,DeleteAll,EnableOrFreeze,queryOnlyRole,queryCatalog} from '@/services/rolesServices/role';
 
 const RoleModel = {
   namespace: 'role',
@@ -7,11 +7,29 @@ const RoleModel = {
     roles: [],
     visible: false,
     count:"",
+    roleCata: [{childs:[]}],
   },
   effects: {
     // 获取所有角色信息
     *fetchRoles(_, { call, put }) {
       const response = yield call(queryRole);
+      // console.log(JSON.stringify(response.data))
+      // alert(JSON.stringify(response.data))
+      yield put({
+        type: 'reloadRoles',
+        payload: response});
+    },
+     // 获取所有编目信息
+     *fetchCatalog(_, { call, put }) {
+      const response = yield call(queryCatalog);
+      //console.log(JSON.stringify(response.results))
+      yield put({
+        type: 'reloadCatalogs',
+        payload: response});
+    },
+     // 获取单个角色信息
+     *fetchOnlyRole(_, { call, put }) {
+      const response = yield call(queryOnlyRole);
       // console.log(JSON.stringify(response.data))
       // alert(JSON.stringify(response.data))
       yield put({
@@ -53,6 +71,13 @@ const RoleModel = {
       return {
         ...state,
         visible: action.payload,
+      };
+    },
+     // 更新状态中的catalog
+     reloadCatalogs(state, action) {
+      return {
+        ...state,
+        roleCata: action.payload.data,
       };
     },
     // 更新状态中的users
