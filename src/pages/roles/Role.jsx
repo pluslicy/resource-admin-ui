@@ -1,6 +1,6 @@
 import React from 'react';
-import {Button,Table,Modal,Radio,Menu,Tree,
-          menu1,Dropdown,Icon,Input,Select,
+import {Button,Table,Modal,Radio,Menu,
+          menu1,Dropdown,Icon,Input,Select,Tree 
         } from 'antd';
 
 const {Option} = Select;
@@ -8,7 +8,6 @@ const { TreeNode } = Tree;
 import styles from './role.less'
 // import RoleForm from './RoleForm'
 import {connect} from 'dva'
-
 
 
 class Role extends React.Component {
@@ -37,7 +36,12 @@ class Role extends React.Component {
     }),
     this.props.dispatch({
 			type: 'role/fetchCatalog'
-		})
+    }),
+    this.props.dispatch({
+      type: 'role/feachPermission',
+      // payload:{type:'0'}
+    })
+   
   }
   
   
@@ -121,7 +125,7 @@ class Role extends React.Component {
       this.setState({
         value:""
       })
-      if(this.state.value===1){
+      if(this.state.value===0){
         this.setState({
           visibleWeb:true
         })
@@ -196,33 +200,32 @@ class Role extends React.Component {
     onChange = e => {
       // console.log('radio checked', e.target.value);
       console.log(e.target.value);
-      console.log(e.target.value.type)
+      // console.log(e.target.value.type)
       this.setState({
         value: e.target.value,
       });
     };
  
+   
+ 
+    
+    onSelect = (selectedKeys, info) => {
+      console.log('onSelect', info);
+      this.setState({ selectedKeys });
+    };
+
     // 遍历网站用户树
     renderTreeNodes = data =>
-    {
-      data.map(item => {
-        // console.log("-----------------",this.props.role.roleCata)
-        if (item.childs) {
-          return (
-            <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
-              {this.renderTreeNodes(item.childs)}
-            </TreeNode>
-          );
-        }
-        return <TreeNode {...item} />;
-      });
-      
-    }
-  onSelect = (selectedKeys, info) => {
-    console.log('onSelect', info);
-    this.setState({ selectedKeys });
-  };
-
+    data.map(item => {
+      if (item.childs) {
+        return (
+          <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
+            {this.renderTreeNodes(item.childs)}
+          </TreeNode>
+        );
+      }
+      return <TreeNode {...item} />;
+    });
 
   render(){ 
     const rowSelection = {
@@ -312,12 +315,21 @@ class Role extends React.Component {
             
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
-
+              {/* <Tree onSelect={this.onSelect} 
+                defaultExpandParent
+                checkable
+                >
+						  	{this.renderTreeNodes(this.props.role.webRole)}
+						  </Tree> */}
             </div>
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
-              <Tree>
-                {this.renderTreeNodes(this.props.role.roleCata[0].childs)}
-              </Tree>
+              <Tree onSelect={this.onSelect} 
+              defaultExpandParent
+              checkable
+							>
+						  	{this.renderTreeNodes(this.props.role.roleCata)}
+						  </Tree>
+              
             </div>
             </div>
         </Modal>
@@ -413,14 +425,7 @@ class Role extends React.Component {
             <Button type="danger" size="small"  onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp;
             <Button type="delete" size="small" onClick={this.batchDelete}>删除</Button>
         </div>
-        {/* {console.log(this.props.role.roleCata[0].childs)} */}
-        {console.log(this.props.role.roleCata)}
-       
-        {/* <Tree onSelect={this.onSelect} style={{marginLeft:"3em"}}
-							defaultExpandParent
-							>
-							{this.renderTreeNodes(this.props.role.roleCata)}
-				</Tree> */}
+  
       </div>
       
     );

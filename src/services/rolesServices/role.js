@@ -1,5 +1,6 @@
 import request from '@/utils/request';
 import qs from 'qs';
+import Paragraph from 'antd/lib/typography/Paragraph';
 
 /* 封装所有的异步请求 */
 
@@ -10,14 +11,10 @@ export async function queryRole() {
 // 查询所有编目
 export async function queryCatalog() {
   return request('/api/mp_man_catalog/catanestlist/');
-}
-// 查询单个角色列表
-export async function queryOnlyRole() {
-  return request('/api/mp_man_roles/rolepermslist/');
-}
-// 查询所有权限
-export async function queryPer() {
-  return request('api/mp_man_roles/permlist/');
+} 
+// 查询前台权限
+export async function queryPermission(param) {
+  return request('/api/mp_man_permissions/permissiontree/',{params:param});
 }
 
 //修改角色

@@ -1,5 +1,6 @@
 import { message } from 'antd';
-import { queryRole,UpdateRole,DeleteAll,EnableOrFreeze,queryOnlyRole,queryCatalog} from '@/services/rolesServices/role';
+import { queryRole,UpdateRole,DeleteAll,EnableOrFreeze,queryOnlyRole,queryCatalog,
+         queryPermission} from '@/services/rolesServices/role';
 
 const RoleModel = {
   namespace: 'role',
@@ -8,6 +9,7 @@ const RoleModel = {
     visible: false,
     count:"",
     roleCata: [{childs:[]}],
+    webBackRole:[{childs:[]}],
   },
   effects: {
     // 获取所有角色信息
@@ -27,8 +29,18 @@ const RoleModel = {
         type: 'reloadCatalogs',
         payload: response});
     },
-     // 获取单个角色信息
-     *fetchOnlyRole(_, { call, put }) {
+
+    // 获取用户权限
+    *feachPermission(_, { call, put }) {
+      const response = yield call(queryPermission,_.payload);
+      //console.log(JSON.stringify(response.results))
+      yield put({
+        type: 'reloadPermission',
+        payload: response});
+    },
+   
+    // 获取单个角色信息
+    *fetchOnlyRole(_, { call, put }) {
       const response = yield call(queryOnlyRole);
       // console.log(JSON.stringify(response.data))
       // alert(JSON.stringify(response.data))
@@ -36,7 +48,7 @@ const RoleModel = {
         type: 'reloadRoles',
         payload: response});
     },
-
+    //修改角色
     *updateRoles(_, { call, put }) {
       const response = yield call(UpdateRole, _.payload);
       message.success(response.message);
@@ -78,6 +90,13 @@ const RoleModel = {
       return {
         ...state,
         roleCata: action.payload.data,
+      };
+    },
+    // 更新状态中的前台permission
+    reloadPermission(state, action) {
+      return {
+        ...state,
+        webBackRole: action.payload.data,
       };
     },
     // 更新状态中的users

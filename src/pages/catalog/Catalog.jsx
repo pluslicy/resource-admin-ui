@@ -231,7 +231,7 @@ class Catalog extends React.Component {
 
 	render() {
 		// 级联
-		const { cities } = this.state;
+		// const { cities } = this.state;
 		return (
 			<div className={styles.content}>
 				{/* 左边面板 */}
