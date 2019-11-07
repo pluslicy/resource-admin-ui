@@ -28,13 +28,12 @@ export async function UpdateRole(param) {
 
 // 添加角色
 export async function AddRole(param) {
-  return request('/api/mp_man_roles/cre_role/', {
+  return request('/api/mp_man_roles/mod_role/', {
     method: 'post',
-    data: qs.stringify(param),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+    data: param,
+    headers: { 'Content-Type': 'application/json' },
   });
 }
-
 
 // 设置用户启用/冻结
 export async function EnableOrFreeze(param) {

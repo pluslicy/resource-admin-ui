@@ -16,8 +16,8 @@ class Role extends React.Component {
     super(props);
     this.state = {
       form: {},
-      visible: false,
-      visibleWeb:false,
+      // visible: false,
+      // visibleWeb:false,
       
       // 添加单选按钮
       value:"",
@@ -36,10 +36,9 @@ class Role extends React.Component {
     }),
     this.props.dispatch({
 			type: 'role/fetchCatalog'
-    }),
+    })
     this.props.dispatch({
       type: 'role/feachPermission',
-      // payload:{type:'0'}
     })
    
   }
@@ -106,6 +105,7 @@ class Role extends React.Component {
     showModal = () => {
       this.setState({
         visible: true,
+        value:""
         // visibleWeb:false,
       });
     };
@@ -118,24 +118,30 @@ class Role extends React.Component {
 
     // 添加模态框 ok
     handleOk = e => {
-      // console.log(e);
-      // this.props.dispatch({
-      //   type:'role/fetchOnlyRole'})
-
-      this.setState({
-        value:""
-      })
       if(this.state.value===0){
         this.setState({
           visibleWeb:true
         })
-      }else if(this.state.value===""){
-          this.setState({
-            visible:"false"
-          })
+        this.props.dispatch({
+          type: 'role/feachPermission',
+          payload:{
+            type:this.state.value,
+          }
+        })
+      }else if(this.state.value===1){
+        this.setState({
+         
+          visibleBack:true,
+        })
+        this.props.dispatch({
+          type: 'role/feachPermission',
+          payload:{
+            type:this.state.value,
+          }
+        })
       }else{
         this.setState({
-          visibleBack:true,
+          visible:"false"
         })
       }
       this.setState({
@@ -227,6 +233,19 @@ class Role extends React.Component {
       return <TreeNode {...item} />;
     });
 
+     // 遍历网站用户权限树
+     renderPerTreeNodes = data =>
+     data.map(item => {
+       if (item.childs) {
+         return (
+           <TreeNode title={item.name} key={item.id} dataRef={item}>
+             {this.renderPerTreeNodes(item.childs)}
+           </TreeNode>
+         );
+       }
+       return <TreeNode {...item} />;
+     });
+
   render(){ 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -314,20 +333,26 @@ class Role extends React.Component {
             <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
             
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
-            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
-              {/* <Tree onSelect={this.onSelect} 
-                defaultExpandParent
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
+              操作权限
+              {/* {console.log(this.props.role.webBackRole)}  checkedKeys={[]} */}
+              <Tree 
                 checkable
+                
+                autoExpandParent
                 >
-						  	{this.renderTreeNodes(this.props.role.webRole)}
-						  </Tree> */}
+						  	{this.renderPerTreeNodes(this.props.role.webBackRole[0].childs)}
+						  </Tree>
             </div>
-            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
+              资源权限
+             {/* {console.log(this.props.role.roleCata)} */}
               <Tree onSelect={this.onSelect} 
-              defaultExpandParent
+              
+              autoExpandParent
               checkable
 							>
-						  	{this.renderTreeNodes(this.props.role.roleCata)}
+						  	{this.renderTreeNodes(this.props.role.roleCata[0].childs)}
 						  </Tree>
               
             </div>
@@ -344,12 +369,18 @@ class Role extends React.Component {
             <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
             
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
-            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
-
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
+              操作权限
+              <Tree 
+                  checkable
+                  autoExpandParent
+                  >
+                  {this.renderPerTreeNodes(this.props.role.webBackRole[0].childs)}
+						  </Tree>
             </div>
-            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+            {/* <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
 
-            </div>
+            </div> */}
             </div>
 
           </Modal>

@@ -22,7 +22,7 @@ const RoleModel = {
         payload: response});
     },
      // 获取所有编目信息
-     *fetchCatalog(_, { call, put }) {
+    *fetchCatalog(_, { call, put }) {
       const response = yield call(queryCatalog);
       //console.log(JSON.stringify(response.results))
       yield put({
@@ -33,7 +33,7 @@ const RoleModel = {
     // 获取用户权限
     *feachPermission(_, { call, put }) {
       const response = yield call(queryPermission,_.payload);
-      //console.log(JSON.stringify(response.results))
+      // console.log("111111111111",JSON.stringify(sresponse.results))
       yield put({
         type: 'reloadPermission',
         payload: response});
@@ -48,6 +48,14 @@ const RoleModel = {
         type: 'reloadRoles',
         payload: response});
     },
+     // 添加角色
+    *fetchAddRole(_, { call, put }) {
+      // console.log(_.payload)
+      yield call(AddRole, _.payload);
+      // yield put({ type: 'changeVisible', payload: false });
+      yield put({ type: 'reloadRoles'});
+     },
+
     //修改角色
     *updateRoles(_, { call, put }) {
       const response = yield call(UpdateRole, _.payload);
@@ -64,6 +72,7 @@ const RoleModel = {
         type: 'fetchRoles'
       });
     },
+
     //批量设置用户状态
     *fetchEnableOrFreeze(_, { call, put }) {
       const response = yield call(EnableOrFreeze,_.payload.status);
