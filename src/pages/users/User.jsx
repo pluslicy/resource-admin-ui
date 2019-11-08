@@ -58,14 +58,14 @@ class User extends React.Component {
     })
   }
 
-   //批量删除用户
-   batchDelete=()=>{
+    //批量删除用户
+    batchDelete=()=>{
     this.props.dispatch({
         type:"users/fetchDeleteUsers",
         payload:this.state.ids
     })
     
-}
+    }
     // 批量启用和冻结
     batchEnableOrFreeze=(e)=>{
       // console.log(this.props.dispatch)
@@ -95,8 +95,14 @@ class User extends React.Component {
           
               }
         }) }
+        setTimeout(() => {
+          // console.log("1111")
+          this.setState({
+            ids:[]
+          })
+        }, 100);
     }
-    //根据状态查询(完成)
+    //根据状态查询(未完成)
     handleChange5=(value)=>{
       this.setState({
           textQuery:{...this.state.textQuery,...{is_active:value}}
@@ -127,34 +133,34 @@ class User extends React.Component {
            
        
    }
-  //添加模态框 
-  saveFormRef = formRef => {
-    this.formRef = formRef;
-  };
-  handleOkModal = e => {
-    // 提交表单
-    e.preventDefault();
-    const { form } = this.formRef.props;
-    form.validateFields(['username','password','user_phone','user_gender','groups'],(err, values) => {
-        if (err) {
-          console.log(err)
+    //添加模态框 
+    saveFormRef = formRef => {
+      this.formRef = formRef;
+    };
+    handleOkModal = e => {
+      // 提交表单
+      e.preventDefault();
+      const { form } = this.formRef.props;
+      form.validateFields(['username','password','user_phone','user_gender','groups'],(err, values) => {
+          if (err) {
+            console.log(err)
+            this.setState({
+              visible:true
+            })
+          return ;
+          }
           this.setState({
-            visible:true
+            visible:false
           })
-        return ;
-        }
-        this.setState({
-          visible:false
+        
+          console.log('Received values of form: ', values);
+          this.props.dispatch({
+            type:"users/AddUsers",
+            payload:values
         })
-       
-        console.log('Received values of form: ', values);
-        this.props.dispatch({
-          type:"users/AddUsers",
-          payload:values
-      })
-        // form.resetFields();
+          // form.resetFields();
 
-    });
+      });
       
     };
 
@@ -245,21 +251,21 @@ class User extends React.Component {
     });
   };
 
-    // 教师用户ok
-    handleOkTea = e => {
-      console.log(e);
-      this.setState({
-        visibleTeacher: false,
-      });
-    };
-    // 教师用户关闭
-    handleCancelTea = e => {
-      console.log(e);
-      this.setState({
-        visibleTeacher: false,
-      });
-    };
+  // 教师用户ok
+  handleOkTea = e => {
+    console.log(e);
+    this.setState({
+      visibleTeacher: false,
+    });
+  };
 
+  // 教师用户关闭
+  handleCancelTea = e => {
+    console.log(e);
+    this.setState({
+      visibleTeacher: false,
+    });
+  };
 
   // 添加角色模态框
   showPermise =(record)=>{
@@ -338,6 +344,7 @@ class User extends React.Component {
     const text = <span>导入时需要按模板填写,点击<a>下载</a></span>; 
     // 表格第一列选框
     const rowSelection = {
+      selectedRowKeys:this.state.ids,
       onChange: (selectedRowKeys, selectedRows) => {
         this.setState({
           ids:selectedRowKeys

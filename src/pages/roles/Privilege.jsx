@@ -1,11 +1,11 @@
 import React from 'react';
-import { Form, Input, Radio, Select, Modal, Table, Icon, Button } from 'antd';
+import { Form, Input, Radio, Select, Modal, Table, Icon, Button,Tabs  } from 'antd';
 import style from './Privilege.less';
 import { connect } from 'dva';
 var arr = [];
 var data = {};
 const {Option} = Select;
-
+const { TabPane } = Tabs;
 
 class Privilege extends React.Component {
   constructor(props) {
@@ -42,10 +42,9 @@ class Privilege extends React.Component {
    // 冻结状态改变
    handleChange=(record,e)=>{
     if(e._owner){
-      // console.log("---------------",this.props.dispatch)
+      console.log("---------------",this.props.dispatch)
       this.props.dispatch({
         type:"privilege/fetchEnableOrFreeze",
-        
         payload:{
          status:{
              enable:0,
@@ -57,47 +56,58 @@ class Privilege extends React.Component {
          }
      })
     }
-
-   // 批量启用和冻结
-  //  batchEnableOrFreeze=(e)=>{
-  //   console.log("------------",this.props.dispatch)
-  //     if(e.target.textContent=="冻 结"){
-  //     this.props.dispatch({
-  //         type:"privilege/fetchEnableOrFreeze",
-  //         payload:{
-  //         status:{
-  //             enable:0,
-  //             ids:this.state.ids,
-  //         },
-  //         page:this.state.page,
-  //         pageSize:10,
-      
-  //         }
-  //     })
-  //     }else{
-  //     this.props.dispatch({
-  //       type:"privilege/fetchEnableOrFreeze",
-  //         payload:{
-  //           status:{
-  //               enable:1,
-  //               ids:this.state.ids,
-  //           },
-  //           page:this.state.page,
-  //           pageSize:10,
-        
-  //           }
-  //     }) }}
   }
+   // 批量启用和冻结
+   batchEnableOrFreeze=(e)=>{
+    // console.log("------------",this.props.dispatch)
+      if(e.target.textContent=="冻 结"){
+      this.props.dispatch({
+          type:"privilege/fetchEnableOrFreeze",
+          payload:{
+          status:{
+              enable:0,
+              ids:this.state.ids,
+          },
+          page:this.state.page,
+          pageSize:10,
+      
+          }
+      })
+      }else{
+      this.props.dispatch({
+        type:"privilege/fetchEnableOrFreeze",
+          payload:{
+            status:{
+                enable:1,
+                ids:this.state.ids,
+            },
+            page:this.state.page,
+            pageSize:10,
+        
+            }
+      }) }
+      setTimeout(() => {
+        // console.log("1111")
+        this.setState({
+          ids:[]
+        })
+      }, 100);
+    }
+
+  
 
 
   render() {
     // table第一列选框
     const rowSelection = {
+      selectedRowKeys:this.state.ids,
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        this.setState({
+          ids:selectedRowKeys
+        })
+        // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       }
     };
-
     // table第一行
     const columns = [
       {
@@ -135,12 +145,16 @@ class Privilege extends React.Component {
  
     return (
       <div className={style.Back}>
+        <Tabs defaultActiveKey="1">
+              <TabPane tab="权限" key="1"> </TabPane>
+        </Tabs>
          <Table
               rowKey="id"
               size="small"
               width="400px"
-              rowSelection={{rowSelection,columnTitle:"#"}} 
+              // rowSelection={{rowSelection,columnTitle:"#"}} 
               columns={columns} 
+              rowSelection={rowSelection} 
               dataSource={this.props.privilege.privileges}
               pagination={{
                 onChange: page => {
@@ -174,13 +188,13 @@ class Privilege extends React.Component {
                 },
               }}
           />
-          {/* <Button type="primary" size="small" onClick={this.batchEnableOrFreeze}>启用</Button>&nbsp;
-          <Button type="danger" size="small" onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp; */}
+          <Button type="primary" size="small" onClick={this.batchEnableOrFreeze}>启用</Button>&nbsp;
+          <Button type="danger" size="small" onClick={this.batchEnableOrFreeze}>冻结</Button>&nbsp;
       </div>
     );
   }
+   
 }
-
 export default connect(({ privilege }) => ({
   privilege,
 }))(Privilege);

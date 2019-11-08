@@ -1,14 +1,14 @@
 import React from 'react';
-import {Button,Table,Modal,Radio,Menu,
+import {Button,Table,Modal,Radio,Menu,Form,Tabs,
           menu1,Dropdown,Icon,Input,Select,Tree 
         } from 'antd';
 
 const {Option} = Select;
 const { TreeNode } = Tree;
+const { TabPane } = Tabs;
 import styles from './role.less'
 // import RoleForm from './RoleForm'
 import {connect} from 'dva'
-
 
 class Role extends React.Component {
 
@@ -23,6 +23,11 @@ class Role extends React.Component {
       value:"",
       ids:[],
       page:1,
+      // 添加
+      id:"",
+      name:"",
+      catalogues:[],
+      permissions:[],
 
     };
   }
@@ -42,7 +47,25 @@ class Role extends React.Component {
     })
    
   }
-  
+  inputOnchange = e =>{
+    console.log(e.target.value)
+    this.setState({
+      name: e.target.value
+    });
+  }
+  tijiao(){
+
+
+    // {
+    //   "role_profile": {
+    // "catalogues":[2,3]
+    // },
+    //   "permissions": 
+    //     [1,2,3]
+    //   ,
+    //   "name": this.state.name
+    // }
+  }
   
    // 冻结状态改变
    handleChange=(record,e)=>{
@@ -63,7 +86,7 @@ class Role extends React.Component {
  }
    // 批量启用和冻结
    batchEnableOrFreeze=(e)=>{
-    console.log(this.props.dispatch)
+    // console.log(this.props.dispatch)
       if(e.target.textContent=="冻 结"){
       this.props.dispatch({
           type:"role/fetchEnableOrFreeze",
@@ -77,6 +100,7 @@ class Role extends React.Component {
       
           }
       })
+      
       }else{
       this.props.dispatch({
           type:"role/fetchEnableOrFreeze",
@@ -90,6 +114,12 @@ class Role extends React.Component {
         
             }
       }) }
+      setTimeout(() => {
+        // console.log("1111")
+        this.setState({
+          ids:[]
+        })
+      }, 100);
   }
 
   //批量删除用户
@@ -216,8 +246,11 @@ class Role extends React.Component {
  
     
     onSelect = (selectedKeys, info) => {
-      console.log('onSelect', info);
-      this.setState({ selectedKeys });
+      console.log('selected', selectedKeys, info);
+    };
+  
+    onCheck = (checkedKeys, info) => {
+      console.log('onCheck', checkedKeys, info);
     };
 
     // 遍历网站用户树
@@ -245,13 +278,17 @@ class Role extends React.Component {
        }
        return <TreeNode {...item} />;
      });
+   
 
   render(){ 
+   
     const rowSelection = {
+      selectedRowKeys:this.state.ids,
       onChange: (selectedRowKeys, selectedRows) => {
         this.setState({
           ids:selectedRowKeys
         })
+        
         // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       }
     };
@@ -296,9 +333,15 @@ class Role extends React.Component {
     
     ];
 
+    // getFieldDecorator('id');
+    // const { getFieldDecorator } = this.props.form;
+ 
 
     return (
       <div className={styles.content}>
+        <Tabs defaultActiveKey="1">
+              <TabPane tab="角色" key="1"> </TabPane>
+        </Tabs>
         <div className="btn1">
            <Button type="primary" onClick={this.showModal} size="small">添加</Button>
         </div>
@@ -330,7 +373,18 @@ class Role extends React.Component {
               width="600px"
               height="400px"
               >
-            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
+        {/* <Form layout="inline">
+            <Form.Item>
+              {getFieldDecorator('name', {
+                rules: [{ required: true, message: '请输入角色名称' }],
+              })(
+                <Input
+                  placeholder="输入角色名称"style={{width:500,marginLeft:"1em"}}
+                />,
+              )}
+            </Form.Item>
+        </Form> */}
+            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} onChange={this.inputOnchange}/>
             
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
@@ -338,8 +392,9 @@ class Role extends React.Component {
               {/* {console.log(this.props.role.webBackRole)}  checkedKeys={[]} */}
               <Tree 
                 checkable
-                
                 autoExpandParent
+                onSelect={this.onSelect}
+                onCheck={this.onCheck}
                 >
 						  	{this.renderPerTreeNodes(this.props.role.webBackRole[0].childs)}
 						  </Tree>
@@ -348,7 +403,8 @@ class Role extends React.Component {
               资源权限
              {/* {console.log(this.props.role.roleCata)} */}
               <Tree onSelect={this.onSelect} 
-              
+              onSelect={this.onSelect}
+              onCheck={this.onCheck} 
               autoExpandParent
               checkable
 							>
@@ -366,7 +422,7 @@ class Role extends React.Component {
               onCancel={this.handleCancelBack}
               width="600px"
               height="400px">
-            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}}/>
+            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} />
             
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
@@ -462,6 +518,7 @@ class Role extends React.Component {
     );
     }
 }
+
 
 export default connect(({ role }) => ({
   role,
