@@ -226,13 +226,13 @@ class Check extends React.Component {
 							</video>
 						</Modal>
 					</TabPane>
-					<TabPane tab="文档(4)" key="2">
+					{/* <TabPane tab="文档(4)" key="2">
 						<iframe
 							src='/resource/Check/word'
 							style={{ width: '100%', height: '350px', }} frameborder='0'>
 								<word></word>
 						</iframe>
-					</TabPane>
+					</TabPane> */}
 				</Tabs>,
 			</div>
 		);

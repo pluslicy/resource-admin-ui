@@ -1,7 +1,7 @@
 import request from '@/utils/request';
 
 export async function findAll() {
-  return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist/',{}); 
+  return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist'); 
 }
 
 

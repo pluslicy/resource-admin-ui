@@ -3,8 +3,9 @@ import styles from './video.less';
 import WordForm from './WordForm'
 import { connect } from 'dva';
 
-import { Button, Table, Icon, DatePicker, Input, Divider, Modal, Form } from 'antd';
+import { Button, Table, Icon,Tabs, DatePicker, Input, Divider, Modal, Form } from 'antd';
 
+const { TabPane } = Tabs;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
 
@@ -206,54 +207,58 @@ class Check extends React.Component {
 
 		return (
 			<div className={styles.content}>
-				<div className={styles.content_top}>
-					<RangePicker onChange={this.onChange} style={{ width: 300 }} />
-					<Search
-						onSearch={value => this.onSearch(value)}
-						style={{ width: 200 }}
-						placeholder={'根据名称搜索'} />
-				</div>
-				<div>
-					<Table
-						size="small"
-						bordered
-						rowSelection={rowSelection}
-						columns={columns}
-						dataSource={this.props.word.words}
-					/>
-				</div>
-				<div className={styles.content_bottom}>
-					<Button size="small" type="primary" onClick={this.passAll.bind(this)}>
-						一键通过
-				</Button>
-				</div>
-				<WordForm
-					title="拒绝的理由"
-					wrappedComponentRef={this.saveFormRef}
-					visible={this.state.visible}
-					onOk={this.handleOk}
-					onCancel={this.handleCancel}
-					onCreate={this.handleCreate}
-				>
-					<Form onSubmit={this.handleOk}>
-						<Form.Item>
-							<Input autosize={{ minRows: 6, maxRows: 10 }} placeholder="请输入拒绝理由..." />
-						</Form.Item>
-						<Form.Item >
-							<Button htmlType={'submit'}>提交</Button>
-						</Form.Item>
-					</Form>
-				</WordForm>
-				<Modal
-					width={900}
-					visible={this.state.visible2}
-					onOk={this.handleOk2}
-					onCancel={this.handleCancel2}
-				>
-					<iframe src='https://view.officeapps.live.com/op/view.aspx?src=http://storage.xuetangx.com/public_assets/xuetangx/PDF/1.xls'
-						style={{ width: '100%', height: '350px', }} frameborder='1'>
-					</iframe>
-				</Modal>
+				<Tabs defaultActiveKey="1" >
+					<TabPane tab={'文档 (' + this.props.word.words.count + ')'} key='1'>
+						<div className={styles.content_top}>
+							<RangePicker onChange={this.onChange} style={{ width: 300 }} />
+							<Search
+								onSearch={value => this.onSearch(value)}
+								style={{ width: 200 }}
+								placeholder={'根据名称搜索'} />
+						</div>
+						<div>
+							<Table
+								size="small"
+								bordered
+								rowSelection={rowSelection}
+								columns={columns}
+								dataSource={this.props.word.words}
+							/>
+						</div>
+						<div className={styles.content_bottom}>
+							<Button size="small" type="primary" onClick={this.passAll.bind(this)}>
+								一键通过
+						</Button>
+						</div>
+						<WordForm
+							title="拒绝的理由"
+							wrappedComponentRef={this.saveFormRef}
+							visible={this.state.visible}
+							onOk={this.handleOk}
+							onCancel={this.handleCancel}
+							onCreate={this.handleCreate}
+						>
+							<Form onSubmit={this.handleOk}>
+								<Form.Item>
+									<Input autosize={{ minRows: 6, maxRows: 10 }} placeholder="请输入拒绝理由..." />
+								</Form.Item>
+								<Form.Item >
+									<Button htmlType={'submit'}>提交</Button>
+								</Form.Item>
+							</Form>
+						</WordForm>
+						<Modal
+							width={900}
+							visible={this.state.visible2}
+							onOk={this.handleOk2}
+							onCancel={this.handleCancel2}
+						>
+							<iframe src='https://view.officeapps.live.com/op/view.aspx?src=http://storage.xuetangx.com/public_assets/xuetangx/PDF/1.xls'
+								style={{ width: '100%', height: '350px', }} frameborder='1'>
+							</iframe>
+						</Modal>
+					</TabPane>
+				</Tabs>
 			</div>
 		)
 	}

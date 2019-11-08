@@ -16,9 +16,11 @@ import {
   Tooltip,
   Avatar,
   Divider,
+  Select 
 } from 'antd';
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
+const { Option } = Select;
 
 global.constants = {
   //初始化批量删除id数组|全局变量
@@ -87,6 +89,8 @@ class Check extends React.Component {
       selectedRowKeys: selectedRowKeys,
     });
   };
+
+
   render() {
     const { selectedRowKeys } = this.state;
     const rowSelection = {
@@ -99,16 +103,8 @@ class Check extends React.Component {
         }
         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       },
-    };
-
-    const menu = (
-      <Menu>
-        <Menu.Item>
-          <a rel="noopener noreferrer">通过</a>
-        </Menu.Item>
-      </Menu>
-    );
-
+	};
+	
     const columns = [
       { title: '内容', align: 'center', dataIndex: 'comment_text' },
       { title: '来自', align: 'center', dataIndex: 'user' },
@@ -143,15 +139,12 @@ class Check extends React.Component {
             );
           } else if (record.comment_status === 2) {
             return (
-              <div>
+              <div style={{width:"105px",height:"20px",overflow:"hidden"}}>
                 {/* <span style={{ color: 'red' }}>已拒绝</span> */}
-                <Dropdown overlay={menu}>
-                  <a style={{ color: 'red' }} className="ant-dropdown-link">
-                    已拒绝
-                    <Icon type="down" />
-                  </a>
-                </Dropdown>
-                ,
+                <Select defaultValue={"已拒绝"} style={{ width:"100px",marginLeft:"20px",marginTop:"-5px",color:"red"}}>
+                    <Option value={1} onClick={this.pass.bind(this, record)}>通过</Option>
+                    {/* <Option value={0} style={{color:"red"}}>已拒绝</Option> */}
+                  </Select>
               </div>
             );
           } else {
