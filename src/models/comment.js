@@ -1,4 +1,4 @@
-import { findAllComment, fetchCheck } from '@/services/comment';
+import { findAllComment, fetchCheck,batchPass,findByCondidtion } from '@/services/comment';
 
 const Comment = {
   namespace: 'comment',
@@ -18,6 +18,19 @@ const Comment = {
       const response = yield call(fetchCheck, _.payload);
       yield put({
         type: 'findAllComment',
+      });
+    },
+    *batchPass(_, { call, put }) {
+      const response = yield call(batchPass, _.payload);
+      yield put({
+        type: 'findAllComment',
+      });
+    },
+    *findByCondidtion(_, { call, put }) {
+      const response = yield call(findByCondidtion, _.payload);
+      yield put({
+        type: 'reloadAll',
+        payload: response.results,
       });
     },
   },

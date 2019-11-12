@@ -2,9 +2,10 @@ import React from 'react';
 import styles from './video.less';
 import VideoForm from './VideoForm'
 import { connect } from 'dva';
+import Word from './Word'
 
 import { Button, Table, Tabs, Icon, DatePicker, Input, Modal, Form, Divider } from 'antd';
-// import {word} from './';
+
 const { TabPane } = Tabs;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search, TextArea } = Input;
@@ -24,18 +25,30 @@ class Check extends React.Component {
 			form: {},
 			selectedRowKeys: [],
 			date: [],
-			name: []
+			name: [],
+			page:1,
 		};
 	}
 	// 在渲染前调用
 	componentWillMount() {
-		this.props.dispatch({ type: 'video/findAll' })
+		this.props.dispatch({ 
+			type: 'video/findAll',
+			payload:{
+				page:1,
+				pageSize:10,
+			}
+		})
 	}
 	// 批量一键通过
 	passAll = () => {
 		var data = global.constants.ids
 		console.log(data)
-		this.props.dispatch({ type: 'video/passVideo', payload: data })
+		this.props.dispatch({ 
+			type: 'video/passVideo', 
+			payload: data,
+			page:this.state.page,
+            pageSize:10,
+		 })
 	}
 	// 日期选择框
 	onChange = (date, dateString) => {
@@ -179,7 +192,8 @@ class Check extends React.Component {
 		return (
 			<div className={styles.content}>
 				<Tabs defaultActiveKey="1" >
-					<TabPane tab={'视频 (' + this.props.video.videos.count + ')'} key='1'>
+					{/* <TabPane tab={'视频 (' + this.props.video.videos.count + ')'} key='1'> */}
+					<TabPane tab='视频' key='1'>
 						<div className={styles.content_top}>
 							<RangePicker onChange={this.onChange} style={{ width: 300 }} />
 							<Search onSearch={value => this.onSearch(value)} style={{ width: 200 }} placeholder={'根据名称搜索'} />
@@ -191,6 +205,37 @@ class Check extends React.Component {
 								rowSelection={rowSelection}
 								columns={columns}
 								dataSource={this.props.video.videos.results}
+								pagination={{
+									onChange: page => {
+									  console.log(page);
+									  // let p = page - 1;
+									  // console.log(p);
+									  this.props.dispatch({
+										type:"video/findAll",
+										payload:{
+										  page:page,
+										  pageSize:10,
+										}
+									  })
+									  this.setState({
+										page:page
+									  })
+									},
+									total:this.props.video.videos.count,
+									pageSize: 10,
+									size:'small',
+									
+									hideOnSinglePage: false,
+									itemRender: (current, type, originalElement) => {
+									  if (type === 'prev') {
+										return <Button size="small" style={{marginRight:"1em"}}>上一页</Button>;
+									  }
+									  if (type === 'next') {
+										return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+									  }
+									  return originalElement;
+									},
+								  }}
 							/>
 						</div>
 						<div className={styles.content_bottom}>
@@ -226,13 +271,11 @@ class Check extends React.Component {
 							</video>
 						</Modal>
 					</TabPane>
-					{/* <TabPane tab="文档(4)" key="2">
-						<iframe
-							src='/resource/Check/word'
-							style={{ width: '100%', height: '350px', }} frameborder='0'>
-								<word></word>
-						</iframe>
-					</TabPane> */}
+					{/* <TabPane tab={'文档 (' + this.props.word.words.count + ')'} key='2'> */}
+					<TabPane tab='文档' key='2'>
+
+						 <Word  treekey={this.state.treekey}></Word>
+					</TabPane>
 				</Tabs>,
 			</div>
 		);

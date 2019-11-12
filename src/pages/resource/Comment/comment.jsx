@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './comment.less';
 import moment from 'moment';
 import { connect } from 'dva';
+import Restore from './Restore';
 
 import {
   Button,
@@ -16,23 +17,22 @@ import {
   Tooltip,
   Avatar,
   Divider,
-  Select 
+  Select,
+  Tabs
 } from 'antd';
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
 const { Option } = Select;
-
-global.constants = {
-  //初始化批量删除id数组|全局变量
-  ids: [],
-};
+const { TabPane } = Tabs;
 
 class Check extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
-      selectedRowKeys: [],
+      ids:[],
+      date: ['',''],
+			name: []
     };
   }
 
@@ -62,8 +62,41 @@ class Check extends React.Component {
 
   // 一键通过
   passAll = () => {
-    alert(this.state.selectedRowKeys);
+    // alert(this.state.selectedRowKeys);
+    var data ={ 
+      comment_status: 1, //通过
+      ids:this.state.ids,
+    }
+		console.log(data)
+    this.props.dispatch({ type: 'comment/batchPass', payload: data })
+    
+    setTimeout(() => {
+      // console.log("1111")
+      this.setState({
+        ids:[]
+      })
+    }, 100);
   };
+  
+  //日期选择器
+	onChange = (date, dateString) => {
+		console.log(date, dateString);
+		this.setState({
+			date: dateString,
+		});
+		var values = [dateString, this.state.name];
+		console.log(values)
+		this.props.dispatch({ type: 'comment/findByCondidtion', payload: values });
+  };
+
+  // 名称搜索框
+	onSearch = (value) => {
+		this.setState({
+			name: value,
+		});
+		var values = [this.state.date, value];
+		this.props.dispatch({ type: 'comment/findByCondidtion', payload: values });
+	}
 
   handleCancel = e => {
     console.log(e);
@@ -90,20 +123,16 @@ class Check extends React.Component {
     });
   };
 
-
   render() {
-    const { selectedRowKeys } = this.state;
     const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows, record) => {
-        //遍历selectedRows拿到id集合
-        global.constants.ids = [];
-        for (let i = 0; i < selectedRows.length; i++) {
-          let { id } = selectedRows[i];
-          global.constants.ids.push(id);
-        }
+      selectedRowKeys:this.state.ids,
+      onChange: (selectedRowKeys, selectedRows) => {
+        this.setState({
+          ids:selectedRowKeys
+        })
         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-	};
+      }
+    };
 	
     const columns = [
       { title: '内容', align: 'center', dataIndex: 'comment_text' },
@@ -139,11 +168,9 @@ class Check extends React.Component {
             );
           } else if (record.comment_status === 2) {
             return (
-              <div style={{width:"105px",height:"20px",overflow:"hidden"}}>
-                {/* <span style={{ color: 'red' }}>已拒绝</span> */}
-                <Select defaultValue={"已拒绝"} style={{ width:"100px",marginLeft:"20px",marginTop:"-5px",color:"red"}}>
+              <div style={{width:"75px",marginLeft:"20px",height:"20px",overflow:"hidden"}}>
+                <Select defaultValue={"已拒绝"} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px",color:"red"}}>
                     <Option value={1} onClick={this.pass.bind(this, record)}>通过</Option>
-                    {/* <Option value={0} style={{color:"red"}}>已拒绝</Option> */}
                   </Select>
               </div>
             );
@@ -164,59 +191,67 @@ class Check extends React.Component {
 
     return (
       <div className={styles.content}>
-        <div className={styles.content_top}>
-          <RangePicker onChange={this.onChange} style={{ width: 300 }} />
-          <Search
-            onSearch={value => console.log(value)}
-            style={{ width: 200 }}
-            placeholder="请输入搜索内容"
-          />
-        </div>
-        <div>
-          <Table
-            // rowKey="id"
-            size="small"
-            bordered
-            rowSelection={rowSelection}
-            columns={columns}
-            dataSource={this.props.comment.comments}
-          />
-        </div>
-        <div className={styles.content_bottom}>
-          <Button size="small" type="primary" onClick={this.passAll.bind(this)}>
-            一键通过
-          </Button>
-        </div>
-        <Modal
-          width={'900px'}
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-        >
-          <video width="100%" height="70%" controls>
-            <source src="D:/a.mp4" type="video/mp4" />
-          </video>
-          {/* <Comment
+        <Tabs defaultActiveKey="1" >
+					<TabPane tab={'评论 (' + this.props.comment.comments.count + ')'} key='1'>
+            <div className={styles.content_top}>
+              <RangePicker onChange={this.onChange} style={{ width: 300 }} />
+              <Search
+                onSearch={value => this.onSearch(value)}
+                style={{ width: 200 }}
+                placeholder="请输入姓名"
+              />
+            </div>
+            <div>
+              <Table
+                rowKey="id"
+                size="small"
+                bordered
+                rowSelection={rowSelection}
+                columns={columns}
+                dataSource={this.props.comment.comments}
+              />
+            </div>
+            <div className={styles.content_bottom}>
+              <Button size="small" type="primary" onClick={this.passAll.bind(this)}>
+                一键通过
+              </Button>
+            </div>
+            <Modal
+              width={'900px'}
+              visible={this.state.visible}
+              onOk={this.handleOk}
+              onCancel={this.handleCancel}
+            >
+              <video width="100%" height="70%" controls>
+                <source src="D:/a.mp4" type="video/mp4" />
+              </video>
+              {/* <Comment
 
-						author={<a>{this.state.restore.author}</a>}
-						avatar={
-							<Avatar
-								src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-								alt={this.state.restore.author}
-							/>
-						}
-						content={
-							<p>
-								{this.state.restore.key}
-							</p>
-						}
-						datetime={
-							<Tooltip title={this.state.restore.jishu}>
-								<span>{this.state.restore.jishu}</span>
-							</Tooltip>
-						}
-					/> */}
-        </Modal>
+                author={<a>{this.state.restore.author}</a>}
+                avatar={
+                  <Avatar
+                    src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                    alt={this.state.restore.author}
+                  />
+                }
+                content={
+                  <p>
+                    {this.state.restore.key}
+                  </p>
+                }
+                datetime={
+                  <Tooltip title={this.state.restore.jishu}>
+                    <span>{this.state.restore.jishu}</span>
+                  </Tooltip>
+                }
+              /> */}
+            </Modal>
+            </TabPane>
+					{/* <TabPane tab={'回复 (' + this.props.word.words.count + ')'} key='2'> */}
+					<TabPane tab={'回复 (' + 4 + ')'} key='2'>
+						 <Restore  treekey={this.state.treekey}></Restore>
+					</TabPane>
+				</Tabs>,
       </div>
     );
   }
