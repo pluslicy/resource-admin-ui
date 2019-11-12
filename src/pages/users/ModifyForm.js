@@ -3,7 +3,7 @@ import { Form, Input,Button,Radio} from 'antd';
 
 
 
-class AddUserForm extends React.Component {
+class ModifyForm extends React.Component {
   
   render() {
     const formLayout = {
@@ -22,7 +22,7 @@ class AddUserForm extends React.Component {
       <div>
     <Form layout="vertical" {...formLayout}>
           <Form.Item label="用户名">
-            {getFieldDecorator('username', {
+            {getFieldDecorator('last_name', {
               rules: [{ required: true, message: '请输入用户名!' }]
             })(<Input placeholder='输入用户名' />)}
             {/*  style={{marginBottom:'1em'}} */}
@@ -59,7 +59,7 @@ const mapPropsToFields = props => {
   }
   return obj;
 };  
-
+// AddUserForm
 export default Form.create({
   mapPropsToFields,
-})(AddUserForm);
+})(ModifyForm);

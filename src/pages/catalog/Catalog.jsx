@@ -317,8 +317,11 @@ class Catalog extends React.Component {
 						</Modal>
 
 						<div>
-						<Tree onSelect={this.onSelect} style={{marginLeft:"3em"}}
-							defaultExpandParent
+						<Tree autoExpandParent 
+							  defaultExpandAll
+							  onSelect={this.onSelect} 
+							  style={{marginLeft:"3em"}}
+							
 							>
 							{this.renderTreeNodes(this.props.catalog.roles)}
 						</Tree>

@@ -22,13 +22,13 @@ export async function UpdateRole(param) {
   return request('/api/mp_man_roles/mod_role/', {
     method: 'post',
     data: qs.stringify(param),
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
 // 添加角色
 export async function AddRole(param) {
-  return request('/api/mp_man_roles/mod_role/', {
+  return request('/api/mp_man_roles/cre_role/', {
     method: 'post',
     data: param,
     headers: { 'Content-Type': 'application/json' },

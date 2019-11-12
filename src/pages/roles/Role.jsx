@@ -6,6 +6,7 @@ import {Button,Table,Modal,Radio,Menu,Form,Tabs,
 const {Option} = Select;
 const { TreeNode } = Tree;
 const { TabPane } = Tabs;
+const { confirm } = Modal;
 import styles from './role.less'
 // import RoleForm from './RoleForm'
 import {connect} from 'dva'
@@ -47,6 +48,7 @@ class Role extends React.Component {
     })
    
   }
+  // 网站用户的input框
   inputOnchange = e =>{
     console.log(e.target.value)
     this.setState({
@@ -67,217 +69,247 @@ class Role extends React.Component {
     // }
   }
   
-   // 冻结状态改变
-   handleChange=(record,e)=>{
-    if(e._owner){
-      // console.log("---------------",this.props.dispatch)
-      this.props.dispatch({
+  // 冻结状态改变
+  handleChange=(record,e)=>{
+  if(e._owner){
+    // console.log("---------------",this.props.dispatch)
+    this.props.dispatch({
+      type:"role/fetchEnableOrFreeze",
+      payload:{
+        status:{
+            rp_enable:0,
+            ids:[e._owner.pendingProps.record.id],
+        },
+        page:this.state.page,
+        pageSize:10, 
+        }
+    })
+  }   
+  }
+  // 批量启用和冻结
+  batchEnableOrFreeze=(e)=>{
+  // console.log(this.props.dispatch)
+    if(e.target.textContent=="冻 结"){
+    this.props.dispatch({
         type:"role/fetchEnableOrFreeze",
         payload:{
-         status:{
-             rp_enable:0,
-             ids:[e._owner.pendingProps.record.id],
-         },
-         page:this.state.page,
-         pageSize:10, 
-         }
-     })
-    }   
- }
-   // 批量启用和冻结
-   batchEnableOrFreeze=(e)=>{
-    // console.log(this.props.dispatch)
-      if(e.target.textContent=="冻 结"){
-      this.props.dispatch({
-          type:"role/fetchEnableOrFreeze",
-          payload:{
+        status:{
+          rp_enable:0,
+          ids:this.state.ids,
+        },
+        page:this.state.page,
+        pageSize:10,
+    
+        }
+    })
+    
+    }else{
+    this.props.dispatch({
+        type:"role/fetchEnableOrFreeze",
+        payload:{
           status:{
-            rp_enable:0,
-            ids:this.state.ids,
+              rp_enable:1,
+              ids:this.state.ids,
           },
           page:this.state.page,
           pageSize:10,
       
           }
+    }) }
+    setTimeout(() => {
+      // console.log("1111")
+      this.setState({
+        ids:[]
       })
-      
-      }else{
-      this.props.dispatch({
-          type:"role/fetchEnableOrFreeze",
-          payload:{
-            status:{
-                rp_enable:1,
-                ids:this.state.ids,
-            },
-            page:this.state.page,
-            pageSize:10,
-        
-            }
-      }) }
-      setTimeout(() => {
-        // console.log("1111")
-        this.setState({
-          ids:[]
-        })
-      }, 100);
+    }, 100);
   }
 
   //批量删除用户
   batchDelete=()=>{
-    console.log(this.state.ids)
-    this.props.dispatch({
-        type:"role/fetchDelete",
-        payload:this.state.ids
-    })
+    confirm({
+      title: '确认删除数据吗？',
+      okText: '确定',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: () => {
+        this.props.dispatch({
+          type:"role/fetchDelete",
+          payload:this.state.ids
+        });
+      },
+    });
   } 
 
-    // 添加展示模态框
-    showModal = () => {
-      this.setState({
-        visible: true,
-        value:""
-        // visibleWeb:false,
-      });
-    };
-    //配置模态框 
-    configHandle= () => {
-      this.setState({
-        visibleConfig: true,
-      });
-    };
+  // 添加展示模态框
+  showModal = () => {
+    this.setState({
+      visible: true,
+      value:""
+      // visibleWeb:false,
+    });
+  };
+  //配置模态框 
+  configHandle= () => {
+    this.setState({
+      visibleConfig: true,
+    });
+  };
 
-    // 添加模态框 ok
-    handleOk = e => {
-      if(this.state.value===0){
-        this.setState({
-          visibleWeb:true
-        })
-        this.props.dispatch({
-          type: 'role/feachPermission',
-          payload:{
-            type:this.state.value,
-          }
-        })
-      }else if(this.state.value===1){
-        this.setState({
-         
-          visibleBack:true,
-        })
-        this.props.dispatch({
-          type: 'role/feachPermission',
-          payload:{
-            type:this.state.value,
-          }
-        })
-      }else{
-        this.setState({
-          visible:"false"
-        })
-      }
+  // 添加模态框 ok
+  handleOk = e => {
+    if(this.state.value===0){
       this.setState({
-        visible: false,
-      });
-    };
-    // 添加模态框关闭 
-    handleCancel = e => {
-      console.log(e);
+        visibleWeb:true
+      })
+      this.props.dispatch({
+        type: 'role/feachPermission',
+        payload:{
+          type:this.state.value,
+        }
+      })
+    }else if(this.state.value===1){
       this.setState({
-        visible: false,
-      });
-    };
-  
-    // 网络用户ok
-    handleOkWeb = e => {
-      // console.log(e);
+        
+        visibleBack:true,
+      })
+      this.props.dispatch({
+        type: 'role/feachPermission',
+        payload:{
+          type:this.state.value,
+        }
+      })
+    }else{
       this.setState({
-        visibleWeb: false,
-      });
-    };
-    // 网络用户关闭
-    handleCancelWeb = e => {
-      // console.log(e);
-      this.setState({
-        visibleWeb: false,
-      });
-    };
+        visible:"false"
+      })
+    }
+    this.setState({
+      visible: false,
+    });
+  };
+  // 添加模态框关闭 
+  handleCancel = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };
 
-    // 后台用户ok
-    handleOkBack = e => {
-      console.log(e);
-      this.setState({
-        visibleBack: false,
-      });
-    };
-    // 后台用户关闭
-    handleCancelBack = e => {
-      console.log(e);
-      this.setState({
-        visibleBack: false,
-      });
-    };
+  // 网络用户ok
+  handleOkWeb = e => {
+    let a={
+      name: this.state.name,
+      rp_type:0,
+      role_profile: this.state.role_profile,
+      catalogues:this.state.catalogues,
+      permissions: this.state.permissions,
+    }
+    
+    // console.log(this.props.dispatch)
+    this.props.dispatch({
+      type:"role/fetchAddRole",
+      payload:a
+    })
+    this.setState({
+      visibleWeb: false,
+    });
+  };
+  // 网络用户关闭
+  handleCancelWeb = e => {
+    // console.log(e);
+    this.setState({
+      visibleWeb: false,
+    });
+  };
 
-    // 配置ok
-    handleOkConfig = e => {
-      console.log(e);
-      this.setState({
-        visibleConfig: false,
-      });
-    };
-    // 配置关闭
-    handleCancelConfig = e => {
-      console.log(e);
-      this.setState({
-        visibleConfig: false,
-      });
-    };
-  
+  // 后台用户ok
+  handleOkBack = e => {
+    let a={
+      name: this.state.name,
+      rp_type:1,
+      role_profile: this.state.role_profile,
+      catalogues:this.state.catalogues,
+      permissions: this.state.permissions,
+    }
+    this.props.dispatch({
+      type:"role/fetchAddRole",
+      payload:a
+    })
+    this.setState({
+      visibleBack: false,
+    });
+  };
+  // 后台用户关闭
+  handleCancelBack = e => {
+    console.log(e);
+    this.setState({
+      visibleBack: false,
+    });
+  };
 
-    // 添加单选按钮
-    onChange = e => {
-      // console.log('radio checked', e.target.value);
-      console.log(e.target.value);
-      // console.log(e.target.value.type)
-      this.setState({
-        value: e.target.value,
-      });
-    };
- 
+  // 配置ok
+  handleOkConfig = e => {
+    console.log(e);
+    this.setState({
+      visibleConfig: false,
+    });
+  };
+  // 配置关闭
+  handleCancelConfig = e => {
+    // console.log(e);
+    this.setState({
+      visibleConfig: false,
+    });
+  };
+
+
+  // 添加单选按钮
+  onChange = e => {
+    // console.log('radio checked', e.target.value);
+    console.log(e.target.value);
+    // console.log(e.target.value.type)
+    this.setState({
+      value: e.target.value,
+    });
+  };
+
    
  
     
-    onSelect = (selectedKeys, info) => {
-      console.log('selected', selectedKeys, info);
-    };
+  // onSelect = (selectedKeys, info) => {
+  //   console.log('selected', selectedKeys, info);
+  // };
   
-    onCheck = (checkedKeys, info) => {
-      console.log('onCheck', checkedKeys, info);
-    };
+  onCheck = (checkedKeys, info) => {
+    console.log('onCheck', checkedKeys, info);
+    this.setState({ checkedKeys });
+  };
 
-    // 遍历网站用户树
-    renderTreeNodes = data =>
-    data.map(item => {
-      if (item.childs) {
-        return (
-          <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
-            {this.renderTreeNodes(item.childs)}
-          </TreeNode>
-        );
-      }
-      return <TreeNode {...item} />;
-    });
+  // 遍历网站用户树
+  renderTreeNodes = data =>
+  data.map(item => {
+    if (item.childs) {
+      return (
+        <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
+          {this.renderTreeNodes(item.childs)}
+        </TreeNode>
+      );
+    }
+    return <TreeNode {...item} />;
+  });
 
-     // 遍历网站用户权限树
-     renderPerTreeNodes = data =>
-     data.map(item => {
-       if (item.childs) {
-         return (
-           <TreeNode title={item.name} key={item.id} dataRef={item}>
-             {this.renderPerTreeNodes(item.childs)}
-           </TreeNode>
-         );
-       }
-       return <TreeNode {...item} />;
-     });
+  // 遍历网站用户权限树
+  renderPerTreeNodes = data =>
+  data.map(item => {
+    if (item.childs) {
+      return (
+        <TreeNode title={item.name} key={item.id} dataRef={item}>
+          {this.renderPerTreeNodes(item.childs)}
+        </TreeNode>
+      );
+    }
+    return <TreeNode {...item} />;
+  });
    
 
   render(){ 
@@ -288,7 +320,6 @@ class Role extends React.Component {
         this.setState({
           ids:selectedRowKeys
         })
-        
         // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       }
     };
@@ -367,25 +398,14 @@ class Role extends React.Component {
 
         {/* 网站用户模态框 */}
         <Modal   
+              title="添加网站用户角色"
               visible={this.state.visibleWeb}
               onOk={this.handleOkWeb}
               onCancel={this.handleCancelWeb}
               width="600px"
               height="400px"
               >
-        {/* <Form layout="inline">
-            <Form.Item>
-              {getFieldDecorator('name', {
-                rules: [{ required: true, message: '请输入角色名称' }],
-              })(
-                <Input
-                  placeholder="输入角色名称"style={{width:500,marginLeft:"1em"}}
-                />,
-              )}
-            </Form.Item>
-        </Form> */}
-            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} onChange={this.inputOnchange}/>
-            
+            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} value={this.state.name} onChange={this.inputOnchange}/>
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
               操作权限
@@ -417,17 +437,20 @@ class Role extends React.Component {
 
           {/* 后台用户模态框 */}
         <Modal
+              title="添加后台管理角色"
               visible={this.state.visibleBack}
               onOk={this.handleOkBack}
               onCancel={this.handleCancelBack}
               width="600px"
               height="400px">
-            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} />
+            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} value={this.state.name} onChange={this.inputOnchange} />
             
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
               操作权限
               <Tree 
+                  onSelect={this.onSelect}
+                  onCheck={this.onCheck} 
                   checkable
                   autoExpandParent
                   >

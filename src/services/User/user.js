@@ -33,6 +33,15 @@ export async function AddUser(param) {
   });
 }
 
+// 修改用户信息
+export async function editUsersMessage(param) {
+  return request('/api/mp_man_users/mod_user/', {
+    method: 'post',
+    data:param,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 // 设置用户启用/冻结
 export async function EnableOrFreeze(param) {
   return request('/api/mp_man_users/set_frozen/', {

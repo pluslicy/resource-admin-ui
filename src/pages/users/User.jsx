@@ -1,11 +1,13 @@
 import React from 'react';
-import {Button,Input,Table,Icon,Select,Checkbox ,Modal,Radio,Upload,message ,Avatar,Dropdown,Menu,Tooltip,Tabs,} from 'antd';
+import {Button,Input,Table,Icon,Select,Checkbox,
+        Modal,Radio,Upload,message ,Avatar,Dropdown,
+        Menu,Tooltip,Tabs,} from 'antd';
 import _ from 'lodash'
 const {Search} = Input;
 const {Option} = Select;
 // tabs用户
 const { TabPane } = Tabs;
-
+const { confirm } = Modal;
 
 // 引入自定义组件
 import style from './User.less'
@@ -24,6 +26,7 @@ class User extends React.Component {
       ids:[],
       query:{},
       groups:[],
+      form:{},
       // visible:false,
       // visibleImport:false,
       // visiblePermise:false,
@@ -58,111 +61,120 @@ class User extends React.Component {
     })
   }
 
-    //批量删除用户
-    batchDelete=()=>{
-    this.props.dispatch({
-        type:"users/fetchDeleteUsers",
-        payload:this.state.ids
-    })
-    
-    }
-    // 批量启用和冻结
-    batchEnableOrFreeze=(e)=>{
-      // console.log(this.props.dispatch)
-        if(e.target.textContent=="冻 结"){
-        this.props.dispatch({
-            type:"users/fetchEnableOrFreeze",
-            payload:{
+  //批量删除用户
+  batchDelete=()=>{
+    confirm({
+      title: '确认删除数据吗？',
+      okText: '确定',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: () => {
+        this.props.dispatch({ 
+          type:"users/fetchDeleteUsers",
+          payload:this.state.ids
+        });
+      },
+    });
+  }
+  // 批量启用和冻结
+  batchEnableOrFreeze=(e)=>{
+    // console.log(this.props.dispatch)
+      if(e.target.textContent=="冻 结"){
+      this.props.dispatch({
+          type:"users/fetchEnableOrFreeze",
+          payload:{
+          status:{
+              is_active:false,
+              ids:this.state.ids,
+          },
+          page:this.state.page,
+          pageSize:10,
+      
+          }
+      })
+      }else{
+      this.props.dispatch({
+          type:"users/fetchEnableOrFreeze",
+          payload:{
             status:{
-                is_active:false,
+                is_active:true,
                 ids:this.state.ids,
             },
             page:this.state.page,
             pageSize:10,
         
             }
+      }) }
+      setTimeout(() => {
+        // console.log("1111")
+        this.setState({
+          ids:[]
         })
-        }else{
-        this.props.dispatch({
-            type:"users/fetchEnableOrFreeze",
-            payload:{
-              status:{
-                  is_active:true,
-                  ids:this.state.ids,
-              },
-              page:this.state.page,
-              pageSize:10,
-          
-              }
-        }) }
-        setTimeout(() => {
-          // console.log("1111")
-          this.setState({
-            ids:[]
-          })
-        }, 100);
-    }
-    //根据状态查询(未完成)
-    handleChange5=(value)=>{
-      this.setState({
-          textQuery:{...this.state.textQuery,...{is_active:value}}
-      })
+      }, 100);
+  }
+  //根据状态查询(未完成)
+  handleChange5=(value)=>{
+    this.setState({
+        textQuery:{...this.state.textQuery,...{is_active:value}}
+    })
+    this.props.dispatch({
+    type:"users/fetchUser",payload:{...this.state.textQuery,...{is_active:value}}
+    })
+
+  }
+  // 冻结状态改变
+  handleChange=(record,e)=>{
+    if(e._owner){
+      // console.log("---------------",this.props.dispatch)
       this.props.dispatch({
-      type:"users/fetchUser",payload:{...this.state.textQuery,...{is_active:value}}
-      })
-
-    }
-    // 冻结状态改变
-    handleChange=(record,e)=>{
-      if(e._owner){
-        // console.log("---------------",this.props.dispatch)
-        this.props.dispatch({
-          type:"users/fetchEnableOrFreeze",
-          payload:{
-           status:{
-               is_active:false,
-               ids:[e._owner.pendingProps.record.id],
-           },
-           page:this.state.page,
-           pageSize:10,
-       
-           }
-       })
-      }
-          
-           
-       
-   }
-    //添加模态框 
-    saveFormRef = formRef => {
-      this.formRef = formRef;
-    };
-    handleOkModal = e => {
-      // 提交表单
-      e.preventDefault();
-      const { form } = this.formRef.props;
-      form.validateFields(['username','password','user_phone','user_gender','groups'],(err, values) => {
-          if (err) {
-            console.log(err)
-            this.setState({
-              visible:true
-            })
-          return ;
-          }
-          this.setState({
-            visible:false
-          })
-        
-          console.log('Received values of form: ', values);
-          this.props.dispatch({
-            type:"users/AddUsers",
-            payload:values
-        })
-          // form.resetFields();
-
-      });
+        type:"users/fetchEnableOrFreeze",
+        payload:{
+          status:{
+              is_active:false,
+              ids:[e._owner.pendingProps.record.id],
+          },
+          page:this.state.page,
+          pageSize:10,
       
-    };
+          }
+      })
+    }
+        
+          
+      
+  }
+  //添加模态框 
+  saveFormRef = formRef => {
+    // console.log(formRef,'----')
+    this.formRef = formRef;
+  };
+  handleOkModal = e => {
+    // 提交表单
+    e.preventDefault();
+    const { form } = this.formRef.props;
+    form.validateFields(['username','password','user_phone','user_gender','groups'],(err, values) => {
+        if (err) {
+          console.log(err)
+          this.setState({
+            visible:true
+          })
+        return ;
+        }
+        this.setState({
+          visible:false
+        })
+        // console.log('添加时:', values);
+        this.props.dispatch({
+          type:"users/AddUsers",
+          payload:values,
+          page:this.state.page,
+          pageSize:10,
+        })
+        form.resetFields();
+
+    });
+    
+  };
 
   // 添加用户模态框
   showModal =()=>{
@@ -295,23 +307,39 @@ class User extends React.Component {
   };  
 
   // 修改模态框
-  showModify =record=>{
+  showModify = record => {
+    console.log(record.id)
     this.setState({
-      visibleModify:true, 
-    })
-  }
-  // showModify = record => {
-	// 	this.setState({
-	// 		form: record,
-	// 	});
-	// 	this.props.dispatch({ type: 'users/changeVisible', payload: true });
-  // };
-  
-  ModifyOk = e => {
-    console.log(e);
-    this.setState({
-      visibleModify: false,
+      form: record,
+      visibleModify:true,
     });
+  };
+  ModifyOk = e => {
+     // 提交表单
+     e.preventDefault();
+     const { form } = this.formRef.props;
+     form.validateFields(['id','last_name','user_gender','user_phone'],(err, values) => {
+      //  console.log('11111111',values)
+         if (err) {
+           console.log(err)
+           this.setState({
+            visibleModify:true
+           })
+         return ;
+         }
+         this.setState({
+          visibleModify:false
+         })
+        //  console.log('修改时:', values);
+         this.props.dispatch({
+           type:"users/editUsers",
+           payload:values,
+           page:this.state.page,
+           pageSize:10,
+         })
+         form.resetFields();
+
+     });
   };
   ModifyCancel = e => {
     console.log(e);
@@ -409,7 +437,7 @@ class User extends React.Component {
       },
       {
         title: '操作',
-        dataIndex: 'operation',
+        dataIndex: 'state',
         render:(text,record)=>{
           return(
             <div>
@@ -538,7 +566,7 @@ class User extends React.Component {
         </Modal>
 
         {/* 导入按钮模态框 */}
-         {/* 显示学生、教师模态框 */}
+        {/* 显示学生、教师模态框 */}
         <Modal
             title="导入用户"
             visible={this.state.visibleImport}
@@ -557,7 +585,7 @@ class User extends React.Component {
            
         </Modal>
           {/* 学生用户模态框 */}
-       <Modal 
+        <Modal 
             title="导入学生用户"
             visible={this.state.visibleStudent}
             onOk={this.handleOkStu}
@@ -588,11 +616,12 @@ class User extends React.Component {
           onOk={this.AddPermiseOk}
           onCancel={this.AddPermiseCancel}
          >
-              {console.log("++",this.state.groups)}
+              {console.log("添加的角色有",this.state.groups)}
                 <Select
+                  showArrow={true}
                   mode="multiple"
                   style={{ width: '100%' }}
-                  placeholder="Please select"
+                  placeholder="请为用户选择角色！"
                   value={this.state.groups}
                   onChange={this.handleChangeRole.bind(this)}
                 >
@@ -610,7 +639,7 @@ class User extends React.Component {
           onOk={this.ModifyOk}
           onCancel={this.ModifyCancel}
         >
-          <ModifyForm />
+          <ModifyForm   initData={this.state.form} wrappedComponentRef={this.saveFormRef}/>
         </Modal>
 
       </div>

@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import {queryUsers,queryRoles,DeleteAllUsers,AddUser,EnableOrFreeze } from '@/services/User/user';
+import {queryUsers,queryRoles,DeleteAllUsers,AddUser,EnableOrFreeze,editUsersMessage } from '@/services/User/user';
 
 const UserModel = {
   namespace: 'users',
@@ -11,23 +11,20 @@ const UserModel = {
   },
   effects: {
     // 获取所有用户信息
-   *fetchUser(_, { call, put }) {
+    *fetchUser(_, { call, put }) {
       const response = yield call(queryUsers,_.payload);
       yield put({
         type: 'reloadUsers',
         payload: response});
-        },
-    
-
+    },
     // 获取所有角色信息
-   *fetchRole(_, { call, put }) {
+    *fetchRole(_, { call, put }) {
         const response = yield call(queryRoles);
         yield put({
           type: 'reloadRoles',
           payload: response});
-      },
-
-   //批量设置用户状态
+    },
+    //批量设置用户状态
     *fetchEnableOrFreeze(_, { call, put }) {
       const response = yield call(EnableOrFreeze,_.payload.status);
       yield put({
@@ -38,7 +35,14 @@ const UserModel = {
         }
       });
     },
-   //批量删除用户
+    // 修改用户
+    *editUsers(_, { call, put }) {
+      const response = yield call(editUsersMessage, _.payload);
+      yield put({
+        type: 'fetchUser',
+      });
+    },
+    //批量删除用户
     *fetchDeleteUsers(_, { call, put }) {
       const response = yield call(DeleteAllUsers,{ids:_.payload});
       yield put({
@@ -49,7 +53,11 @@ const UserModel = {
     *AddUsers(_, { call, put }) {
       const response = yield call(AddUser,_.payload);
       yield put({
-        type: 'fetchUser'
+        type: 'fetchUser',
+        payload:{
+          // page:_.payload.page,
+          // pageSize:_.payload.pageSize
+        }
       });
     },
 

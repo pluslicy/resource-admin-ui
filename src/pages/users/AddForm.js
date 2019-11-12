@@ -39,7 +39,7 @@ class AddForm extends React.Component {
       }
     
       function handleChange(value) {
-        console.log(`selected ${value}`);
+        // console.log(`selected ${value}`);
       }
     
     

@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import { queryRole,UpdateRole,DeleteAll,EnableOrFreeze,queryOnlyRole,queryCatalog,
-         queryPermission} from '@/services/rolesServices/role';
+         queryPermission,AddRole} from '@/services/rolesServices/role';
 
 const RoleModel = {
   namespace: 'role',
@@ -53,14 +53,13 @@ const RoleModel = {
       // console.log(_.payload)
       yield call(AddRole, _.payload);
       // yield put({ type: 'changeVisible', payload: false });
-      yield put({ type: 'reloadRoles'});
+      yield put({ type: 'fetchRoles'});
      },
 
     //修改角色
     *updateRoles(_, { call, put }) {
       const response = yield call(UpdateRole, _.payload);
       message.success(response.message);
-      yield put({ type: 'changeVisible', payload: false });
       yield put({ type: 'fetchRoles'});
      },
 
