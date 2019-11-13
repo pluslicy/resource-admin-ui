@@ -1,10 +1,7 @@
 import request from '@/utils/request';
 
-export async function findAllComment() {
-  return request('/api/mp_man_comments/commentlist/?comment_type=1');
-}
-
 export async function findAllReply() {
+    console.log("123");
 	return request('/api/mp_man_comments/commentlist/?comment_type=2');
 }
 
@@ -26,21 +23,6 @@ export async function batchPass(param) {
 		headers: { 'Content-Type': 'application/json' },
 		getResponse: true,
 	});
-}
-
-export async function findByCondidtion(dateString) {
-	var startDate = '';
-	var endDate = '';
-	var value = '';
-	if (dateString[0] != undefined) {
-		var dateString1 = dateString[0];
-		startDate = dateString1[0];
-		endDate = dateString1[1];
-	}
-	if (dateString[1] != undefined) {
-		value = dateString[1];
-	}
-	return request('/api/mp_man_comments/commentlist/?comment_type=1'+'&search=' + value + '&time_start=' + startDate + '&time_end=' + endDate);
 }
 
 export async function findByCondidtions(dateString) {

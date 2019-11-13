@@ -228,7 +228,7 @@ class Check extends React.Component {
 				<div>
 					<Table
 						size="small"
-						bordered
+						// bordered
 						rowSelection={rowSelection}
 						columns={columns}
 						dataSource={this.props.word.words}

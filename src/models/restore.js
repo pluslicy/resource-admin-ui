@@ -1,20 +1,12 @@
-import { findAllComment, fetchCheck,batchPass,findByCondidtion,findByCondidtions,findAllReply} from '@/services/comment';
+import { fetchCheck,batchPass,findByCondidtions,findAllReply} from '@/services/comment';
 
-const Comment = {
-  namespace: 'comment',
+const Restore = {
+  namespace: 'restore',
   state: {
-    comments: [],
     restores:[],
     loading: true,
   },
   effects: {
-    *findAllComment(_, { call, put }) {
-      const response = yield call(findAllComment, _.payload);
-      yield put({
-        type: 'reloadAll',
-        payload: response.results,
-      });
-    },
     *findAllReply(_, { call, put }) {
       const response = yield call(findAllReply, _.payload);
       yield put({
@@ -25,20 +17,13 @@ const Comment = {
     *fetchCheck(_, { call, put }) {
       const response = yield call(fetchCheck, _.payload);
       yield put({
-        type: 'findAllComment',
+        type: 'findAllReply',
       });
     },
     *batchPass(_, { call, put }) {
       const response = yield call(batchPass, _.payload);
       yield put({
-        type: 'findAllComment',
-      });
-    },
-    *findByCondidtion(_, { call, put }) {
-      const response = yield call(findByCondidtion, _.payload);
-      yield put({
-        type: 'reloadAll',
-        payload: response.results,
+        type: 'findAllReply',
       });
     },
     *findByCondidtions(_, { call, put }) {
@@ -50,13 +35,6 @@ const Comment = {
     },
   },
   reducers: {
-    reloadAll(state, action) {
-      return {
-        ...state,
-        comments: action.payload,
-        loading: false,
-      };
-    },
     reloadAllReply(state, action) {
       return {
         ...state,
@@ -67,4 +45,4 @@ const Comment = {
   },
 };
 
-export default Comment;
+export default Restore;

@@ -4,22 +4,8 @@ import moment from 'moment';
 import { connect } from 'dva';
 import Restore from './Restore';
 
-import {
-  Button,
-  Table,
-  DatePicker,
-  Input,
-  Modal,
-  Comment,
-  Icon,
-  Menu,
-  Dropdown,
-  Tooltip,
-  Avatar,
-  Divider,
-  Select,
-  Tabs
-} from 'antd';
+import {Button,Table,DatePicker,Input,Modal,Comment,Icon,Menu,Dropdown,Tooltip,Avatar,Divider,Select,Tabs} from 'antd';
+
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
 const { Option } = Select;
@@ -32,12 +18,19 @@ class Check extends React.Component {
       visible: false,
       ids:[],
       date: ['',''],
-			name: []
+      name: [],
+      page:1,
     };
   }
 
   componentWillMount() {
-    this.props.dispatch({ type: 'comment/findAllComment' });
+    this.props.dispatch({ 
+      type: 'comment/findAllComment',
+      payload:{
+				page:1,
+				pageSize:10,
+			}
+     });
   }
 
   onChange = (date, dateString) => {
@@ -68,7 +61,10 @@ class Check extends React.Component {
       ids:this.state.ids,
     }
 		console.log(data)
-    this.props.dispatch({ type: 'comment/batchPass', payload: data })
+    this.props.dispatch({ 
+      type: 'comment/batchPass',
+      payload: data,
+    })
     
     setTimeout(() => {
       // console.log("1111")
@@ -192,7 +188,8 @@ class Check extends React.Component {
     return (
       <div className={styles.content}>
         <Tabs defaultActiveKey="1" >
-					<TabPane tab={'评论 (' + this.props.comment.comments.count + ')'} key='1'>
+					<TabPane tab='评论' key='1'>
+					{/* <TabPane tab={'评论 (' + this.props.comment.comments.count + ')'} key='1'> */}
             <div className={styles.content_top}>
               <RangePicker onChange={this.onChange} style={{ width: 300 }} />
               <Search
@@ -205,10 +202,41 @@ class Check extends React.Component {
               <Table
                 rowKey="id"
                 size="small"
-                bordered
+                // bordered
                 rowSelection={rowSelection}
                 columns={columns}
                 dataSource={this.props.comment.comments}
+                pagination={{
+									onChange: page => {
+									  console.log(page);
+									  // let p = page - 1;
+									  // console.log(p);
+									  this.props.dispatch({
+										type:"comment/findAllComment",
+										payload:{
+										  page:page,
+										  pageSize:10,
+										}
+									  })
+									  this.setState({
+										page:page
+									  })
+									},
+									total:this.props.comment.comments.count,
+									pageSize: 10,
+									size:'small',
+									
+									hideOnSinglePage: false,
+									itemRender: (current, type, originalElement) => {
+									  if (type === 'prev') {
+										return <Button size="small" style={{marginRight:"1em"}}>上一页</Button>;
+									  }
+									  if (type === 'next') {
+										return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
+									  }
+									  return originalElement;
+									},
+								  }}
               />
             </div>
             <div className={styles.content_bottom}>
@@ -248,10 +276,10 @@ class Check extends React.Component {
             </Modal>
             </TabPane>
 					{/* <TabPane tab={'回复 (' + this.props.word.words.count + ')'} key='2'> */}
-					<TabPane tab={'回复 (' + 4 + ')'} key='2'>
+					<TabPane tab='回复' key='2'>
 						 <Restore  treekey={this.state.treekey}></Restore>
 					</TabPane>
-				</Tabs>,
+				</Tabs>
       </div>
     );
   }

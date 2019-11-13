@@ -201,7 +201,7 @@ class Check extends React.Component {
 						<div>
 							<Table
 								size="small"
-								bordered
+								// bordered
 								rowSelection={rowSelection}
 								columns={columns}
 								dataSource={this.props.video.videos.results}
@@ -276,7 +276,7 @@ class Check extends React.Component {
 
 						 <Word  treekey={this.state.treekey}></Word>
 					</TabPane>
-				</Tabs>,
+				</Tabs>
 			</div>
 		);
 	}
