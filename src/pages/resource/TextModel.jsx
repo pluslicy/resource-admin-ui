@@ -557,7 +557,7 @@ class TextModel extends React.Component{
                         hideOnSinglePage: false,
                         itemRender: (current, type, originalElement) => {
                         if (type === 'prev') {
-                            return <Button size="small" style={{marginRight:"1em"}}>上一页text</Button>;
+                            return <Button size="small" style={{marginRight:"1em"}}>上一页</Button>;
                         }
                         if (type === 'next') {
                             return <Button size="small" style={{marginLeft:"1em"}}>下一页</Button>;
