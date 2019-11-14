@@ -16,20 +16,28 @@ class Role extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      form: {},
+      // form: {},
       // visible: false,
-      // visibleWeb:false,
+      // visibleWeb:true,
       
       // 添加单选按钮
       value:"",
       ids:[],
       page:1,
       // 添加
+      array:[],
       id:"",
-      name:"",
-      catalogues:[],
-      permissions:[],
-
+      // name:"",
+      // catalogues:[],
+      // permissions:[],
+      data:{
+        name:"",
+        role_profile:{
+            rp_type:0,
+            catalogues:[]
+        },
+        permissions:[]
+      }
     };
   }
   componentDidMount(){
@@ -50,24 +58,14 @@ class Role extends React.Component {
   }
   // 网站用户的input框
   inputOnchange = e =>{
-    console.log(e.target.value)
+    // console.log(e.target.value)
+    var obj=this.state.data;
+    obj.name=e.target.value;
     this.setState({
-      name: e.target.value
+      data:obj
     });
   }
-  tijiao(){
-
-
-    // {
-    //   "role_profile": {
-    // "catalogues":[2,3]
-    // },
-    //   "permissions": 
-    //     [1,2,3]
-    //   ,
-    //   "name": this.state.name
-    // }
-  }
+  
   
   // 冻结状态改变
   handleChange=(record,e)=>{
@@ -144,9 +142,17 @@ class Role extends React.Component {
   showModal = () => {
     this.setState({
       visible: true,
-      value:""
-      // visibleWeb:false,
+      value:"",
+      data:{
+        name:"",
+        role_profile:{
+            rp_type:0,
+            catalogues:[]
+        },
+        permissions:[]
+      }
     });
+    
   };
   //配置模态框 
   configHandle= () => {
@@ -158,8 +164,12 @@ class Role extends React.Component {
   // 添加模态框 ok
   handleOk = e => {
     if(this.state.value===0){
+      var obj=this.state.data;
+      obj.role_profile.rp_type=this.state.value;
       this.setState({
-        visibleWeb:true
+        visibleWeb:true,
+        data:obj,
+        array:[]
       })
       this.props.dispatch({
         type: 'role/feachPermission',
@@ -168,8 +178,10 @@ class Role extends React.Component {
         }
       })
     }else if(this.state.value===1){
+      var obj=this.state.data;
+      obj.role_profile.rp_type=this.state.value;
       this.setState({
-        
+       data:obj,
         visibleBack:true,
       })
       this.props.dispatch({
@@ -197,22 +209,17 @@ class Role extends React.Component {
 
   // 网络用户ok
   handleOkWeb = e => {
-    let a={
-      name: this.state.name,
-      rp_type:0,
-      role_profile: this.state.role_profile,
-      catalogues:this.state.catalogues,
-      permissions: this.state.permissions,
-    }
-    
+    // console.log(this.state.data)
+   
     // console.log(this.props.dispatch)
     this.props.dispatch({
       type:"role/fetchAddRole",
-      payload:a
+      payload:this.state.data
     })
     this.setState({
       visibleWeb: false,
     });
+
   };
   // 网络用户关闭
   handleCancelWeb = e => {
@@ -224,20 +231,21 @@ class Role extends React.Component {
 
   // 后台用户ok
   handleOkBack = e => {
-    let a={
-      name: this.state.name,
-      rp_type:1,
-      role_profile: this.state.role_profile,
-      catalogues:this.state.catalogues,
-      permissions: this.state.permissions,
-    }
-    this.props.dispatch({
-      type:"role/fetchAddRole",
-      payload:a
-    })
-    this.setState({
-      visibleBack: false,
-    });
+    console.log(this.state.data)
+    // let a={
+    //   name: this.state.name,
+    //   rp_type:1,
+    //   role_profile: this.state.role_profile,
+    //   catalogues:this.state.catalogues,
+    //   permissions: this.state.permissions,
+    // }
+    // this.props.dispatch({
+    //   type:"role/fetchAddRole",
+    //   payload:a
+    // })
+    // this.setState({
+    //   visibleBack: false,
+    // });
   };
   // 后台用户关闭
   handleCancelBack = e => {
@@ -272,23 +280,40 @@ class Role extends React.Component {
       value: e.target.value,
     });
   };
-
    
- 
-    
   // onSelect = (selectedKeys, info) => {
   //   console.log('selected', selectedKeys, info);
   // };
   
   onCheck = (checkedKeys, info) => {
-    console.log('onCheck', checkedKeys, info);
-    this.setState({ checkedKeys });
+    // console.log('onCheck', checkedKeys, info);
+    var arr=[];
+    checkedKeys.forEach((item)=>{
+      arr.push(parseInt(item))
+    })
+    var obj=this.state.data;
+    obj.permissions=arr;
+    this.setState({
+     data:obj
+    });
   };
-
+  onCheckCatalogues = (checkedKeys, info) => {
+    // console.log('onCheck', checkedKeys, info);
+    var arr=[];
+    checkedKeys.forEach((item)=>{
+      arr.push(parseInt(item))
+    })
+    var obj=this.state.data;
+    obj.role_profile.catalogues=arr;
+    this.setState({
+      data:obj
+    });
+  };
   // 遍历网站用户树
   renderTreeNodes = data =>
   data.map(item => {
     if (item.childs) {
+      console.log("aaa")
       return (
         <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
           {this.renderTreeNodes(item.childs)}
@@ -300,6 +325,8 @@ class Role extends React.Component {
 
   // 遍历网站用户权限树
   renderPerTreeNodes = data =>
+
+  
   data.map(item => {
     if (item.childs) {
       return (
@@ -310,7 +337,12 @@ class Role extends React.Component {
     }
     return <TreeNode {...item} />;
   });
-   
+  onExpand=(expandedKeys)=>{
+    console.log(expandedKeys)
+    this.setState({
+      array:expandedKeys
+    })
+  }
 
   render(){ 
    
@@ -378,7 +410,7 @@ class Role extends React.Component {
         </div>
         {/* 添加模态框 */}
         <div>
-         <Modal
+        <Modal
             title="请选择角色类型"
             visible={this.state.visible}
             onOk={this.handleOk}
@@ -405,16 +437,18 @@ class Role extends React.Component {
               width="600px"
               height="400px"
               >
-            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} value={this.state.name} onChange={this.inputOnchange}/>
+            <Input placeholder="输入角色名称" style={{width:500,marginLeft:"1em"}} value={this.state.data.name} onChange={this.inputOnchange}/>
             <div style={{display:"flex",justifyContent:"space-around",marginTop:"1em"}}>
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
               操作权限
               {/* {console.log(this.props.role.webBackRole)}  checkedKeys={[]} */}
               <Tree 
                 checkable
-                autoExpandParent
-                onSelect={this.onSelect}
                 onCheck={this.onCheck}
+                defaultExpandedKeys={[]}
+                checkedKeys={this.state.data.permissions}
+                onExpand={this.onExpand}
+                expandedKeys={this.state.array}
                 >
 						  	{this.renderPerTreeNodes(this.props.role.webBackRole[0].childs)}
 						  </Tree>
@@ -422,11 +456,11 @@ class Role extends React.Component {
             <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px",overflow:"auto"}}>
               资源权限
              {/* {console.log(this.props.role.roleCata)} */}
-              <Tree onSelect={this.onSelect} 
-              onSelect={this.onSelect}
-              onCheck={this.onCheck} 
-              autoExpandParent
+              <Tree 
+              onCheck={this.onCheckCatalogues}
               checkable
+              defaultExpandedKeys={[]}
+              checkedKeys={this.state.data.role_profile.catalogues}
 							>
 						  	{this.renderTreeNodes(this.props.role.roleCata[0].childs)}
 						  </Tree>
@@ -457,9 +491,19 @@ class Role extends React.Component {
                   {this.renderPerTreeNodes(this.props.role.webBackRole[0].childs)}
 						  </Tree>
             </div>
-            {/* <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
-
-            </div> */}
+            <div style={{border:"1px solid #e8e8e8",width:"248px",height:"352px"}}>
+            资源权限
+             {/* {console.log(this.props.role.roleCata)} */}
+              <Tree onSelect={this.onSelect} 
+                  onSelect={this.onSelect}
+                  onCheck={this.onCheck} 
+                  
+                  autoExpandParent
+                  checkable
+                  >
+                    {this.renderTreeNodes(this.props.role.roleCata[0].childs)}
+						  </Tree>
+            </div>
             </div>
 
           </Modal>

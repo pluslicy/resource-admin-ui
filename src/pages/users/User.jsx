@@ -34,16 +34,7 @@ class User extends React.Component {
       // 添加单选按钮
       value:"",
       page:1,
-      textQuery:{
-        dr_created_time_start:"",
-        dr_created_time_end:"",
-        bytime:false,
-        byhot:false,
-        search:"",
-        dr_permission:"",
-        dr_format:"",
-        is_active:"",
-    },
+      flag:false,
     })
   }
 
@@ -61,6 +52,69 @@ class User extends React.Component {
     })
   }
 
+  //根据用户名查询
+  searchName=(value)=>{
+    // console.log(value)
+    var vq={...this.props.users.userSearch,...{search:value}};
+    // console.log(value)
+    this.props.dispatch({
+      type:"users/fetchUsersQuery",payload:vq
+    })
+    console.log(this.props.users.userSearch)
+    this.props.dispatch({
+        type:"users/fetchUser",payload:{...this.props.users.vq,...{search:value}}
+    });
+  }
+  //根据角色查询
+  handleChange3=(value)=>{
+    console.log(value)
+    var vq={...this.props.users.userSearch,...{groups:value}};
+    console.log(value)
+    this.props.dispatch({
+      type:"users/fetchUsersQuery",payload:vq
+    })
+    console.log(this.props.users.userSearch)
+    this.props.dispatch({
+        type:"users/fetchUser",payload:{...this.props.users.vq,...{groups:value}}
+    });
+
+  }
+  //根据性别查询
+  handleChange4=(value)=>{
+      // console.log(value)
+      var vq={...this.props.users.userSearch,...{user_gender:value}};
+      console.log(vq)
+      this.props.dispatch({
+        type:"users/fetchUsersQuery",payload:vq
+      })
+      console.log(this.props.users.userSearch)
+      this.props.dispatch({
+          type:"users/fetchUser",payload:{...this.props.users.vq,...{user_gender:value}}
+      });
+  }
+  //根据状态查询
+  handleChange5=(value)=>{
+    // console.log(value)
+    var vq={...this.props.users.userSearch,...{is_active:value}};
+    // console.log(value)
+    this.props.dispatch({
+      type:"users/fetchUsersQuery",payload:vq
+    })
+    console.log(this.props.users.userSearch)
+    this.props.dispatch({
+        type:"users/fetchUser",payload:{...this.props.users.vq,...{is_active:value}}
+    });
+  }
+  // 按时间查询
+  checkTimeChange=(e)=>{
+    var vq={...this.props.users.userSearch,...{bytime:`${e.target.checked}`}};
+      this.props.dispatch({
+        type:"users/fetchUsersQuery",payload:vq
+      })
+    this.props.dispatch({
+      type:"users/fetchUser",payload:{...this.props.users.vq,...{bytime:`${e.target.checked}`}}
+    })
+  }
   //批量删除用户
   batchDelete=()=>{
     confirm({
@@ -71,7 +125,12 @@ class User extends React.Component {
       onOk: () => {
         this.props.dispatch({ 
           type:"users/fetchDeleteUsers",
-          payload:this.state.ids
+          payload:{
+            values:this.state.ids,
+            page:this.state.page,
+            pageSize:10,
+          }
+          
         });
       },
     });
@@ -112,16 +171,6 @@ class User extends React.Component {
         })
       }, 100);
   }
-  //根据状态查询(未完成)
-  handleChange5=(value)=>{
-    this.setState({
-        textQuery:{...this.state.textQuery,...{is_active:value}}
-    })
-    this.props.dispatch({
-    type:"users/fetchUser",payload:{...this.state.textQuery,...{is_active:value}}
-    })
-
-  }
   // 冻结状态改变
   handleChange=(record,e)=>{
     if(e._owner){
@@ -143,7 +192,18 @@ class User extends React.Component {
           
       
   }
-  //添加模态框 
+  
+  // 添加用户模态框
+  showModal =()=>{
+    // console.log(this.state.flag)
+    // console.log(this.state.form)
+    if(this.state.flag){
+      this.state.form.resetFields()
+    }
+    this.setState({
+      visible:true, 
+    })
+  }
   saveFormRef = formRef => {
     // console.log(formRef,'----')
     this.formRef = formRef;
@@ -152,12 +212,17 @@ class User extends React.Component {
     // 提交表单
     e.preventDefault();
     const { form } = this.formRef.props;
+    
     form.validateFields(['username','password','user_phone','user_gender','groups'],(err, values) => {
+     
         if (err) {
           console.log(err)
           this.setState({
-            visible:true
+            visible:true,
+            flag:true,
+            form:form
           })
+          
         return ;
         }
         this.setState({
@@ -166,9 +231,11 @@ class User extends React.Component {
         // console.log('添加时:', values);
         this.props.dispatch({
           type:"users/AddUsers",
-          payload:values,
-          page:this.state.page,
-          pageSize:10,
+          payload:{
+            values:values,
+            page:this.state.page,
+            pageSize:10,},
+          
         })
         form.resetFields();
 
@@ -176,12 +243,7 @@ class User extends React.Component {
     
   };
 
-  // 添加用户模态框
-  showModal =()=>{
-    this.setState({
-      visible:true, 
-    })
-  }
+
 
   handleCancelModal = e => {
     console.log(e);
@@ -400,7 +462,7 @@ class User extends React.Component {
       },
       {
         title: '作品',
-        dataIndex: 'address',
+        dataIndex: 'content_num',
       },
       {
         title: '角色',
@@ -479,34 +541,38 @@ class User extends React.Component {
           <Button className={style.btn} style={{width:'80px'}} type='primary' onClick={this.showModal}>添加</Button>
           <Search
               placeholder="请输入用户名"
-              onSearch={value => console.log(value)}
+              onSearch={this.searchName}
               style={{ marginLeft:"2em",width: "222px",height:"30px"}}
             />
-            <br/>
           <Tooltip placement="bottom" title={text}>
             <Button style={{width:"80px",position:'absolute',right:'5%'}} onClick={this.showImport}><Icon type="upload" />导入</Button>
           </Tooltip>
         </div>
-        <div>
-          <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>角色 </span>
-          <Select size="small" defaultValue="lucy" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">全部</Option>
-          </Select>
-          <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>性别 </span>
-          <Select size="small" defaultValue="all" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px"}} onChange={this.handleChange}>
-            <Option value="jack">男</Option>
-            <Option value="lucy">女</Option>
-            <Option value="all">全部</Option>
-          </Select>
-          <span style={{marginLeft:"2em",marginTop:"2em",fontWeight:"700",fontSize:"14px"}}>状态 </span>
-          <Select value={this.props.users.user.is_active} size="small" placeholder="状态" defaultValue="" style={{width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
-              <Option value="">状态</Option>
-              <Option value={true}>启用中</Option>
-              <Option value={false}>冻结</Option>
-          </Select>
-          <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
-          <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
+        <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
+              <span style={{marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>角色 </span>
+              <Select  size="small" defaultValue="" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:80}} onChange={this.handleChange3}>
+                <Option style={{fontSize:"12px"}} value="">角色</Option>
+              
+                  {this.props.users.roles.map((item)=>{
+                    return <Option key={item.id} style={{fontSize:"12px"}} value={item.id}>{item.name}</Option>
+                  })}
+              </Select>
+              <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>性别 </span>
+              <Select className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
+                  <Option style={{fontSize:"12px"}} value="">全部</Option>
+                  <Option style={{fontSize:"12px"}} value={1}>男</Option>
+                  <Option style={{fontSize:"12px"}} value={2}>女</Option>
+          
+              </Select>
+              
+              <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>状态 </span>
+              <Select size="small" placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
+                  <Option style={{fontSize:"12px"}} value="">全部</Option>
+                  <Option style={{fontSize:"12px"}} value={true}>启用中</Option>
+                  <Option style={{fontSize:"12px"}} value={false}>冻结</Option>
+              </Select>
+              <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
+             
         </div>
         {/* {console.log(this.props.users.user)} */}
        

@@ -49,15 +49,18 @@ class AddForm extends React.Component {
       return (
           <div>
               <Form layout="vertical" {...formLayout}>
-                <Form.Item label="用户名">
+                <Form.Item label="用户名" >
                   {getFieldDecorator('username', {
                     rules: [{ required: true, message: '请输入用户名!' }],
                   })(<Input />)}
                 </Form.Item>
-                <Form.Item label="密码">
+                <Form.Item label="密码" hasFeedback>
                   {getFieldDecorator('password', {
                     rules: [{ required: true, message: '请输入密码!' }],
-                  })(<Input />)}
+                  })( <Input
+                    type="password"
+                    placeholder="密码"
+                  />,)}
                 </Form.Item>
                 <Form.Item label="联系方式">
                   {getFieldDecorator('user_phone', {

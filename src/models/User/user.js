@@ -1,13 +1,23 @@
 import { message } from 'antd';
-import {queryUsers,queryRoles,DeleteAllUsers,AddUser,EnableOrFreeze,editUsersMessage } from '@/services/User/user';
+import {queryUsers,queryRoles,DeleteAllUsers,AddUser,EnableOrFreeze,editUsersMessage, } from '@/services/User/user';
 
 const UserModel = {
   namespace: 'users',
   state: {
     user: [],
+    userSearch:{
+        bytime:false,
+        user_gender:"",
+        is_active:"",
+        groups:"",
+        search:"",
+        page:1,
+        pageSize:10
+    },
     visible: false,
     roles:[],
-    count:""
+    count:"",
+   
   },
   effects: {
     // 获取所有用户信息
@@ -24,6 +34,7 @@ const UserModel = {
           type: 'reloadRoles',
           payload: response});
     },
+    
     //批量设置用户状态
     *fetchEnableOrFreeze(_, { call, put }) {
       const response = yield call(EnableOrFreeze,_.payload.status);
@@ -44,19 +55,30 @@ const UserModel = {
     },
     //批量删除用户
     *fetchDeleteUsers(_, { call, put }) {
-      const response = yield call(DeleteAllUsers,{ids:_.payload});
-      yield put({
-        type: 'fetchUser'
-      });
-    },
-    //添加用户
-    *AddUsers(_, { call, put }) {
-      const response = yield call(AddUser,_.payload);
+      const response = yield call(DeleteAllUsers,{ids:_.payload.values});
       yield put({
         type: 'fetchUser',
         payload:{
-          // page:_.payload.page,
-          // pageSize:_.payload.pageSize
+          page:_.payload.page,
+          pageSize:_.payload.pageSize
+        }
+      });
+    },
+    // 搜索
+    *fetchUsersQuery(_, { call, put }) {
+     const response = yield call(queryUsers,_.payload);
+      yield put({
+        type: 'reloadUsers',
+        payload: response});
+    },
+    //添加用户
+    *AddUsers(_, { call, put }) {
+      const response = yield call(AddUser,_.payload.values);
+      yield put({
+        type: 'fetchUser',
+        payload:{
+          page:_.payload.page,
+          pageSize:_.payload.pageSize
         }
       });
     },
@@ -77,6 +99,12 @@ const UserModel = {
         user: action.payload.results,
         count:action.payload.count,
       };
+    },
+    reloadUserSearch(state,action){
+      return{
+        ...state,
+        userSearch:action.payload
+      }
     },
     reloadRoles(state, action) {
       return {
