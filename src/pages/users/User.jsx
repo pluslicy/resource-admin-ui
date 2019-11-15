@@ -16,6 +16,7 @@ import AddForm from './AddForm';
 import ModifyForm from './ModifyForm'
 import {connect} from 'dva'
 import index from '../Welcome';
+import { tsUndefinedKeyword } from '@babel/types';
 
 
 
@@ -35,6 +36,7 @@ class User extends React.Component {
       value:"",
       page:1,
       flag:false,
+      juese:undefined
     })
   }
 
@@ -56,26 +58,27 @@ class User extends React.Component {
   searchName=(value)=>{
     // console.log(value)
     var vq={...this.props.users.userSearch,...{search:value}};
-    // console.log(value)
+    console.log(vq)
     this.props.dispatch({
-      type:"users/fetchUsersQuery",payload:vq
+      type:"users/fetchUser",payload:vq
     })
     console.log(this.props.users.userSearch)
     this.props.dispatch({
-        type:"users/fetchUser",payload:{...this.props.users.vq,...{search:value}}
+        type:"users/fetchUsersQuery",payload:{...vq,...{search:value}}
     });
   }
   //根据角色查询
   handleChange3=(value)=>{
-    console.log(value)
+    // console.log(value)
     var vq={...this.props.users.userSearch,...{groups:value}};
-    console.log(value)
+    // console.log(value)
+    
     this.props.dispatch({
-      type:"users/fetchUsersQuery",payload:vq
+      type:"users/fetchUser",payload:vq
     })
-    console.log(this.props.users.userSearch)
+ 
     this.props.dispatch({
-        type:"users/fetchUser",payload:{...this.props.users.vq,...{groups:value}}
+        type:"users/fetchUsersQuery",payload:{...vq,...{groups:value}}
     });
 
   }
@@ -85,11 +88,11 @@ class User extends React.Component {
       var vq={...this.props.users.userSearch,...{user_gender:value}};
       console.log(vq)
       this.props.dispatch({
-        type:"users/fetchUsersQuery",payload:vq
+        type:"users/fetchUser",payload:vq
       })
       console.log(this.props.users.userSearch)
       this.props.dispatch({
-          type:"users/fetchUser",payload:{...this.props.users.vq,...{user_gender:value}}
+          type:"users/fetchUsersQuery",payload:{...vq,...{user_gender:value}}
       });
   }
   //根据状态查询
@@ -97,22 +100,26 @@ class User extends React.Component {
     // console.log(value)
     var vq={...this.props.users.userSearch,...{is_active:value}};
     // console.log(value)
+    console.log(vq)
+
     this.props.dispatch({
-      type:"users/fetchUsersQuery",payload:vq
+      type:"users/fetchUser",payload:vq
     })
     console.log(this.props.users.userSearch)
     this.props.dispatch({
-        type:"users/fetchUser",payload:{...this.props.users.vq,...{is_active:value}}
+        type:"users/fetchUsersQuery",payload:{...vq,...{is_active:value}}
     });
   }
   // 按时间查询
   checkTimeChange=(e)=>{
     var vq={...this.props.users.userSearch,...{bytime:`${e.target.checked}`}};
       this.props.dispatch({
-        type:"users/fetchUsersQuery",payload:vq
+        type:"users/fetchUser",payload:vq
       })
+      console.log(vq)
+
     this.props.dispatch({
-      type:"users/fetchUser",payload:{...this.props.users.vq,...{bytime:`${e.target.checked}`}}
+      type:"users/fetchUsersQuery",payload:{...vq,...{bytime:`${e.target.checked}`}}
     })
   }
   //批量删除用户
@@ -242,9 +249,6 @@ class User extends React.Component {
     });
     
   };
-
-
-
   handleCancelModal = e => {
     console.log(e);
     this.setState({
@@ -550,9 +554,8 @@ class User extends React.Component {
         </div>
         <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
               <span style={{marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>角色 </span>
-              <Select  size="small" defaultValue="" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:80}} onChange={this.handleChange3}>
-                <Option style={{fontSize:"12px"}} value="">角色</Option>
-              
+              <Select  size="small" placeholder="全部" defaultValue={this.state.gg} style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:80}} onChange={this.handleChange3}>
+                  <Option style={{fontSize:"12px"}} value={this.state.juese}>全部</Option>
                   {this.props.users.roles.map((item)=>{
                     return <Option key={item.id} style={{fontSize:"12px"}} value={item.id}>{item.name}</Option>
                   })}

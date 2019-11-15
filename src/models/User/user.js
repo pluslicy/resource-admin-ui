@@ -9,7 +9,7 @@ const UserModel = {
         bytime:false,
         user_gender:"",
         is_active:"",
-        groups:"",
+        groups:undefined,
         search:"",
         page:1,
         pageSize:10
@@ -66,10 +66,10 @@ const UserModel = {
     },
     // 搜索
     *fetchUsersQuery(_, { call, put }) {
-     const response = yield call(queryUsers,_.payload);
+    
       yield put({
-        type: 'reloadUsers',
-        payload: response});
+        type: 'reloadUserSearch',
+        payload: _.payload});
     },
     //添加用户
     *AddUsers(_, { call, put }) {
