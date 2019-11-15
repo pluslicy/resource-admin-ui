@@ -1,7 +1,6 @@
 import request from '@/utils/request';
 
 export async function findAllReply() {
-    console.log("123");
 	return request('/api/mp_man_comments/commentlist/?comment_type=2');
 }
 
@@ -38,4 +37,11 @@ export async function findByCondidtions(dateString) {
 		value = dateString[1];
 	}
 	return request('/api/mp_man_comments/commentlist/?comment_type=2'+'&search=' + value + '&time_start=' + startDate + '&time_end=' + endDate);
+}
+
+export async function findReplyById(param) {
+	return request('/api/mp_man_comments/commentcontext/?id='+param, {
+		method: 'get',
+		getResponse: true,
+	  });
 }

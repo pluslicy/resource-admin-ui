@@ -10,6 +10,7 @@ const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const { Search } = Input;
 const { Option } = Select;
 const { TabPane } = Tabs;
+const tsIcon = require('../video.png');
 
 class Check extends React.Component {
   constructor(props) {
@@ -20,6 +21,7 @@ class Check extends React.Component {
       date: ['',''],
       name: [],
       page:1,
+      pathurl:"",
     };
   }
 
@@ -109,8 +111,10 @@ class Check extends React.Component {
   showModal = record => {
     this.setState({
       visible: true,
-      restore: record,
-    });
+      pathurl:record.object_infor.path,
+    });    
+		this.props.dispatch({ type: 'comment/findReplyById', payload: record.id });
+
   };
   // 改变多选框
   onSelectChange = (selectedRowKeys, e) => {
@@ -134,7 +138,7 @@ class Check extends React.Component {
       { title: '内容', align: 'center', dataIndex: 'comment_text' },
       { title: '来自', align: 'center', dataIndex: 'user' },
       {
-        title: '被回复作品',
+        title: '被评论作品',
         align: 'center',
         dataIndex: 'object_infor.name',
         render: (text, record) => {
@@ -164,11 +168,14 @@ class Check extends React.Component {
             );
           } else if (record.comment_status === 2) {
             return (
-              <div style={{width:"75px",marginLeft:"20px",height:"20px",overflow:"hidden"}}>
-                <Select defaultValue={"已拒绝"} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px",color:"red"}}>
-                    <Option value={1} onClick={this.pass.bind(this, record)}>通过</Option>
-                  </Select>
+              <div>
+                <span style={{color:"red"}}>已拒绝</span>
               </div>
+              // <div style={{width:"75px",marginLeft:"20px",height:"20px",overflow:"hidden"}}>
+              //   <Select defaultValue={"已拒绝"} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px",color:"red"}}>
+              //       <Option value={1} onClick={this.pass.bind(this, record)}>通过</Option>
+              //     </Select>
+              // </div>
             );
           } else {
             return (
@@ -208,9 +215,6 @@ class Check extends React.Component {
                 dataSource={this.props.comment.comments}
                 pagination={{
 									onChange: page => {
-									  console.log(page);
-									  // let p = page - 1;
-									  // console.log(p);
 									  this.props.dispatch({
 										type:"comment/findAllComment",
 										payload:{
@@ -251,28 +255,27 @@ class Check extends React.Component {
               onCancel={this.handleCancel}
             >
               <video width="100%" height="70%" controls>
-                <source src="D:/a.mp4" type="video/mp4" />
-              </video>
-              {/* <Comment
-
-                author={<a>{this.state.restore.author}</a>}
-                avatar={
-                  <Avatar
-                    src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                    alt={this.state.restore.author}
-                  />
-                }
-                content={
-                  <p>
-                    {this.state.restore.key}
-                  </p>
-                }
-                datetime={
-                  <Tooltip title={this.state.restore.jishu}>
-                    <span>{this.state.restore.jishu}</span>
-                  </Tooltip>
-                }
-              /> */}
+						    <source src={this.state.pathurl} />
+					    </video>
+                  <Comment
+                  author={<a>{this.props.comment.discuss.username}</a>}
+                  avatar={
+                    <Avatar
+                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                      alt={this.props.comment.discuss.username}
+                    />
+                  }
+                  content={
+                    <p>
+                      {this.props.comment.discuss.comment_text}
+                    </p>
+                  }
+                  datetime={
+                    <Tooltip title={this.props.comment.discuss.comment_time}>
+                    <span>{this.props.comment.discuss.comment_time}</span>
+                    </Tooltip>
+                  }
+                />
             </Modal>
             </TabPane>
 					{/* <TabPane tab={'回复 (' + this.props.word.words.count + ')'} key='2'> */}

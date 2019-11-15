@@ -217,7 +217,7 @@ class Check extends React.Component {
 		];
 
 		return (
-			<div className={styles.content}>
+			<div className={styles.content_word}>
 				<div className={styles.content_top}>
 					<RangePicker onChange={this.onChange} style={{ width: 300 }} />
 					<Search

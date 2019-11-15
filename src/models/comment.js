@@ -1,10 +1,11 @@
-import { findAllComment, fetchCheck,batchPass,findByCondidtion,findByCondidtions,findAllReply} from '@/services/comment';
+import { findAllComment, fetchCheck,batchPass,findByCondidtion,findReplyById} from '@/services/comment';
 
 const Comment = {
   namespace: 'comment',
   state: {
     comments: [],
-    restores:[],
+    discuss:{},
+    // com:[],
     loading: true,
   },
   effects: {
@@ -12,13 +13,6 @@ const Comment = {
       const response = yield call(findAllComment, _.payload);
       yield put({
         type: 'reloadAll',
-        payload: response.results,
-      });
-    },
-    *findAllReply(_, { call, put }) {
-      const response = yield call(findAllReply, _.payload);
-      yield put({
-        type: 'reloadAllReply',
         payload: response.results,
       });
     },
@@ -41,11 +35,12 @@ const Comment = {
         payload: response.results,
       });
     },
-    *findByCondidtions(_, { call, put }) {
-      const response = yield call(findByCondidtions, _.payload);
+    *findReplyById(_, { call, put }) {
+      const response = yield call(findReplyById, _.payload);
       yield put({
-        type: 'reloadAllReply',
-        payload: response.results,
+        type: 'reloadReplyById',
+        payload: response.data.data.comment,
+
       });
     },
   },
@@ -57,10 +52,10 @@ const Comment = {
         loading: false,
       };
     },
-    reloadAllReply(state, action) {
+    reloadReplyById(state, action) {
       return {
         ...state,
-        restores: action.payload,
+        discuss: action.payload,
         loading: false,
       };
     },

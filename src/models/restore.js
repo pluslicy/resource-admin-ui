@@ -1,9 +1,10 @@
-import { fetchCheck,batchPass,findByCondidtions,findAllReply} from '@/services/comment';
+import { fetchCheck,batchPass,findByCondidtions,findAllReply,findReplyById} from '@/services/restore';
 
 const Restore = {
   namespace: 'restore',
   state: {
     restores:[],
+    replay:[{}],
     loading: true,
   },
   effects: {
@@ -33,12 +34,28 @@ const Restore = {
         payload: response.results,
       });
     },
+    *findReplyById(_, { call, put }) {
+      const response = yield call(findReplyById, _.payload);
+      yield put({
+        type: 'reloadReplyById',
+        payload: response.data.data.replay_list,
+
+      });
+    },
   },
   reducers: {
     reloadAllReply(state, action) {
       return {
         ...state,
         restores: action.payload,
+        loading: false,
+      };
+    },
+    reloadReplyById(state, action) {
+      console.log(action.payload,"www11")
+      return {
+        ...state,
+        replay: action.payload,
         loading: false,
       };
     },
