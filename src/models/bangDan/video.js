@@ -1,4 +1,10 @@
-import { findAll, findCustomVideorank, findCustomVideolist } from '@/services/bangDan/video';
+import {
+  findAll,
+  findCustomVideorank,
+  findCustomVideolist,
+  findByName,
+  delrank,
+} from '@/services/bangDan/video';
 export default {
   namespace: 'videobangdan',
   state: {
@@ -29,6 +35,20 @@ export default {
         payload: response,
       });
     },
+    *findByName(_, { call, put }) {
+      const response = yield call(findByName, _.payload);
+      yield put({
+        type: 'reloadAllCustomVideolist',
+        payload: response,
+      });
+    },
+    *delrank(_, { call, put }) {
+      const response = yield call(delrank, _.payload);
+      yield put({
+        type: 'findCustomVideorank',
+        payload: response,
+      });
+    },
   },
   reducers: {
     reloadAll(state, action) {
@@ -46,7 +66,6 @@ export default {
       };
     },
     reloadAllCustomVideolist(state, action) {
-      console.log(action.payload);
       return {
         ...state,
         customVideolist: action.payload,

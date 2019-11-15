@@ -18,3 +18,11 @@ export async function findCustomWordrank() {
 export async function findCustomWordlist() {
   return request(baseURL + '/mp_man_module/get_custom_docslist/');
 }
+// 自定义榜单搜索
+export async function findByName(value) {
+  return request(baseURL + '/mp_man_module/get_custom_docslist/?search=' + value);
+}
+// 删除自定义文档榜单
+export async function deldocsrank(value) {
+  return request.post(baseURL + '/mp_man_module/del_custom_docsrank/' + value + '/');
+}

@@ -1,4 +1,10 @@
-import { findAll, findCustomWordrank, findCustomWordlist } from '@/services/bangDan/word';
+import {
+  findAll,
+  findCustomWordrank,
+  findCustomWordlist,
+  findByName,
+  delrank,
+} from '@/services/bangDan/word';
 export default {
   namespace: 'wordbangdan',
   state: {
@@ -26,6 +32,20 @@ export default {
       const response = yield call(findCustomWordlist, _.payload);
       yield put({
         type: 'reloadAllCustomWordlist',
+        payload: response,
+      });
+    },
+    *findByName(_, { call, put }) {
+      const response = yield call(findByName, _.payload);
+      yield put({
+        type: 'reloadAllCustomWordlist',
+        payload: response,
+      });
+    },
+    *delrank(_, { call, put }) {
+      const response = yield call(delrank, _.payload);
+      yield put({
+        type: 'findCustomWordrank',
         payload: response,
       });
     },

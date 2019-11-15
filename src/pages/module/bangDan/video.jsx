@@ -39,7 +39,16 @@ class bangDan extends React.Component {
     });
   };
 
+  // 根据名称搜索
+  findByName(value) {
+    this.props.dispatch({ type: 'videobangdan/findByName', payload: value });
+  }
+  // 删除自定义榜单
+  delrank(id) {
+    this.props.dispatch({ type: 'videobangdan/delrank', payload: id });
+  }
   render() {
+    // 视频列表表格列的配置描述
     const columns = [
       {
         title: '#',
@@ -67,7 +76,7 @@ class bangDan extends React.Component {
       },
       {
         title: '收藏',
-        dataIndex: 'vr_comment',
+        dataIndex: 'vr_collection',
       },
       {
         title: '评论',
@@ -82,7 +91,7 @@ class bangDan extends React.Component {
         dataIndex: 'vr_created_time',
       },
     ];
-
+    // 自定义榜单(5项)表格列的配置描述
     const columns1 = [
       {
         dataIndex: 'videorank_order',
@@ -91,17 +100,17 @@ class bangDan extends React.Component {
         dataIndex: 'name',
       },
       {
-        dataIndex: '↑ ↓',
+        render: (text, record) => <a>↑</a>,
       },
       {
-        dataIndex: '×',
+        render: (text, record) => <a>↓</a>,
+      },
+      {
+        render: (text, record) => <a onClick={() => this.delrank(record.id)}>×</a>,
       },
     ];
+    // 自定义榜单中视频列表表格列的配置描述
     const columns2 = [
-      {
-        title: '#',
-        dataIndex: 'id',
-      },
       {
         title: '名称',
         dataIndex: 'vr_name',
@@ -123,6 +132,17 @@ class bangDan extends React.Component {
         dataIndex: 'vr_created_time',
       },
     ];
+    // 自定义榜单的选择框
+    const rowSelection = {
+      columnTitle: '#',
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      },
+      getCheckboxProps: record => ({
+        disabled: record.name === 'Disabled User', // Column configuration not to be checked
+        name: record.name,
+      }),
+    };
 
     return (
       <div style={{ padding: '1em', backgroundColor: '#ffffff', borderRadius: '5px' }}>
@@ -181,7 +201,7 @@ class bangDan extends React.Component {
             <div style={{ float: 'right' }}>
               <Search
                 placeholder="请输入搜索内容"
-                onSearch={value => console.log(value)}
+                onSearch={value => this.findByName(value)}
                 style={{ width: 200 }}
               />
               <br />
@@ -198,6 +218,7 @@ class bangDan extends React.Component {
               <Radio>按时间</Radio>
               <Radio>按热度</Radio>
               <Table
+                rowSelection={rowSelection}
                 bordered
                 rowKey="id"
                 size="small"

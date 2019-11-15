@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Radio, Table, Modal, Input, Select } from 'antd';
+import { Button, Radio, Table, Modal, Input, Select, Divider } from 'antd';
 import { connect } from 'dva';
 const { Search } = Input;
 const { Option } = Select;
@@ -39,7 +39,14 @@ class bangDan extends React.Component {
       visible: false,
     });
   };
-
+  // 根据名称搜索
+  findByName(value) {
+    this.props.dispatch({ type: 'wordbangdan/findByName', payload: value });
+  }
+  // 删除自定义文档榜单
+  delrank(id) {
+    this.props.dispatch({ type: 'wordbangdan/delrank', payload: id });
+  }
   render() {
     const columns = [
       {
@@ -92,17 +99,16 @@ class bangDan extends React.Component {
         dataIndex: 'name',
       },
       {
-        dataIndex: '↑ ↓',
+        render: (text, record) => <a>↑</a>,
       },
       {
-        dataIndex: '×',
+        render: (text, record) => <a>↓</a>,
+      },
+      {
+        render: (text, record) => <a onClick={() => this.delrank(record.id)}>×</a>,
       },
     ];
     const columns2 = [
-      {
-        title: '#',
-        dataIndex: 'id',
-      },
       {
         title: '名称',
         dataIndex: 'dr_name',
@@ -124,7 +130,17 @@ class bangDan extends React.Component {
         dataIndex: 'dr_created_time',
       },
     ];
-
+    // 自定义榜单的选择框
+    const rowSelection = {
+      columnTitle: '#',
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      },
+      getCheckboxProps: record => ({
+        disabled: record.name === 'Disabled User', // Column configuration not to be checked
+        name: record.name,
+      }),
+    };
     return (
       <div style={{ padding: '1em', backgroundColor: '#ffffff', borderRadius: '5px' }}>
         <a>
@@ -181,7 +197,7 @@ class bangDan extends React.Component {
             <div style={{ float: 'right' }}>
               <Search
                 placeholder="请输入搜索内容"
-                onSearch={value => console.log(value)}
+                onSearch={value => this.findByName(value)}
                 style={{ width: 200 }}
               />
               <br />
@@ -198,11 +214,12 @@ class bangDan extends React.Component {
               <Radio>按时间</Radio>
               <Radio>按热度</Radio>
               <Table
+                rowSelection={rowSelection}
                 bordered
                 rowKey="id"
                 size="small"
                 columns={columns2}
-                dataSource={this.props.wordbangdan.words.results}
+                dataSource={this.props.wordbangdan.customWordlist.results}
               />
             </div>
           </div>

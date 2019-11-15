@@ -18,3 +18,11 @@ export async function findCustomVideorank() {
 export async function findCustomVideolist() {
   return request(baseURL + '/mp_man_module/get_custom_videolist/');
 }
+// 自定义榜单搜索
+export async function findByName(value) {
+  return request(baseURL + '/mp_man_module/get_custom_videolist/?search=' + value);
+}
+// 删除自定义文档榜单
+export async function delrank(value) {
+  return request.post(baseURL + '/mp_man_module/del_custom_videorank/' + value + '/');
+}
