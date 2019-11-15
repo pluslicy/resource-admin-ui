@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import { findAllCata, findAllVideo, findAllText,DeleteAllText,EnableOrFreeze,EnableOrFreezeVideo,DeleteAllVideo,
-PermissionText,PermissionVideo,findAllTextDalBum,findAllVideoDalBum,UpdateTextBian,UpdateVideoBian,UploadOneOrMore,UploadVideoOneOrMore} from '@/services/Db';
+PermissionText,PermissionVideo,findAllTextDalBum,findAllVideoDalBum,UpdateTextBian,UpdateVideoBian,UploadOneOrMore,UploadVideoOneOrMore,CreateAlbum} from '@/services/Db';
 
 const DbModel = {
   namespace: 'Db',
@@ -19,6 +19,12 @@ const DbModel = {
       yield put({
         type: 'reloadCatalist',
         payload: response.data,
+      });
+    },
+    *fetchCreateAlbum(_, { call, put }) {
+      const response = yield call(CreateAlbum,_.payload);
+      yield put({
+        type: 'fetchTextDalBum'
       });
     },
     //访问后台接口，上传文档

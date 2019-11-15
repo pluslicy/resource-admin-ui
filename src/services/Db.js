@@ -115,3 +115,12 @@ export async function UploadVideoOneOrMore(param) {
     getResponse: true,
   })
 }
+// 创建专辑
+export async function CreateAlbum(param) {
+  return request('/api/up_man_perres/up_cre_dalbum/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"application/json"},
+    getResponse: true,
+  })
+}

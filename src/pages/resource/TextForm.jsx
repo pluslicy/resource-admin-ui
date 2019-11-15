@@ -11,6 +11,7 @@ const { TextArea } = Input;
 const { TabPane } = Tabs;
 import {connect} from 'dva'
 import styles from './db.less';
+import AlbumForm from './albumForm'
 
 
 const Option = Select.Option;
@@ -27,7 +28,7 @@ class TextForm extends React.Component{
           key:"",
           childs:[],
           visible:false,
-          bumName:""
+         
       }
     }
     showBum(){
@@ -35,24 +36,23 @@ class TextForm extends React.Component{
           visible:true
         })
     }
-    closeBum(){
+    closeBum=()=>{
       this.setState({
         visible:false
       })
     }
-    setBumName(e){
-      this.setState({
-        bumName:e.target.value
-      })
-    }
     componentDidMount(){
-      
+      // console.log("aaaaaaaaaaaa",this.props.flag)
      this.setState({
        key:this.props.flag
      })
       this.props.dispatch({
         type:'Db/fetchTextDalBum'
       })
+    }
+    componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
+      console.log("aaaaaaaaaaaaaaa",nextProps)
+      this.setState({key:nextProps.flag});
     }
     handleChange(value) {
       console.log(`selected ${value}`);
@@ -76,9 +76,7 @@ class TextForm extends React.Component{
                 key:"专辑"
             })
           }
-          this.setState({
-            value: e.target.value,
-          });
+
     };
     selectFang(value){ 
       var a=this.props.Db.catalist[0].childs.filter((item,index)=>{
@@ -91,15 +89,51 @@ class TextForm extends React.Component{
      
     }
     callback=(key)=>{
-      console.log(key)
+      console.log(key);
+      this.setState({
+        key:key
+      })
     }
-    loadRadio(){
-      if(this.props.text.flag=="文档"){
-        return (<span><Radio value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
-      }else{
-       return  <span><Radio disabled={true} value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>
-      }
-    }
+   
+    saveFormRef = formRef => {
+      this.formRef = formRef;
+    };
+    formatDate=(date)=>{  
+      var y = date.getFullYear();  
+      var m = date.getMonth() + 1;  
+      m = m < 10 ? '0' + m : m;  
+      var d = date.getDate();  
+      d = d < 10 ? ('0' + d) : d;  
+      var hh=date.getHours();
+      var mm=date.getMinutes();
+      return y + '-' + m + '-' + d+'T'+hh+':'+mm;  
+    }; 
+    handleOk = e => {
+      // 提交表单
+      e.preventDefault();
+      const { form } = this.formRef.props;
+      form.validateFields((err, values) => {
+          if (err) {
+          return;
+          }
+  
+          console.log('Received values of form: ', values);
+          var obj={};
+          obj.da_name=values.da_name;
+          obj.da_desc=values.da_desc;
+          obj.catalogue=parseInt(values.text_js[0]);
+          obj.user=24;
+          obj.da_created_time=this.formatDate(new Date());
+          this.props.dispatch({
+            type:"Db/fetchCreateAlbum",
+            payload:obj
+          })
+          // form.resetFields();
+      });
+      this.setState({
+        visible:false
+      })
+      };
     render(){
         const { getFieldDecorator } = this.props.form;
         const formItemLayout = {
@@ -121,16 +155,10 @@ class TextForm extends React.Component{
             
             <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.state.key} onChange={this.callback}>
             
-                <Form.Item>
-                              {
-                                  getFieldDecorator('flag',{})
-                                  (
-                                    <Radio.Group defaultValue={this.state.key} style={{marginLeft:".5em"}} onChange={this.onRadioChange} >
-                                        {this.loadRadio()}
-                                    </Radio.Group>
-                                  )
-                              }
-                </Form.Item>
+                     <Radio.Group value={this.state.key} style={{marginLeft:".5em",height:"40px",marginTop:"1em"}} onChange={this.onRadioChange} >
+                                       <Radio value={"文档"}>文档</Radio>
+                                       <Radio checked  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio>
+                     </Radio.Group>
               
               <TabPane className={styles.tb} style={{bottom:"none"}} key="文档">
               <Form style={{marginLeft:"-2.1em"}} {...formItemLayout} className="video-form">
@@ -191,29 +219,7 @@ class TextForm extends React.Component{
                               )
                           }
                     </Form.Item>
-                    <Form.Item label="方向">
-                          {
-                              getFieldDecorator('zj_fid',{})
-                              (
-                                 
-                                  <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}} onChange={this.selectFang.bind(this)} placeholder="请选择方向" name='sd'  >
-                                  {
-                                      this.props.Db.catalist[0].childs.map((item)=>{
-                                          return <Option key={item.id} value={item.id}>{item.catalogue_name}</Option>
-                                      })
-                                  }
-                                  </Select>
-                              )
-                          }
-                    </Form.Item>
-                    <Form.Item label="技术" >
-                          {
-                              getFieldDecorator('zj_ad',{})
-                              (
-                                <Cascader  options={this.state.childs}  fieldNames={{ label: 'catalogue_name', value: 'id', children: 'childs' }}  changeOnSelect placeholder="请选择技术"/>
-                              )
-                          }
-                    </Form.Item>  
+                   
                     <Form.Item  label="">
                       {getFieldDecorator('zj_vip', {
                         })(
@@ -221,25 +227,19 @@ class TextForm extends React.Component{
                         <Checkbox style={{paddingLeft:"5em"}} value={1}> &nbsp;设置为vip</Checkbox>
                       )}
                     </Form.Item>
-                    <Form.Item style={{marginTop:"-1em"}} label="专辑描述">
-                      {getFieldDecorator('zj_description', {
-                      
-                      })(
-                        <TextArea rows={3} />
-                      )}
-                    </Form.Item>
+                    
                   </Form>
               </TabPane>
             </Tabs>
             <Modal
-                        onCancel={this.handleCancel1}
+                        onCancel={this.closeBum}
                         title="自定义创建专辑"
                         visible={this.state.visible}
                         footer={[
-                            <Button onClick={this.closeBum.bind(this)} style={{marginRight:"40%"}}>确认</Button>
+                            <Button onClick={this.handleOk.bind(this)} style={{marginRight:"40%"}}>确认</Button>
                         ]}
                         >
-                      <Input value={this.state.bumName} onChange={this.setBumName.bind(this)}></Input>
+                      <AlbumForm wrappedComponentRef={this.saveFormRef}></AlbumForm>
             </Modal>
             </div>
         );

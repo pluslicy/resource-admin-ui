@@ -42,6 +42,7 @@ const DbVideoAndTextModel = {
           type: 'reloadTextQuery',payload:_.payload
         });
       },
+    
   },
   reducers: {
     // 更新状态中的catalist
