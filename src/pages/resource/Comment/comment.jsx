@@ -254,7 +254,7 @@ class Check extends React.Component {
               onOk={this.handleOk}
               onCancel={this.handleCancel}
             >
-              <video width="100%" height="70%" controls>
+              <video width="850px" height="500px" controls>
 						    <source src={this.state.pathurl} />
 					    </video>
                   <Comment
