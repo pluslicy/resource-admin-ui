@@ -212,7 +212,7 @@ class TextModel extends React.Component{
           
           this.state.arr.forEach((item,index)=>{
             var b={
-              da:"",
+              da:1,
               catalogue:"",
               user: 24,
               dr_name:"",
@@ -224,8 +224,8 @@ class TextModel extends React.Component{
               dr_size:"",
               dr_page:0
             }
-            b.da=values.da;b.catalogue=parseInt(values.zj_ad[values.zj_ad.length-1]);b.dr_name=item.resource_name;b.dr_url=item.resource_url;
-            b.dr_desc=values.zj_description;b.dr_format=item.resource_type;b.dr_size=item.resource_size;
+            b.da=values.da;b.dr_name=item.resource_name;b.dr_url=item.resource_url;
+            b.dr_format=item.resource_type;b.dr_size=item.resource_size;
             if(values.zj_vip==true){
               b.dr_permission=0;
             }
@@ -241,7 +241,7 @@ class TextModel extends React.Component{
               user: 24,
               dr_name:"",
               dr_url:"",
-              dr_desc:"",
+              dr_desc:"hhhh",
               dr_permission: 1,
               dr_owner: 1,
               dr_format:"",
