@@ -7,7 +7,7 @@ const {RangePicker} = DatePicker;
 const { Option } = Select;
 import styles from './db.less'
 import TextForm from './TextForm'
-
+import request from '../../utils/request'
 class TextModel extends React.Component{
     constructor(props){
         super(props);
@@ -15,7 +15,6 @@ class TextModel extends React.Component{
             names:[],
             arr:[],
             childs:[],
-            flag:"",
             fileList: [],
             filelist:[],
             file:{},
@@ -38,6 +37,9 @@ class TextModel extends React.Component{
           percent:0,
           file:{}
         });
+        // this.props.dispatch({
+        //   type:"Db/fetchUpdateFlag",payload:""
+        // })
     };
     componentDidMount(){
         this.props.dispatch({
@@ -206,13 +208,13 @@ class TextModel extends React.Component{
         console.log('up values',this.state.arr)
        
         var saveArr=[];
-        if(values.flag=="专辑"){
+        if(this.props.Db.flag=="专辑"){
           
           this.state.arr.forEach((item,index)=>{
             var b={
               da:"",
               catalogue:"",
-              user: 1,
+              user: 24,
               dr_name:"",
               dr_url:"",
               dr_desc:"",
@@ -229,14 +231,14 @@ class TextModel extends React.Component{
             }
             saveArr.push(b)
           })
-         
+          // request.get('/api/')
         }
         else{
           this.state.arr.forEach((item,index)=>{
             var b={
-              da:"",
+              da:null,
               catalogue:"",
-              user: 1,
+              user: 24,
               dr_name:"",
               dr_url:"",
               dr_desc:"",
@@ -246,6 +248,7 @@ class TextModel extends React.Component{
               dr_size:"",
               dr_page:0
             }
+           
             b.da=values.da;b.catalogue=parseInt(values.text_js[values.text_js.length-1]);b.dr_name=item.resource_name;b.dr_url=item.resource_url;
             b.dr_desc=values.description;b.dr_format=item.resource_type;b.dr_size=item.resource_size;
             if(values.name==true){
@@ -255,15 +258,16 @@ class TextModel extends React.Component{
           })
           
         }
+        console.log(saveArr)
         this.props.dispatch({
           type:"Db/fetchUploadOneOrMore",payload:saveArr
         })
         form.resetFields();
     });
-      this.setState({
-          visible1:false,
-          visible3:false
-      })
+      // this.setState({
+      //     visible1:false,
+      //     visible3:false
+      // })
     };
     closeTiaoZheng=()=>{
       this.props.dispatch({
@@ -481,14 +485,16 @@ class TextModel extends React.Component{
             <div className="table">
                 {/* 文件上传组件 */}
                 <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
-                  console.log(file)
+                  console.log(fileList.length)
                   if(fileList.length==1){
-                    this.setState({
-                      flag:"文档"
+                   
+                    this.props.dispatch({
+                      type:'Db/fetchUpdateFlag',payload:"文档"
                     })
                   }else{
-                    this.setState({
-                      flag:"专辑"
+                
+                    this.props.dispatch({
+                      type:'Db/fetchUpdateFlag',payload:"专辑"
                     })
                   }
                 var b=[];

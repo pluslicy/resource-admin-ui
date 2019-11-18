@@ -19,16 +19,14 @@ const children = [];
 for (let i = 10; i < 36; i++) {
   children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
 }
-
+var flag="";
 class TextForm extends React.Component{
 
     constructor(props){
       super(props)
       this.state={
-          key:"",
           childs:[],
-          visible:false,
-         
+          visible:false
       }
     }
     showBum(){
@@ -42,18 +40,14 @@ class TextForm extends React.Component{
       })
     }
     componentDidMount(){
-      // console.log("aaaaaaaaaaaa",this.props.flag)
-     this.setState({
-       key:this.props.flag
-     })
       this.props.dispatch({
         type:'Db/fetchTextDalBum'
       })
     }
-    componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
-      console.log("aaaaaaaaaaaaaaa",nextProps)
-      this.setState({key:nextProps.flag});
-    }
+    // componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
+    //   console.log("aaaaaaaaaaaaaaa",nextProps)
+    //   this.setState({key:this.props.Db.flag});
+    // }
     handleChange(value) {
       console.log(`selected ${value}`);
     }
@@ -65,15 +59,17 @@ class TextForm extends React.Component{
       return e && e.fileList;
     };
     onRadioChange = e => {
+      console.log("aaaaaaaaaaaa",this.props.Db.flag)
 
       console.log(e.target.value)
         if(e.target.value==="文档"){
-            this.setState({
-                key:"文档"
+           
+            this.props.dispatch({
+              type:'Db/fetchUpdateFlag',payload:"文档"
             })
           }else{
-            this.setState({
-                key:"专辑"
+            this.props.dispatch({
+              type:'Db/fetchUpdateFlag',payload:"专辑"
             })
           }
 
@@ -128,12 +124,36 @@ class TextForm extends React.Component{
             type:"Db/fetchCreateAlbum",
             payload:obj
           })
-          // form.resetFields();
+          form.resetFields();
       });
       this.setState({
         visible:false
       })
       };
+    loadRadio(){
+        if(this.props.Db.flag=="文档"){
+          // this.setState({
+          //   key:this.props.vtest.flag
+          // })
+         
+          flag="文档"
+          return (<span><Radio value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
+        }else if(this.props.Db.flag=="专辑"){
+          // this.setState({
+          //   key:this.props.vtest.flag
+          // })
+
+          if(flag=="文档"){
+            flag="";
+            return (<span><Radio value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
+          }
+          
+          if(flag==""){
+            return  <span><Radio disabled value={"文档"}>文档</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>
+          }
+          
+        }
+      }
     render(){
         const { getFieldDecorator } = this.props.form;
         const formItemLayout = {
@@ -153,11 +173,10 @@ class TextForm extends React.Component{
             // <div className="DbForm" style={{width:"800px",height:"550px",}}>
             <div className={styles.DbForm}>
             
-            <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.state.key} onChange={this.callback}>
+            <Tabs className={styles.tab} tabBarStyle={{boxSizing:"none"}} style={{boxSizing:"none",marginTop:"-6.6em",border:"none",marginLeft:"3em"}} animated={false} activeKey={this.props.Db.flag} onChange={this.callback}>
             
-                     <Radio.Group value={this.state.key} style={{marginLeft:".5em",height:"40px",marginTop:"1em"}} onChange={this.onRadioChange} >
-                                       <Radio value={"文档"}>文档</Radio>
-                                       <Radio checked  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio>
+                     <Radio.Group value={this.props.Db.flag} style={{marginLeft:".5em",height:"40px",marginTop:"1em"}} onChange={this.onRadioChange} >
+                                      {this.loadRadio()}
                      </Radio.Group>
               
               <TabPane className={styles.tb} style={{bottom:"none"}} key="文档">
@@ -167,7 +186,7 @@ class TextForm extends React.Component{
                           {
                               getFieldDecorator('id',{})
                               (
-                                  <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}} onChange={this.selectFang.bind(this)} placeholder="请选择方向" name='teacherId'  >
+                                  <Select style={{borderBottom:"2px solid #e8e8e8",borderRadius:"4px"}} onChange={this.selectFang.bind(this)} placeholder="请选择方向" name='id'  >
                                   {
                                       this.props.Db.catalist[0].childs.map((item)=>{
                                           return <Option key={item.id} value={item.id}>{item.catalogue_name}</Option>

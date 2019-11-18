@@ -27,6 +27,7 @@ const DbVideoAndTextModel = {
         catalogue_path:"",
         catalogue:""
     },
+    flag:""
   },
   effects: {
     // 获取所有编目
@@ -42,7 +43,11 @@ const DbVideoAndTextModel = {
           type: 'reloadTextQuery',payload:_.payload
         });
       },
-    
+    *fetchUpdateFlag(_, { call, put }) {
+      yield put({
+        type: 'loadFlag',payload:_.payload
+      });
+    },
   },
   reducers: {
     // 更新状态中的catalist
@@ -58,6 +63,12 @@ const DbVideoAndTextModel = {
           tq: action.payload,
         };
     },
+    loadFlag(state,action){
+      return {
+        ...state,
+        flag: action.payload,
+      };
+    }
   },
 };
 

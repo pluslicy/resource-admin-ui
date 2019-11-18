@@ -220,7 +220,7 @@ class VideoModel extends React.Component{
               var b={
                 va:"",
                 catalogue:"",
-                user: 1,
+                user: 24,
                 vr_name:"",
                 vr_url:"",
                 vr_desc:"",
@@ -244,7 +244,7 @@ class VideoModel extends React.Component{
               var b={
                 va:"",
                 catalogue:"",
-                user: 1,
+                user: 24,
                 vr_name:"",
                 vr_url:"",
                 vr_desc:"",
@@ -387,7 +387,7 @@ class VideoModel extends React.Component{
     }
     uptext(e){
       // if(e.target.__reactInternalInstance$q2jug5y2evp)
-      // console.log(e.target.previousElementSibling.previousElementSibling.innerText);
+      console.log(e.target.previousElementSibling.previousElementSibling.innerText);
       var add_text=document.getElementById("add_text")
       
       add_text.style.display="block"
@@ -397,8 +397,14 @@ class VideoModel extends React.Component{
       btn.style.pointerEvents="none"
       btn.style.background="grey"
       this.setState({
-        textname:e.target.previousElementSibling.previousElemntSibling.innerText
+        textname:e.target.previousElementSibling.previousElementSibling.innerText
       })
+      // if(e.target!=undefined){
+      //   this.setState({
+      //     textname:e.target.previousElementSibling.previousElemntSibling.innerText
+      //   })
+      // }
+     
       // this.setState({
       //   vtext:e.target.__reactInternalInstance$htlud7b3i2u
       // })
@@ -508,8 +514,8 @@ class VideoModel extends React.Component{
             },
         };
         const props = {
-              // action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
-              action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+              action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+              // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
               onChange: this.handleChange2,
               accept:".doc,.docx,.mp4",
               data:{
@@ -528,18 +534,14 @@ class VideoModel extends React.Component{
                     <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
                         console.log(file)
                         if(fileList.length==1){
-                          this.setState({
-                            flag:"视频"
-                          })
+                         
                           this.props.dispatch({
-                            type:"Db/fetchUpdateFlag",payload:"视频"
+                            type:"vt/fetchUpdateFlag",payload:"视频"
                           })
                         }else{
-                          this.setState({
-                            flag:"专辑"
-                          })
+          
                           this.props.dispatch({
-                            type:"Db/fetchUpdateFlag",payload:"视频"
+                            type:"vt/fetchUpdateFlag",payload:"专辑"
                           })
                         }
                       var b=[];
@@ -695,7 +697,7 @@ class VideoModel extends React.Component{
 
                         </div>
                         
-                        <VideoForm id="v_form" wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag,name:this.state.vtext.key}} add={this.state.add} flag={this.state.flag}/>
+                        <VideoForm id="v_form" wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag,name:this.state.vtext.key}} add={this.state.add} />
                         <div id="add_text" style={{display:"none",width:"570px",height:"405px",left:"260px",top:"150px",position:"absolute",background:"#fff",overflowY:"auto"}}>
                           <AddTextForm textname={this.state.textname}></AddTextForm>
                         </div>
