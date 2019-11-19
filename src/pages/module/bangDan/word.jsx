@@ -142,12 +142,7 @@ class bangDan extends React.Component {
       }),
     };
     return (
-      <div style={{ padding: '1em', backgroundColor: '#ffffff', borderRadius: '5px' }}>
-        <a>
-          <span style={{ fontSize: '20px' }}>文档</span>
-        </a>
-        <br />
-        <hr />
+      <div>
         <Button onClick={this.showModal}>自定义榜单</Button>
         <Radio.Group
           style={{ marginBottom: '1em', marginLeft: '0.5em' }}

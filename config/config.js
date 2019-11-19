@@ -98,147 +98,140 @@ export default {
           path: '/resource',
           name: 'resource',
           icon: 'desktop',
-          routes:[
-          {
-            path: '/resource/db',
-            name: 'db',
-            icon: 'right',
-            component: './resource/Db',
-          },{
-            path: '/resource/check/video',
-            name: 'check',
-            icon: 'right',
-            component: './resource/Check/Video',
-          },{
-            path: '/resource/comment/comment',
-            name: 'comment',
-            icon: 'right',
-            component: './resource/comment/comment',
-          }]
+          routes: [
+            {
+              path: '/resource/db',
+              name: 'db',
+              icon: 'right',
+              component: './resource/Db',
+            },
+            {
+              path: '/resource/check/video',
+              name: 'check',
+              icon: 'right',
+              component: './resource/Check/Video',
+            },
+            {
+              path: '/resource/comment/comment',
+              name: 'comment',
+              icon: 'right',
+              component: './resource/comment/comment',
+            },
+          ],
         },
         // 模块管理
         {
           path: '/module',
           name: 'module',
           icon: 'file',
-          routes:[{
-            path: '/module/bangDan',
-            name: 'bangDan',
-            icon: 'right',
-            routes:[{
+          routes: [
+            {
+              name: 'bangDan',
               path: '/module/bangDan/video',
-              name: 'video',
               icon: 'right',
               component: './module/bangDan/Video',
             },
             {
-              path: '/module/bangDan/word',
-              name: 'word',
+              path: '/module/recommend',
+              name: 'recommend',
               icon: 'right',
-              component: './module/bangDan/Word',
-            }]
-          },{
-            path: '/module/recommend',
-            name: 'recommend',
-            icon: 'right',
-             routes:[{
               path: '/module/recommend/javaee',
-              name: 'javaee',
               icon: 'right',
               component: './module/recommend/javaee',
             },
             {
-              path: '/module/recommend/py',
-              name: 'py',
+              path: '/module/setting',
+              name: 'setting',
               icon: 'right',
-              component: './module/recommend/Py',
+              component: './module/Setting',
             },
-             {
-              path: '/module/recommend/ht',
-              name: 'ht',
+            {
+              path: '/module/admin',
+              name: 'admin',
               icon: 'right',
-              component: './module/recommend/Ht',
-            }]
-          },{
-            path: '/module/setting',
-            name: 'setting',
-            icon: 'right',
-            component: './module/Setting',
-          },{
-            path: '/module/admin',
-            name: 'admin',
-            icon: 'right',
-            component: './module/Admin',
-          },{
-            path: '/module/news',
-            name: 'news',
-            icon: 'right',
-            component: './module/News',
-          },{
-            path: '/module/authentication',
-            name: 'authentication',
-            icon: 'right',
-            component: './module/Authentication',
-          },
-          {
-            path: '/module/lunbo',
-            name: 'lunbo',
-            icon: 'right',
-            component: './module/Lunbo',
-          }]
+              component: './module/Admin',
+            },
+            {
+              path: '/module/news',
+              name: 'news',
+              icon: 'right',
+              component: './module/News',
+            },
+            {
+              path: '/module/authentication',
+              name: 'authentication',
+              icon: 'right',
+              component: './module/Authentication',
+            },
+            {
+              path: '/module/lunbo',
+              name: 'lunbo',
+              icon: 'right',
+              component: './module/Lunbo',
+            },
+          ],
         },
         // 角色管理
         {
           path: '/roles',
           name: 'roles',
           icon: 'star',
-          routes:[{
-            path: '/roles/privilege',
-            name: 'privilege',
-            icon: 'right',
-            component: './roles/Privilege',
-          },{
-            path: '/roles/role',
-            name: 'role',
-            icon: 'right',
-            component: './roles/Role',
-          }]
+          routes: [
+            {
+              path: '/roles/privilege',
+              name: 'privilege',
+              icon: 'right',
+              component: './roles/Privilege',
+            },
+            {
+              path: '/roles/role',
+              name: 'role',
+              icon: 'right',
+              component: './roles/Role',
+            },
+          ],
         },
         // 用户管理
         {
           path: '/users',
           name: 'users',
           icon: 'stock',
-          routes:[{
-            path: '/users/user',
-            name: 'user',
-            icon: 'right',
-            component: './users/User',
-          }]
+          routes: [
+            {
+              path: '/users/user',
+              name: 'user',
+              icon: 'right',
+              component: './users/User',
+            },
+          ],
         },
         // 学校管理
         {
           path: '/schools',
           name: 'schools',
           icon: 'user',
-          routes:[{
-            path: '/schools/School',
-            name: 'school',
-            icon: 'right',
-            component: './schools/School',
-          }]
+          routes: [
+            {
+              path: '/schools/School',
+              name: 'school',
+              icon: 'right',
+              component: './schools/School',
+            },
+          ],
         },
         // 编目管理
         {
-         path: '/catalog',
+          path: '/catalog',
           name: 'catalog',
           icon: 'menu',
-          routes:[{
-            path: '/catalog/Catalog',
-            name: 'catalog',
-            icon: 'right',
-            component: './catalog/Catalog',
-          }]
+          routes: [
+            {
+              path: '/catalog/Catalog',
+              name: 'catalog',
+              icon: 'right',
+              component: './catalog/Catalog',
+            },
+          ],
         },
         {
           component: './404',
