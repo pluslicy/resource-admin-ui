@@ -264,10 +264,10 @@ class TextModel extends React.Component{
         })
         form.resetFields();
     });
-      // this.setState({
-      //     visible1:false,
-      //     visible3:false
-      // })
+      this.setState({
+          visible1:false,
+          visible3:false
+      })
     };
     closeTiaoZheng=()=>{
       this.props.dispatch({

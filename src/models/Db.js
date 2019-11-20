@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import { findAllCata, findAllVideo, findAllText,DeleteAllText,EnableOrFreeze,EnableOrFreezeVideo,DeleteAllVideo,
 PermissionText,PermissionVideo,findAllTextDalBum,findAllVideoDalBum,UpdateTextBian,UpdateVideoBian,UploadOneOrMore,
-UploadVideoOneOrMore,CreateAlbum,CreateVideoAlbum} from '@/services/Db';
+UploadVideoOneOrMore,CreateAlbum,CreateVideoAlbum,UploadAttach} from '@/services/Db';
 
 const DbModel = {
   namespace: 'Db',
@@ -11,7 +11,8 @@ const DbModel = {
     textlist:{},
     textdalbum:[],
     videodalbum:[],
-    flag:""
+    flag:"",
+    successFile:[]
   },
   effects: {
     // 获取所有编目
@@ -129,6 +130,12 @@ const DbModel = {
         type: 'loadFlag',payload:_.payload
       });
     },
+    *fetchUpdateAttach(_, { call, put }) {
+      const response = yield call(UploadAttach,_.payload);
+      yield put({
+        type: 'reloadSuccessFile',payload:response.data
+      });
+    },
   },
   reducers: {
     // 更新状态中的catalist
@@ -136,6 +143,14 @@ const DbModel = {
       return {
         ...state,
         catalist: action.payload,
+      };
+    },
+    reloadSuccessFile(state, action) {
+      var arr=state.successFile;
+      arr.push(action.payload);
+      return {
+        ...state,
+        successFile: arr,
       };
     },
     reloadVideolist(state, action) {

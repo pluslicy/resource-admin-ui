@@ -126,9 +126,9 @@ class TextForm extends React.Component{
           })
           form.resetFields();
       });
-      this.setState({
-        visible:false
-      })
+          this.setState({
+            visible:false
+          })
       };
     loadRadio(){
         if(this.props.Db.flag=="文档"){

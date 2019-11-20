@@ -10,7 +10,8 @@ class AddTextForm extends React.Component{
     super(props)
     this.state={
         arr:[],
-        file:""
+        file:"",
+        names:[],
     }
   }  
   remove = k => {
@@ -37,17 +38,18 @@ class AddTextForm extends React.Component{
           
         }
         // this.showModal();
-        if (info.file.status === 'done') {
-          // var arr=this.state.arr;
-          // const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
+        if (info.file.status === 'done') {  
+          var arr=this.state.arr;
+          const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
           // upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
-         
-          // arr.push(upobj)
+          var upobj={attach_name:resource_name,attach_size:resource_size,attach_permission:1,attach_owner:24,attach_url:resource_url}
+          
+          arr.push(upobj)
           this.setState({
             file:info.file,
             // arr:arr
           })
-          console.log(info.file.response)
+          console.log(arr,"aaaaa")
           message.success(`${info.file.name} file uploaded successfully`);
         } else if (info.file.status === 'error') {
           // var arr=this.state.names;
@@ -61,8 +63,7 @@ class AddTextForm extends React.Component{
         }
       handleChange(value,event,a){
           console.log(value)
-          console.log(event)
-          console.log(a)
+       
       }
       add = () => {
         const { form } = this.props;
@@ -77,13 +78,40 @@ class AddTextForm extends React.Component{
       };
     
       handleSubmit = e => {
+        var that=this;
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            const { keys, names,teams } = values;
+            const { keys, names,teams,uploads} = values;
             console.log('Received values of form: ', values);
             console.log('Merged values:', keys.map(key => names[key]));
             console.log('Merged values:', keys.map(key => teams[key]));
+            console.log('Merged values:', keys.map(key => uploads[key]));
+            var arr=[];
+            values.uploads.map((item,index)=>{
+              arr.push({resource_name:""})
+            })
+            console.log(arr,"ggg")
+            if(values.names.length!=0){
+              values.names.map((item,index)=>{
+                if(item!=undefined){
+                  arr[index].resource_name=teams[index]+item;
+                }
+              })
+            }
+           
+            values.uploads.map((item,index)=>{
+              arr[index].file=item[item.length-1].originFileObj;
+              arr[index].token="dddd";
+              if(arr[index].resource_name==""){
+                arr[index].resource_name=item[item.length-1].originFileObj.name;
+              }
+            })
+            arr.forEach((item)=>{
+              that.props.dispatch({
+                type:"Db/fetchUpdateAttach",payload:item
+              })
+            })
           }
         });
       };
@@ -103,19 +131,33 @@ class AddTextForm extends React.Component{
         }
         return e && e.fileList;
       };
-      
+    uploadBefore(file,fileList){
+      // (file,fileList)=>{
+      //   console.log(file)
+      // var b=[];
+      // fileList.forEach((item)=>{
+      //     b.push(item.name);
+      // })
+      // this.setState({
+      // filelist:fileList,
+      // file:file,
+      // ok:0,
+      // names:b,
+      // });}
+      return false;
+    }
     render(){
         const props = {
-            // action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
-            action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+            action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+            // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
             onChange: this.handleChange2,
             accept:".doc,.docx,.mp4",
             data:{
-            //   file:this.state.file,
+              file:this.state.file,
               token:"dddd",
-            //   resource_name:this.state.names.map((item)=>{
-            //     if(item===this.state.file.name) return item;
-            //   })
+              resource_name:this.state.names.map((item)=>{
+                if(item===this.state.file.name) return item;
+              })
             }
         };
         const { getFieldDecorator, getFieldValue } = this.props.form;
@@ -188,18 +230,7 @@ class AddTextForm extends React.Component{
             getValueFromEvent: this.normFile,
           })(
             <Upload  showUploadList={false} multiple={false} style={{marginLeft:"10px"}} {...props}
-                 beforeUpload={(file,fileList)=>{
-                    console.log(file)
-                  var b=[];
-                  fileList.forEach((item)=>{
-                      b.push(item.name);
-                  })
-                  this.setState({
-                  filelist:fileList,
-                  file:file,
-                  ok:0,
-                  names:b,
-                  });}}>
+                 beforeUpload={this.uploadBefore.bind(this)}>
                 
                     <Button>
                     <Icon type="upload" /> 选择文件
@@ -264,18 +295,7 @@ class AddTextForm extends React.Component{
                         getValueFromEvent: this.normFile,
                       })(
                         <Upload  showUploadList={false} multiple={false} style={{marginLeft:"10px"}} {...props}
-                            beforeUpload={(file,fileList)=>{
-                                console.log(file)
-                              var b=[];
-                              fileList.forEach((item)=>{
-                                  b.push(item.name);
-                              })
-                              this.setState({
-                              filelist:fileList,
-                              file:file,
-                              ok:0,
-                              names:b,
-                              });}}>
+                            beforeUpload={this.uploadBefore.bind(this)}>
                             
                                 <Button>
                                 <Icon type="upload" /> 选择文件

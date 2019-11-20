@@ -133,3 +133,13 @@ export async function CreateVideoAlbum(param) {
     getResponse: true,
   })
 }
+
+export async function UploadAttach(param) {
+  return request('http://10.0.6.5:53001/FileStorageApp/create_resource/', {
+    method: 'post',
+    data:param,
+    headers:{"Content-Type":"multipart/form-data"},
+    getResponse: true,
+    responseType:'application/json',
+  })
+}

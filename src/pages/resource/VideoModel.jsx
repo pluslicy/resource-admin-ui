@@ -26,7 +26,7 @@ class VideoModel extends React.Component{
             value:"请选择方向",
             flag:"",
             visible1:false,
-            visible:false,
+            visible:true,
             vtext:{},
             percent:0,
             ok:0,
@@ -214,7 +214,7 @@ class VideoModel extends React.Component{
           console.log('up values',this.state.arr)
          
           var saveArr=[];
-          if(values.flag=="专辑"){
+          if(values.da!=null){
             
             this.state.arr.forEach((item,index)=>{
               var b={
@@ -230,7 +230,7 @@ class VideoModel extends React.Component{
                 vr_size:"",
                 vr_time:''
               }
-              b.va=values.da;b.catalogue=parseInt(values.zj_ad[values.zj_ad.length-1]);b.vr_name=item.resource_name;b.vr_url=item.resource_url;
+              b.va=values.da;b.vr_name=item.resource_name;b.vr_url=item.resource_url;
               b.vr_desc=values.zj_description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;b.vr_time=item.created_time;
               if(values.zj_vip==true){
                 b.vr_permission=0;
@@ -263,16 +263,17 @@ class VideoModel extends React.Component{
             })
             
           }
-          this.props.dispatch({
-            type:"Db/fetchUploadVideoOneOrMore",payload:saveArr
-          })
+          console.log(saveArr)
+          // this.props.dispatch({
+          //   type:"Db/fetchUploadVideoOneOrMore",payload:saveArr
+          // })
           form.resetFields();
       });
       
-      this.setState({
-        visible:false,
-        visible1:false
-      })
+      // this.setState({
+      //   visible:false,
+      //   visible1:false
+      // })
       
     };
     handleChange2=(info)=>{
@@ -531,7 +532,7 @@ class VideoModel extends React.Component{
             <div className="table">
                     {/* 文件上传组件 */}
                    
-                    <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
+                    <Upload  {...props} showUploadList={false}  beforeUpload={(file,fileList)=>{
                         console.log(file)
                         if(fileList.length==1){
                          
@@ -676,6 +677,10 @@ class VideoModel extends React.Component{
                         <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的视频:
                             <br/>
                             <ol>
+                            <li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>hhhhh</div>
+                                <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key="1">&nbsp;&nbsp;+文档</span>
+                                </li>
                             {
                                 this.state.filelist.map((item,index)=>{
                                 return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
