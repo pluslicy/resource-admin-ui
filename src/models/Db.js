@@ -12,7 +12,9 @@ const DbModel = {
     textdalbum:[],
     videodalbum:[],
     flag:"",
-    successFile:[]
+    successFile:[],
+    textLength:0,
+    attachment:[]
   },
   effects: {
     // 获取所有编目
@@ -21,6 +23,12 @@ const DbModel = {
       yield put({
         type: 'reloadCatalist',
         payload: response.data,
+      });
+    },
+    *fetchTextLength(_, { call, put }) {
+      yield put({
+        type: 'reloadTextLength',
+        payload:_.payload
       });
     },
     *fetchCreateAlbum(_, { call, put }) {
@@ -131,7 +139,9 @@ const DbModel = {
       });
     },
     *fetchUpdateAttach(_, { call, put }) {
+    
       const response = yield call(UploadAttach,_.payload);
+      // console.log(response,"返回的数据")
       yield put({
         type: 'reloadSuccessFile',payload:response.data
       });
@@ -146,11 +156,20 @@ const DbModel = {
       };
     },
     reloadSuccessFile(state, action) {
-      var arr=state.successFile;
-      arr.push(action.payload);
+      var attachment=state.attachment;
+      var obj={attach_name:action.payload.resource_name,attach_size:action.payload.resource_size,attach_permission:1,attach_owner:24,
+        attach_url:action.payload.resource_url};
+      var arr=state.successFile;//获取当前上传附件的文档数组
+      // arr.push(action.payload);
+      arr.forEach((item,index)=>{
+        if(item.textid==state.textid){
+          item.attachment.push(obj)
+        }
+      })
       return {
         ...state,
         successFile: arr,
+        attachment:attachment
       };
     },
     reloadVideolist(state, action) {
@@ -181,6 +200,23 @@ const DbModel = {
       return {
         ...state,
         flag: action.payload,
+      };
+    },
+    reloadTextLength(state,action){
+     
+      
+      var arr=state.successFile;
+      
+      if(action.payload==""){
+          arr=[];
+      }else{
+        var obj={textid:action.payload,attachment:[]};
+        arr.push(obj);
+      }
+      return {
+        ...state,
+        textid: action.payload,
+        successFile:arr
       };
     }
   },

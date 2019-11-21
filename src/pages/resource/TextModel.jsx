@@ -639,12 +639,7 @@ class TextModel extends React.Component{
                         </ol>
                     </span> <br/><br/>
 
-                        <p style={{marginLeft:"30px",color:'red'}}>
-                        当上传视频为一个时：<br/>
-                        用户可以选择单视频或专辑<br/>
-                        当上传视频为多个时：<br/>
-                        默认为专辑，不可切换
-                        </p>
+                      
 
                     </div>
                     

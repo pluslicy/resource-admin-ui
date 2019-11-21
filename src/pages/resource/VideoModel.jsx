@@ -26,11 +26,12 @@ class VideoModel extends React.Component{
             value:"请选择方向",
             flag:"",
             visible1:false,
-            visible:true,
+            visible:false,
             vtext:{},
             percent:0,
             ok:0,
-            textname:""
+            textname:"",
+            textid:""
         }
     }
     componentDidMount(){
@@ -204,6 +205,8 @@ class VideoModel extends React.Component{
     }
     handleOk = e => {
       e.preventDefault();
+      console.log(this.props.Db.successFile)
+      console.log(e);
       const { form } = this.formRef.props;
       form.validateFields((err, values) => {
           if (err) {
@@ -214,9 +217,9 @@ class VideoModel extends React.Component{
           console.log('up values',this.state.arr)
          
           var saveArr=[];
-          if(values.da!=null){
-            
+          if(values.da!=undefined){
             this.state.arr.forEach((item,index)=>{
+              console.log(item.id)
               var b={
                 va:"",
                 catalogue:"",
@@ -241,6 +244,8 @@ class VideoModel extends React.Component{
           }
           else{
             this.state.arr.forEach((item,index)=>{
+              console.log(item.resource_id)
+              
               var b={
                 va:"",
                 catalogue:"",
@@ -252,10 +257,19 @@ class VideoModel extends React.Component{
                 vr_owner: 1,
                 vr_format:"",
                 vr_size:"",
-                vr_time:''
+                vr_time:'',
+                attachment:[]
+              }
+              
+              for(let i=0;i<this.props.Db.successFile.length;i++){
+                if(this.props.Db.successFile[i].textid===item.resource_id){
+                  b.attachment=this.props.Db.successFile[i].attachment;
+                  delete this.props.Db.successFile[i].textid;
+                }
               }
               b.va=values.da;b.catalogue=parseInt(values.video_js[values.video_js.length-1]);b.vr_name=item.resource_name;b.vr_url=item.resource_url;
-              b.vr_desc=values.description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;b.vr_time=item.created_time
+              b.vr_desc=values.description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;b.vr_time=item.created_time;
+
               if(values.name==true){
                 b.vr_permission=0;
               }
@@ -264,16 +278,18 @@ class VideoModel extends React.Component{
             
           }
           console.log(saveArr)
-          // this.props.dispatch({
-          //   type:"Db/fetchUploadVideoOneOrMore",payload:saveArr
-          // })
+          this.props.dispatch({
+            type:"Db/fetchUploadVideoOneOrMore",payload:saveArr
+          })
           form.resetFields();
       });
-      
-      // this.setState({
-      //   visible:false,
-      //   visible1:false
-      // })
+      this.props.dispatch({
+        type:"Db/fetchTextLength",payload:""
+      })
+      this.setState({
+        visible:false,
+        visible1:false
+      })
       
     };
     handleChange2=(info)=>{
@@ -388,6 +404,11 @@ class VideoModel extends React.Component{
     }
     uptext(e){
       // if(e.target.__reactInternalInstance$q2jug5y2evp)
+      console.log(e.target.id)
+      this.props.dispatch({
+        type:"Db/fetchTextLength",payload:parseInt(e.target.id)
+      })
+      console.log(e.target.id)
       console.log(e.target.previousElementSibling.previousElementSibling.innerText);
       var add_text=document.getElementById("add_text")
       
@@ -398,7 +419,8 @@ class VideoModel extends React.Component{
       btn.style.pointerEvents="none"
       btn.style.background="grey"
       this.setState({
-        textname:e.target.previousElementSibling.previousElementSibling.innerText
+        textname:e.target.previousElementSibling.previousElementSibling.innerText,
+        textid:e.target.id
       })
       // if(e.target!=undefined){
       //   this.setState({
@@ -677,15 +699,12 @@ class VideoModel extends React.Component{
                         <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的视频:
                             <br/>
                             <ol>
-                            <li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>hhhhh</div>
-                                <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key="1">&nbsp;&nbsp;+文档</span>
-                                </li>
                             {
-                                this.state.filelist.map((item,index)=>{
-                                return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
-                                <span style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.name}>&nbsp;&nbsp;+文档</span>
+                                this.state.arr.map((item,index)=>{
+
+                                return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
+                                <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
                                 </li>)
                                 })
                             }
@@ -693,18 +712,13 @@ class VideoModel extends React.Component{
                             </ol>
                         </span> <br/><br/>
 
-                            <p style={{marginLeft:"30px",color:'red'}}>
-                            当上传视频为一个时：<br/>
-                            用户可以选择单视频或专辑<br/>
-                            当上传视频为多个时：<br/>
-                            默认为专辑，不可切换
-                            </p>
+                            
 
                         </div>
                         
                         <VideoForm id="v_form" wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag,name:this.state.vtext.key}} add={this.state.add} />
                         <div id="add_text" style={{display:"none",width:"570px",height:"405px",left:"260px",top:"150px",position:"absolute",background:"#fff",overflowY:"auto"}}>
-                          <AddTextForm textname={this.state.textname}></AddTextForm>
+                          <AddTextForm textname={this.state.textname} textid={this.state.textid}></AddTextForm>
                         </div>
                         <Button id="submit_btn" onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
                         </Modal>   

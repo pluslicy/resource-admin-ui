@@ -133,13 +133,15 @@ export async function CreateVideoAlbum(param) {
     getResponse: true,
   })
 }
-
+// 上传附件
 export async function UploadAttach(param) {
+  const formData = new FormData();
+  formData.append('file', param.file);
+  formData.append('token',param.token);
+  formData.append('resource_name',param.resource_name);
   return request('http://10.0.6.5:53001/FileStorageApp/create_resource/', {
     method: 'post',
-    data:param,
-    headers:{"Content-Type":"multipart/form-data"},
+    data:formData,
     getResponse: true,
-    responseType:'application/json',
   })
 }

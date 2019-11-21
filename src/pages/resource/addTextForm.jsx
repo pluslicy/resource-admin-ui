@@ -114,6 +114,13 @@ class AddTextForm extends React.Component{
             })
           }
         });
+        var add_text=document.getElementById("add_text")
+        console.log(add_text.style)
+        add_text.style.display="none"
+        var btn=document.getElementById("submit_btn")
+        btn.style.opacity="1";
+        btn.style.pointerEvents="auto"
+        btn.style.background="rgba(22, 155, 213, 1)"
       };
       closeAddText(e){
         var add_text=document.getElementById("add_text")
