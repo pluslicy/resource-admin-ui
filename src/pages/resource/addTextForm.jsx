@@ -94,6 +94,7 @@ class AddTextForm extends React.Component{
             console.log(arr,"ggg")
             if(values.names.length!=0){
               values.names.map((item,index)=>{
+                console.log(index)
                 if(item!=undefined){
                   arr[index].resource_name=teams[index]+item;
                 }

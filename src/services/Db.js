@@ -1,25 +1,26 @@
 import request from '@/utils/request';
 import qs from 'qs';
 /* 封装所有的异步请求 */
+var baseURL='http://10.0.6.5:16012'
 export async function findAllCata() {
-  return request('/api/mp_man_catalog/catanestlist/');
+  return request(baseURL+'/mp_man_catalog/catanestlist/');
 }
 export async function findAllVideoDalBum() {
-  return request('/api/up_man_perres/up_valbum/');
+  return request(baseURL+'/up_man_perres/up_valbum/');
 }
 export async function findAllTextDalBum() {
-  return request('/api/up_man_perres/up_dalbum/');
+  return request(baseURL+'/up_man_perres/up_dalbum/');
 }
 
 export async function findAllVideo(param) {
-  return request('/api/mp_man_res/videolist/', {
+  return request(baseURL+'/mp_man_res/videolist/', {
     method: 'get',
     params: param,
     getResponse: true,
   });
 }
 export async function findAllText(param) {
-  return request('/api/mp_man_res/docslist/', {
+  return request(baseURL+'/mp_man_res/docslist/', {
     method: 'get',
     params: param,
     getResponse: true,
@@ -27,7 +28,7 @@ export async function findAllText(param) {
 }
 export async function DeleteAllText(param) {
 
-  return request('/api/mp_man_res/del_docs/', {
+  return request(baseURL+'/mp_man_res/del_docs/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -36,7 +37,7 @@ export async function DeleteAllText(param) {
 }
 export async function UpdateTextBian(param) {
 
-  return request('/api/mp_man_res/set_docs_cata/', {
+  return request(baseURL+'/mp_man_res/set_docs_cata/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -45,7 +46,7 @@ export async function UpdateTextBian(param) {
 }
 export async function UpdateVideoBian(param) {
 
-  return request('/api/mp_man_res/set_video_cata/', {
+  return request(baseURL+'/mp_man_res/set_video_cata/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -54,7 +55,7 @@ export async function UpdateVideoBian(param) {
 }
 export async function DeleteAllVideo(param) {
 
-  return request('/api/mp_man_res/del_videos/', {
+  return request(baseURL+'/mp_man_res/del_videos/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -64,7 +65,7 @@ export async function DeleteAllVideo(param) {
 //设置文档资源的状态
 export async function EnableOrFreeze(param) {
 
-  return request('/api/mp_man_res/set_docs_frozen/', {
+  return request(baseURL+'/mp_man_res/set_docs_frozen/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -73,7 +74,7 @@ export async function EnableOrFreeze(param) {
 }
 //设置视频资源的状态
 export async function EnableOrFreezeVideo(param) {
-  return request('/api/mp_man_res/set_video_frozen/', {
+  return request(baseURL+'/mp_man_res/set_video_frozen/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -82,7 +83,7 @@ export async function EnableOrFreezeVideo(param) {
 }
 //设置文档资源的权限
 export async function PermissionText(param) {
-  return request('/api/mp_man_res/set_docs_permis/', {
+  return request(baseURL+'/mp_man_res/set_docs_permis/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -91,7 +92,7 @@ export async function PermissionText(param) {
 }
 //设置视频资源权限
 export async function PermissionVideo(param) {
-  return request('/api/mp_man_res/set_video_permis/', {
+  return request(baseURL+'/mp_man_res/set_video_permis/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -100,7 +101,7 @@ export async function PermissionVideo(param) {
 }
 //上传文档资源
 export async function UploadOneOrMore(param) {
-  return request('/api/up_man_perres/up_docsupload/', {
+  return request(baseURL+'/up_man_perres/up_docsupload/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -108,7 +109,7 @@ export async function UploadOneOrMore(param) {
   })
 }
 export async function UploadVideoOneOrMore(param) {
-  return request('/api/up_man_perres/up_videoupload/', {
+  return request(baseURL+'/up_man_perres/up_videoupload/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -117,7 +118,7 @@ export async function UploadVideoOneOrMore(param) {
 }
 // 创建文档专辑
 export async function CreateAlbum(param) {
-  return request('/api/up_man_perres/up_cre_dalbum/', {
+  return request(baseURL+'/up_man_perres/up_cre_dalbum/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
@@ -126,7 +127,7 @@ export async function CreateAlbum(param) {
 }
 // 创建视频专辑
 export async function CreateVideoAlbum(param) {
-  return request('/api/up_man_perres/up_cre_valbum/', {
+  return request(baseURL+'/up_man_perres/up_cre_valbum/', {
     method: 'post',
     data:param,
     headers:{"Content-Type":"application/json"},
