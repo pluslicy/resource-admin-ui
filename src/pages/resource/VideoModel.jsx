@@ -221,7 +221,7 @@ class VideoModel extends React.Component{
             this.state.arr.forEach((item,index)=>{
               console.log(item.id)
               var b={
-                va:"",
+                va:null,
                 catalogue:"",
                 user: 24,
                 vr_name:"",
@@ -231,10 +231,18 @@ class VideoModel extends React.Component{
                 vr_owner: 1,
                 vr_format:"",
                 vr_size:"",
-                vr_time:''
+                vr_time:0,
+                vr_suffix:'mp4',
+                attachment:[]
               }
               b.va=values.da;b.vr_name=item.resource_name;b.vr_url=item.resource_url;
-              b.vr_desc=values.zj_description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;b.vr_time=item.created_time;
+              b.vr_desc=values.zj_description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;
+              for(let i=0;i<this.props.Db.successFile.length;i++){
+                if(this.props.Db.successFile[i].textid===item.resource_id){
+                  b.attachment=this.props.Db.successFile[i].attachment;
+                  delete this.props.Db.successFile[i].textid;
+                }
+              }
               if(values.zj_vip==true){
                 b.vr_permission=0;
               }
@@ -247,7 +255,7 @@ class VideoModel extends React.Component{
               console.log(item.resource_id)
               
               var b={
-                va:"",
+                va:null,
                 catalogue:"",
                 user: 24,
                 vr_name:"",
@@ -257,7 +265,8 @@ class VideoModel extends React.Component{
                 vr_owner: 1,
                 vr_format:"",
                 vr_size:"",
-                vr_time:'',
+                vr_time:0,
+                vr_suffix:'mp4',
                 attachment:[]
               }
               
@@ -267,8 +276,8 @@ class VideoModel extends React.Component{
                   delete this.props.Db.successFile[i].textid;
                 }
               }
-              b.va=values.da;b.catalogue=parseInt(values.video_js[values.video_js.length-1]);b.vr_name=item.resource_name;b.vr_url=item.resource_url;
-              b.vr_desc=values.description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;b.vr_time=item.created_time;
+              b.catalogue=parseInt(values.video_js[values.video_js.length-1]);b.vr_name=item.resource_name;b.vr_url=item.resource_url;
+              b.vr_desc=values.description;b.vr_format=item.resource_type;b.vr_size=item.resource_size;
 
               if(values.name==true){
                 b.vr_permission=0;
@@ -432,6 +441,7 @@ class VideoModel extends React.Component{
       //   vtext:e.target.__reactInternalInstance$htlud7b3i2u
       // })
     }
+    
     render(){
         const columns = [
             {
@@ -554,7 +564,7 @@ class VideoModel extends React.Component{
             <div className="table">
                     {/* 文件上传组件 */}
                    
-                    <Upload  {...props} showUploadList={false}  beforeUpload={(file,fileList)=>{
+                    <Upload  multiple={true} {...props} showUploadList={false}  beforeUpload={(file,fileList)=>{
                         console.log(file)
                         if(fileList.length==1){
                          
@@ -700,14 +710,24 @@ class VideoModel extends React.Component{
                             <br/>
                             <ol>
                             {
+                               this.state.arr.length!=this.state.filelist.length?
+                                this.state.filelist.map((item,index)=>{
+                        
+                                  return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                  <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
+                                  <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
+                                  </li>)
+                                  }):
+                                
                                 this.state.arr.map((item,index)=>{
-
-                                return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
-                                <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
-                                </li>)
-                                })
-                            }
+                        
+                                  return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                  <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
+                                  <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
+                                  </li>)
+                                  })
+                              }
+                            
                             
                             </ol>
                         </span> <br/><br/>
