@@ -1,11 +1,11 @@
 import request from '@/utils/request';
-
+var baseURL='http://10.0.6.5:16012'
 export async function findAllComment() {
-  return request('/api/mp_man_comments/commentlist/?comment_type=1');
+  return request(baseURL+'/mp_man_comments/commentlist/?comment_type=1');
 }
 
 export async function fetchCheck(param) {
-  return request('/api/mp_man_comments/auditcomment/', {
+  return request(baseURL+'/mp_man_comments/auditcomment/', {
     method: 'post',
     data: {
       ...param,
@@ -16,7 +16,7 @@ export async function fetchCheck(param) {
 }
 
 export async function batchPass(param) {
-	return request('/api/mp_man_comments/auditscomment/', {
+	return request(baseURL+'/mp_man_comments/auditscomment/', {
 		method: 'post',
 		data: param,
 		headers: { 'Content-Type': 'application/json' },
@@ -36,11 +36,11 @@ export async function findByCondidtion(dateString) {
 	if (dateString[1] != undefined) {
 		value = dateString[1];
 	}
-	return request('/api/mp_man_comments/commentlist/?comment_type=1'+'&search=' + value + '&time_start=' + startDate + '&time_end=' + endDate);
+	return request(baseURL+'/mp_man_comments/commentlist/?comment_type=1'+'&search=' + value + '&time_start=' + startDate + '&time_end=' + endDate);
 }
 
 export async function findReplyById(param) {
-	return request('/api/mp_man_comments/commentcontext/?id='+param, {
+	return request(baseURL+'/mp_man_comments/commentcontext/?id='+param, {
 		method: 'get',
 		getResponse: true,
 	  });

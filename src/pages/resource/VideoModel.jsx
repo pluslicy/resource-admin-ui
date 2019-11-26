@@ -417,6 +417,15 @@ class VideoModel extends React.Component{
       this.props.dispatch({
         type:"Db/fetchTextLength",payload:parseInt(e.target.id)
       })
+      var arr=this.state.arr;
+      arr.forEach((item)=>{
+        if(item.resource_id==e.target.id){
+         item.flag=1;
+        }
+      })
+      this.setState({
+        arr,
+      })
       console.log(e.target.id)
       console.log(e.target.previousElementSibling.previousElementSibling.innerText);
       var add_text=document.getElementById("add_text")
@@ -712,19 +721,42 @@ class VideoModel extends React.Component{
                             {
                                this.state.arr.length!=this.state.filelist.length?
                                 this.state.filelist.map((item,index)=>{
-                        
-                                  return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                  if(item.flag){
+                                    if(item.flag===1){
+                                      return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
                                   <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
-                                  <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
+                                  <svg style={{marginTop:"0.2em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg>
+                                  
+                                  <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+重传</span>
                                   </li>)
+                                    }
+                                  }
+                                  else{
+                                    return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
+                                <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
+                                </li>)
+                                  }
                                   }):
                                 
                                 this.state.arr.map((item,index)=>{
-                        
-                                  return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                  <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
-                                  <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
-                                  </li>)
+                                  if(item.flag){
+                                    if(item.flag===1){
+                                      return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                      <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
+                                      <svg style={{marginTop:"0.2em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg>
+                              
+                                      <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+重传</span>
+                                      </li>)
+
+                                    }
+                                  }else{
+                                    return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                    <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
+                                    <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
+                                    </li>)
+                                  }
+                                 
                                   })
                               }
                             

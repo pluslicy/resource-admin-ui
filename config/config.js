@@ -281,8 +281,11 @@ export default {
     },
   },
   manifest: {
-    basePath: '/',
+    basePath: './',
   },
+  base:'./',
+  history:'hash',
+  publicPath:'./',
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
