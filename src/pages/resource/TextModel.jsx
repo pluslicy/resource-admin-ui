@@ -282,19 +282,18 @@ class TextModel extends React.Component{
     }
      //修改文档名字
     editFileName=(aa,e)=>{
-        var arr=[];
-        var brr=this.state.names;
-        this.state.filelist.forEach((item)=>{
-          arr.push(item.uid)
-        })
-        arr.forEach((item,index)=>{
-            if(item===aa.uid){
-                 brr[index]=e.target.value;
+      console.log(e.target)
+
+      console.log(this.state.arr)
+        var arr=this.state.arr;
+        arr.forEach((item)=>{
+            if(item.resource_id===parseInt(e.target.id)){
+              item.resource_name=e.target.value;
             }
         })
-
+        console.log(arr)
         this.setState({
-          names:brr
+          arr
         })
         
     }
@@ -361,7 +360,6 @@ class TextModel extends React.Component{
       })
     }
     updateFileName(e){
-      console.log(this.state.names)
       console.log(this.state.arr)
 
     }
@@ -629,11 +627,15 @@ class TextModel extends React.Component{
                         <br/>
                         <ol>
                         {
-                            this.state.filelist.map((item,index)=>{
+                          this.state.arr.length!=this.state.filelist.length?this.state.filelist.map((item,index)=>{
                             return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                            <Input onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}} onClick={this.updateFileName.bind(this)}>修改</span>} defaultValue={item.name} />
+                            <Input onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}} value={item.name} onClick={this.updateFileName.bind(this)}>修改</span>} defaultValue={item.name} />
                             </li>)
-                            })
+                            }):this.state.arr.map((item,index)=>{
+                              return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                              <Input id={item.resource_id} onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}} value={item.name} onClick={this.updateFileName.bind(this)}>修改</span>} defaultValue={item.name} />
+                              </li>)
+                              })
                         }
                         
                         </ol>

@@ -364,21 +364,19 @@ class VideoModel extends React.Component{
         btn.style.background="rgba(22, 155, 213, 1)"
     };
      //修改文档名字
-    editFileName=(aa,e)=>{
-      var arr=[];
-      var brr=this.state.names;
-      this.state.filelist.forEach((item)=>{
-        arr.push(item.uid)
-      })
-      arr.forEach((item,index)=>{
-          if(item===aa.uid){
-               brr[index]=e.target.value;
-          }
-      })
-
-      this.setState({
-        names:brr
-      })
+    editFileName=(e)=>{
+      console.log(e)
+      console.log(this.state.arr)
+        var arr=this.state.arr;
+        arr.forEach((item)=>{
+            if(item.resource_id===parseInt(e.target.id)){
+              item.resource_name=e.target.value;
+            }
+        })
+        console.log(arr)
+        this.setState({
+          arr
+        })
       
     }
     closeTiaoZheng=()=>{
@@ -393,7 +391,6 @@ class VideoModel extends React.Component{
       })
     }
     updateFileName(e){
-      console.log(this.state.names)
       console.log(this.state.arr)
 
     }
@@ -426,8 +423,9 @@ class VideoModel extends React.Component{
       this.setState({
         arr,
       })
-      console.log(e.target.id)
-      console.log(e.target.previousElementSibling.previousElementSibling.innerText);
+      // console.log(e.target.id)
+      console.log(e.currentTarget.parentNode.parentNode.previousSibling.value)
+      // console.log(e.target.previousElementSibling.previousElementSibling.innerText);
       var add_text=document.getElementById("add_text")
       
       add_text.style.display="block"
@@ -437,7 +435,7 @@ class VideoModel extends React.Component{
       btn.style.pointerEvents="none"
       btn.style.background="grey"
       this.setState({
-        textname:e.target.previousElementSibling.previousElementSibling.innerText,
+        textname:e.currentTarget.parentNode.parentNode.previousSibling.value,
         textid:e.target.id
       })
       // if(e.target!=undefined){
@@ -723,18 +721,22 @@ class VideoModel extends React.Component{
                                 this.state.filelist.map((item,index)=>{
                                   if(item.flag){
                                     if(item.flag===1){
+                                      
                                       return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                  <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
-                                  <svg style={{marginTop:"0.2em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg>
+
+                                                    <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
+                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
+                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>重传</span><svg style={{paddingTop:"0.2em",marginLeft:".5em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg></div>}  />
                                   
-                                  <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+重传</span>
                                   </li>)
                                     }
                                   }
                                   else{
                                     return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
-                                <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
+                                       <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
+                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
+                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>+文档</span></div>}  />
+                                
                                 </li>)
                                   }
                                   }):
@@ -743,17 +745,17 @@ class VideoModel extends React.Component{
                                   if(item.flag){
                                     if(item.flag===1){
                                       return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                      <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
-                                      <svg style={{marginTop:"0.2em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg>
-                              
-                                      <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+重传</span>
+                                        <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
+                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
+                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>重传</span><svg style={{paddingTop:"0.2em",marginLeft:".5em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg></div>}  />
                                       </li>)
 
                                     }
                                   }else{
                                     return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                    <div  style={{width:"80px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.resource_name}</div>
-                                    <span  style={{fontSize:"12px",color:"#3585FE"}}> &nbsp;&nbsp;修改</span> <span id={item.resource_id} onClick={this.uptext.bind(this)} style={{fontSize:"12px",color:"#3585FE",cursor:"pointer"}} key={item.id}>&nbsp;&nbsp;+文档</span>
+                                     <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
+                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
+                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>+文档</span></div>}  />
                                     </li>)
                                   }
                                  

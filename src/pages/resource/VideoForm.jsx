@@ -131,6 +131,30 @@ class VideoForm extends React.Component{
           }
 
     };
+    loadRadio(){
+      if(this.props.vt.flag=="视频"){
+        // this.setState({
+        //   key:this.props.vtest.flag
+        // })
+       
+        flag="视频"
+        return (<span><Radio value={"视频"}>视频</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
+      }else if(this.props.vt.flag=="专辑"){
+        // this.setState({
+        //   key:this.props.vtest.flag
+        // })
+
+        if(flag=="视频"){
+          flag="";
+          return (<span><Radio value={"视频"}>视频</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>)
+        }
+        
+        if(flag==""){
+          return  <span><Radio disabled value={"视频"}>视频</Radio><Radio  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio></span>
+        }
+        
+      }
+    }
     render(){
         const { getFieldDecorator } = this.props.form;
         const formItemLayout = {
@@ -153,8 +177,7 @@ class VideoForm extends React.Component{
                 
                 <Form.Item>
                       <Radio.Group value={this.props.vt.flag} style={{marginLeft:".5em",height:"40px",marginTop:"1em"}} onChange={this.onRadioChange} >
-                                       <Radio value={"视频"}>视频</Radio>
-                                       <Radio checked  value={"专辑"} style={{marginLeft:"2em"}} >专辑</Radio>
+                                  {this.loadRadio()}
                      </Radio.Group>
                 </Form.Item>
               <TabPane className={styles.tb} style={{bottom:"none"}} key="视频">
