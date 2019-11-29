@@ -9,7 +9,7 @@ import request from '@/utils/request';
 var baseURL = 'http://10.0.6.5:16012';
 
 export async function findAll() {
-  return request(baseURL + '/mp_audit_res/unau_videolist');
+  return request(baseURL + '/mp_audit_res/unau_videolist/?page=1&page_size=1000');
 }
 
 export async function fetchCheck(param) {

@@ -5,7 +5,6 @@ const Comment = {
   state: {
     comments: [],
     discuss:{},
-    // com:[],
     loading: true,
   },
   effects: {

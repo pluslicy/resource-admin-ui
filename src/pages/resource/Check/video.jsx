@@ -26,17 +26,17 @@ class Check extends React.Component {
 			selectedRowKeys: [],
 			date: [],
 			name: [],
-			page:1,
+			// page:1,
 		};
 	}
 	// 在渲染前调用
 	componentWillMount() {
 		this.props.dispatch({ 
 			type: 'video/findAll',
-			payload:{
-				page:1,
-				pageSize:10,
-			}
+			// payload:{
+			// 	page:1,
+			// 	pageSize:10,
+			// }
 		})
 	}
 	// 批量一键通过
@@ -46,8 +46,8 @@ class Check extends React.Component {
 		this.props.dispatch({ 
 			type: 'video/passVideo', 
 			payload: data,
-			page:this.state.page,
-            pageSize:10,
+			// page:this.state.page,
+            // pageSize:10,
 		 })
 	}
 	// 日期选择框
@@ -208,18 +208,18 @@ class Check extends React.Component {
 								pagination={{
 									onChange: page => {
 									  console.log(page);
-									  // let p = page - 1;
-									  // console.log(p);
-									  this.props.dispatch({
-										type:"video/findAll",
-										payload:{
-										  page:page,
-										  pageSize:10,
-										}
-									  })
-									  this.setState({
-										page:page
-									  })
+									  let p = page - 1;
+									  console.log(p);
+									//   this.props.dispatch({
+									// 	type:"video/findAll",
+									// 	payload:{
+									// 	  page:page,
+									// 	  pageSize:10,
+									// 	}
+									//   })
+									//   this.setState({
+									// 	page:page
+									//   })
 									},
 									total:this.props.video.videos.count,
 									pageSize: 10,
