@@ -20,11 +20,13 @@ class TextModel extends React.Component{
             file:{},
             ids:[],
             visible1:false,
+            visible2:false,
             visible3: false,
             percent:0,
             ok:0,
             value:"请选择方向",
             catalogue:"",
+            tname:{}
       
         }
     }
@@ -51,6 +53,17 @@ class TextModel extends React.Component{
           visible1: false,
         });
     };
+    showEditFileName(record,e){
+      var arr=this.state.arr;
+      arr.forEach((item)=>{
+        if(record.resource_id==item.resource_id){
+          item.tname=true;
+        }
+      })
+      this.setState({
+        arr
+      })
+    }
      //根据日期查询
     onChange2=(date, dateString)=>{
         
@@ -281,13 +294,13 @@ class TextModel extends React.Component{
       })
     }
      //修改文档名字
-    editFileName=(aa,e)=>{
-      console.log(e.target)
+    editFileName=(e)=>{
+      
 
       console.log(this.state.arr)
         var arr=this.state.arr;
         arr.forEach((item)=>{
-            if(item.resource_id===parseInt(e.target.id)){
+            if(item.resource_id===this.state.tname.resource_id){
               item.resource_name=e.target.value;
             }
         })
@@ -298,7 +311,6 @@ class TextModel extends React.Component{
         
     }
     handleChange2=(info)=>{
-       
         var upobj={
           resource_id:"",
           resource_name:"",
@@ -315,7 +327,7 @@ class TextModel extends React.Component{
           percent:Math.round(info.file.percent)
         })
         if (info.file.status == 'uploading') {
-          
+
         }
         // this.showModal();
         if (info.file.status === 'done') {
@@ -323,7 +335,7 @@ class TextModel extends React.Component{
           const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
           upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
           let a=this.state.ok+1;
-          arr.push(upobj)
+          arr.unshift(upobj)
           this.setState({
             ok:a,
             file:info.file,
@@ -359,9 +371,30 @@ class TextModel extends React.Component{
         catalogue:value[value.length-1]
       })
     }
-    updateFileName(e){
-      console.log(this.state.arr)
-
+    updateFileName(record,e){
+      var arr=this.state.arr;
+      arr.forEach((item)=>{
+        if(record.resource_id==item.resource_id){
+         
+          item.tname=false;
+        }
+      })
+      this.setState({
+        visible2:true,
+        tname:record,
+        arr
+      })
+    }
+    closeEditFileName(record,e){
+      var arr=this.state.arr;
+      arr.forEach((item)=>{
+        if(record.resource_id==item.resource_id){
+          item.tname=false;
+        }
+      })
+      this.setState({
+        arr
+      })
     }
     render(){
         const columns2 = [
@@ -467,25 +500,25 @@ class TextModel extends React.Component{
         },
         };
         const props = {
-             action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
-              // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-              onChange: this.handleChange2,
-              accept:".doc,.docx,.mp4",
-              data:{
-                file:this.state.file,
-                token:"dddd",
-                resource_name:this.state.names.map((item)=>{
-                  if(item===this.state.file.name) return item;
-                })
-              }
-        };
+          action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+          // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+          onChange: this.handleChange2,
+          accept:".doc,.docx,.mp4",
+          data:{
+            file:this.state.file,
+            token:"dddd",
+            resource_name:this.state.names.map((item)=>{
+              if(item===this.state.file.name) {return item;}
+            })
+          }
+    };
         return (
             <div className="table">
                 {/* 文件上传组件 */}
                 <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
-                  console.log(fileList.length)
+
                   if(fileList.length==1){
-                   
+
                     this.props.dispatch({
                       type:'Db/fetchUpdateFlag',payload:"文档"
                     })
@@ -625,29 +658,60 @@ class TextModel extends React.Component{
                     <div className={styles.left}>
                     <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的文档:
                         <br/>
+                        <div style={{border:"1px solid #efefef"}}>
                         <ol>
                         {
+                         
                           this.state.arr.length!=this.state.filelist.length?this.state.filelist.map((item,index)=>{
-                            return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                            <Input onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}} value={item.name} onClick={this.updateFileName.bind(this)}>修改</span>} defaultValue={item.name} />
-                            </li>)
+                            return ( <li    style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                           
+                            <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"100px"}}  ><span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.name}</span>
+                            {item.tname!=true?<span></span>:<span onClick={this.updateFileName.bind(this)} style={{marginLeft:"2em"}}><svg  t="1574929148750" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1316" width="16" height="16"><path d="M328.602 628.43l-61.008 137.999 138.226-60.781 0.146-0.146-77.218-77.218zM804.15 152.874l77.217 77.217-453.475 453.475-77.217-77.217zM903.297 208.17l86.973-86.973c22.604-22.604 26.036-55.821 7.666-74.192l-10.692-10.692c-18.371-18.371-51.587-14.939-74.192 7.666l-86.973 86.973 77.218 77.218z" p-id="1317"></path><path d="M940.399 902.532c0 21.328-17.289 38.617-38.617 38.617H121.718c-21.328 0-38.617-17.289-38.617-38.617V122.468c0-21.328 17.289-38.617 38.617-38.617h649.827L830.897 24.5H67.714c-24.281 0-43.964 19.683-43.964 43.964v888.072c0 24.281 19.683 43.964 43.964 43.964h888.072c24.281 0 43.964-19.683 43.964-43.964V214.874l-59.351 59.351v628.307z" p-id="1318"></path></svg></span>}
+                            </span>
+                            
+                           
+                           
+                             </li>)
                             }):this.state.arr.map((item,index)=>{
-                              return (<li style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                              <Input id={item.resource_id} onChange={this.editFileName.bind(this,item)} addonAfter={<span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}} value={item.name} onClick={this.updateFileName.bind(this)}>修改</span>} defaultValue={item.name} />
-                              </li>)
+                              
+                              return ( <li   style={{marginLeft:"-10px",marginTop:".5em",display:"flex",width:"100px"}}>
+                           
+                              <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"100px"}} ><span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.resource_name}</span>
+                                {item.tname!=true?<span></span>:<span style={{marginLeft:"2em"}}><svg  onClick={this.updateFileName.bind(this,item)}  t="1574929148750" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1316" width="16" height="16"><path d="M328.602 628.43l-61.008 137.999 138.226-60.781 0.146-0.146-77.218-77.218zM804.15 152.874l77.217 77.217-453.475 453.475-77.217-77.217zM903.297 208.17l86.973-86.973c22.604-22.604 26.036-55.821 7.666-74.192l-10.692-10.692c-18.371-18.371-51.587-14.939-74.192 7.666l-86.973 86.973 77.218 77.218z" p-id="1317"></path><path d="M940.399 902.532c0 21.328-17.289 38.617-38.617 38.617H121.718c-21.328 0-38.617-17.289-38.617-38.617V122.468c0-21.328 17.289-38.617 38.617-38.617h649.827L830.897 24.5H67.714c-24.281 0-43.964 19.683-43.964 43.964v888.072c0 24.281 19.683 43.964 43.964 43.964h888.072c24.281 0 43.964-19.683 43.964-43.964V214.874l-59.351 59.351v628.307z" p-id="1318"></path></svg></span>}
+                              </span>
+                              
+                             
+                             
+                               </li>)
                               })
                         }
                         
                         </ol>
+                        </div>
                     </span> <br/><br/>
 
                       
 
                     </div>
                     
-                    <TextForm wrappedComponentRef={this.saveFormRef} text={{flag:this.state.flag}} flag={this.state.flag}/> 
+                    <TextForm wrappedComponentRef={this.saveFormRef} text={{flag:this.state.flag}} flag={this.state.flag}>
+                      
+                    </TextForm> 
                     <Button onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
-                    </Modal>      
+                    <Modal
+                          title="修改文档文件名"
+                          visible={this.state.visible2}
+                          onOk={()=>{this.setState({tname:{},visible2:false})}}
+                          onCancel={()=>{this.setState({tname:{},visible2:false})}}
+                        >
+                          <div style={{display:'flex',justifyContent:"space-around"}}>
+                          <span style={{width:"100px"}}>文档名称：</span><Input size={'small'} onChange={this.editFileName.bind(this)} value={this.state.tname.resource_name!=undefined?this.state.tname.resource_name:""} />
+
+                          </div>
+                      </Modal>
+                    </Modal>
+                  
+
           </div>
         );
     }

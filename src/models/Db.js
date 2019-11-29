@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import { findAllCata, findAllVideo, findAllText,DeleteAllText,EnableOrFreeze,EnableOrFreezeVideo,DeleteAllVideo,
 PermissionText,PermissionVideo,findAllTextDalBum,findAllVideoDalBum,UpdateTextBian,UpdateVideoBian,UploadOneOrMore,
-UploadVideoOneOrMore,CreateAlbum,CreateVideoAlbum,UploadAttach} from '@/services/Db';
+UploadVideoOneOrMore,CreateAlbum,CreateVideoAlbum,UploadAttach,DeleteAttach} from '@/services/Db';
 
 const DbModel = {
   namespace: 'Db',
@@ -146,6 +146,12 @@ const DbModel = {
         type: 'reloadSuccessFile',payload:response.data
       });
     },
+    *fetchDeleteAttach(_, { call, put }) {
+      const response = yield call(DeleteAttach,_.payload.urls);
+      yield put({
+        type: 'deleteSuccessFile',payload:_.payload.successFile
+      });
+    },
   },
   reducers: {
     // 更新状态中的catalist
@@ -153,6 +159,12 @@ const DbModel = {
       return {
         ...state,
         catalist: action.payload,
+      };
+    },
+    deleteSuccessFile(state,action){
+      return {
+        ...state,
+        successFile: action.payload,
       };
     },
     reloadSuccessFile(state, action) {

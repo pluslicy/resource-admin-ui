@@ -146,3 +146,12 @@ export async function UploadAttach(param) {
     getResponse: true,
   })
 }
+// 删除附件
+export async function DeleteAttach(param) {
+  
+  return request('http://10.0.6.5:53001/FileStorageApp/delete_resource/', {
+    method: 'post',
+    data:{resource_urls:param},
+    getResponse: true,
+  })
+}

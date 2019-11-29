@@ -26,12 +26,15 @@ class VideoModel extends React.Component{
             value:"请选择方向",
             flag:"",
             visible1:false,
+            visible2:false,
             visible:false,
             vtext:{},
             percent:0,
             ok:0,
             textname:"",
-            textid:""
+            textid:"",
+            tname:{},
+            ataArr:[]
         }
     }
     componentDidMount(){
@@ -327,7 +330,7 @@ class VideoModel extends React.Component{
         const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
         upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
         let a=this.state.ok+1;
-        arr.push(upobj)
+        arr.unshift(upobj)
         this.setState({
           ok:a,
           file:info.file,
@@ -365,11 +368,10 @@ class VideoModel extends React.Component{
     };
      //修改文档名字
     editFileName=(e)=>{
-      console.log(e)
       console.log(this.state.arr)
         var arr=this.state.arr;
         arr.forEach((item)=>{
-            if(item.resource_id===parseInt(e.target.id)){
+            if(item.resource_id===this.state.tname.resource_id){
               item.resource_name=e.target.value;
             }
         })
@@ -377,7 +379,6 @@ class VideoModel extends React.Component{
         this.setState({
           arr
         })
-      
     }
     closeTiaoZheng=()=>{
       this.props.dispatch({
@@ -390,9 +391,19 @@ class VideoModel extends React.Component{
         visible1:false
       })
     }
-    updateFileName(e){
-      console.log(this.state.arr)
-
+    updateFileName(record,e){
+      var arr=this.state.arr;
+      arr.forEach((item)=>{
+        if(record.resource_id==item.resource_id){
+         
+          item.tname=false;
+        }
+      })
+      this.setState({
+        visible2:true,
+        tname:record,
+        arr
+      })
     }
     selectFang(value){
       var a=this.props.Db.catalist[0].childs.filter((item,index)=>{
@@ -408,23 +419,15 @@ class VideoModel extends React.Component{
         catalogue:value[value.length-1]
       })
     }
-    uptext(e){
+    uptext(record,e){
       // if(e.target.__reactInternalInstance$q2jug5y2evp)
-      console.log(e.target.id)
+
       this.props.dispatch({
-        type:"Db/fetchTextLength",payload:parseInt(e.target.id)
+        type:"Db/fetchTextLength",payload:record.resource_id
       })
-      var arr=this.state.arr;
-      arr.forEach((item)=>{
-        if(item.resource_id==e.target.id){
-         item.flag=1;
-        }
-      })
-      this.setState({
-        arr,
-      })
+     
       // console.log(e.target.id)
-      console.log(e.currentTarget.parentNode.parentNode.previousSibling.value)
+      // console.log(e.currentTarget.parentNode.parentNode.previousSibling.value)
       // console.log(e.target.previousElementSibling.previousElementSibling.innerText);
       var add_text=document.getElementById("add_text")
       
@@ -435,20 +438,71 @@ class VideoModel extends React.Component{
       btn.style.pointerEvents="none"
       btn.style.background="grey"
       this.setState({
-        textname:e.currentTarget.parentNode.parentNode.previousSibling.value,
-        textid:e.target.id
+        textname:record.resource_name,
+        textid:record.resource_id
       })
-      // if(e.target!=undefined){
-      //   this.setState({
-      //     textname:e.target.previousElementSibling.previousElemntSibling.innerText
-      //   })
-      // }
+      if(e.target!=undefined){
+        this.setState({
+          textname:record.resource_name,
+        })
+      }
      
       // this.setState({
       //   vtext:e.target.__reactInternalInstance$htlud7b3i2u
       // })
     }
-    
+    showEditFileName(record,e){
+      var arr=this.state.arr;
+      arr.forEach((item)=>{
+        if(record.resource_id==item.resource_id){
+          item.tname=true;
+        }
+      })
+      this.setState({
+        arr
+      })
+    }
+    closeEditFileName(record,e){
+      var arr=this.state.arr;
+      arr.forEach((item)=>{
+        if(record.resource_id==item.resource_id){
+          item.tname=false;
+        }
+      })
+      this.setState({
+        arr
+      })
+    }
+    findAttach(record,e){
+        var arr=this.props.Db.successFile;
+        var indexs=[];
+        var brr=arr.map((item,index)=>{
+          
+          if(item.textid==record.resource_id) {
+            indexs.push(index)
+            return item;
+          }
+        })
+        indexs.forEach((item)=>{
+          arr.splice(item,1);
+        })
+        console.log("删除后的附件还有",arr)
+        console.log("删除的附件",brr)
+        var urls=[];
+        brr.forEach((item)=>{
+          if(item.attachment.length!=0){
+            item.attachment.forEach((item,index)=>{
+              urls.push(item.attach_url);
+            })
+          } 
+        })
+        console.log(urls,arr,"参数准备")
+        this.props.dispatch({
+          type:"Db/fetchDeleteAttach",payload:{
+            urls,successFile:arr
+          }
+        })
+    }
     render(){
         const columns = [
             {
@@ -716,49 +770,52 @@ class VideoModel extends React.Component{
                         <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的视频:
                             <br/>
                             <ol>
+                            
                             {
+                              
+                               
                                this.state.arr.length!=this.state.filelist.length?
                                 this.state.filelist.map((item,index)=>{
-                                  if(item.flag){
-                                    if(item.flag===1){
-                                      
+                              
                                       return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
 
-                                                    <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
-                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
-                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>重传</span><svg style={{paddingTop:"0.2em",marginLeft:".5em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg></div>}  />
-                                  
+                              <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"150px"}}  >
+                                <span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.name}</span>
+                                  {item.tname!=true?<span></span>:<span onClick={this.updateFileName.bind(this,item)} style={{marginLeft:"1em"}}><svg t="1574994829624" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3135" width="16" height="16"><path d="M898.00592562 984.09757344H125.86445938A85.96208062 85.96208062 0 0 1 39.90237874 898.13549281V126.59460781A85.83564188 85.83564188 0 0 1 125.73802156 40.758965h514.93482938a28.80417188 28.80417188 0 1 1 0 57.60834469H154.21819625a57.0551775 57.0551775 0 0 0-57.11839688 57.11839593v714.5331225a57.03937312 57.03937312 0 0 0 57.11839688 57.18161531h715.007265a57.0551775 57.0551775 0 0 0 57.11839594-57.18161531V355.44750781a28.79626969 28.79626969 0 1 1 57.59253936 0v543.2095425a85.51954688 85.51954688 0 0 1-85.93047093 85.44052313zM431.22819406 605.5894175a28.70144063 28.70144063 0 1 1-40.58661937-40.58661937L904.7387525 48.66134469a28.68563625 28.68563625 0 1 1 40.52340094 40.58661937z m0 0" p-id="3136"></path><path d="M898.00592562 991.99995219H125.86445938A93.95928844 93.95928844 0 0 1 32 898.13549281V126.59460781A93.848655 93.848655 0 0 1 125.73802156 32.85658625h514.93482938a36.70655156 36.70655156 0 1 1 0 73.41310219H154.15497687a49.15279781 49.15279781 0 0 0-49.16860312 49.21601718v714.5331225a49.31084625 49.31084625 0 0 0 49.2318225 49.27923657h715.05467906a48.83670282 48.83670282 0 0 0 34.77046782-14.41393969 49.53211219 49.53211219 0 0 0 14.38233001-34.8494925V355.44750781a36.69864844 36.69864844 0 1 1 73.3972978 0v543.2095425a93.72221625 93.72221625 0 0 1-93.8170453 93.34290188zM125.73802156 48.66134469A78.02809125 78.02809125 0 0 0 47.80475845 126.59460781v771.540885a78.13872469 78.13872469 0 0 0 78.05970092 78.05970188h772.14146625a77.90165344 77.90165344 0 0 0 78.04389657-77.58555844v-543.2095425a20.89388999 20.89388999 0 1 0-41.78778094 0v514.61873438a65.43169969 65.43169969 0 0 1-18.96571031 46.03926093 64.53082781 64.53082781 0 0 1-46.00765125 19.04473407H154.21819625a65.13140906 65.13140906 0 0 1-65.02077561-65.083995V155.48570563A64.95755625 64.95755625 0 0 1 154.17078125 90.46492999h486.6759225a20.90179312 20.90179312 0 0 0-0.1580475-41.8035853z m285.19686281 573.30180187a36.60382031 36.60382031 0 0 1-25.84077938-62.58684281L899.12806345 43.09806969a36.588015 36.588015 0 1 1 51.68155966 51.79219312L436.79146906 611.1052775a36.68284406 36.68284406 0 0 1-25.85658468 10.85786906zM925.0004525 48.12398281a20.76745219 20.76745219 0 0 0-14.65101094 6.10063688L396.23645937 570.58187749a20.80380375 20.80380375 0 1 0 29.38104563 29.46006938l514.03395845-516.34145343a20.54618531 20.54618531 0 0 0 6.16385624-14.73003469 20.97291469 20.97291469 0 0 0-20.83067156-20.83067156z" p-id="3137"></path></svg></span>}
+                                </span>
+                            
+                                <span id={item.resource_id} style={{marginLeft:"3em"}} onClick={this.uptext.bind(this,item)}>
+                                  <svg  t="1574994459218" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2278" width="16" height="16"><path d="M768 256.576l-47.424-47.36-477.824 477.888a100.48 100.48 0 0 0 0 142.272c39.296 39.232 103.04 39.36 142.464 0.128l525.184-525.376a167.488 167.488 0 0 0 0-237.248 167.68 167.68 0 0 0-237.248-0.128L133.568 606.4c-0.256 0.128-0.384 0.384-0.64 0.64a233.92 233.92 0 0 0 0 330.88 233.792 233.792 0 0 0 331.072 0l0.576-0.64 0.064 0.128L909.184 492.8l-47.488-47.488-444.48 444.416a166.976 166.976 0 1 1-236.16-235.968l-0.064 0.128 539.648-539.648a100.736 100.736 0 0 1 142.4 142.4l-525.312 525.44a33.536 33.536 0 1 1-47.424-47.488L768 256.576z" p-id="2279" fill="#1b8cc8"></path></svg>
+
+                                </span>
+                                {
+                                    this.props.Db.successFile.some((hello)=>{
+                                      return hello.textid==item.resource_id&&hello.attachment.length!=0;
+                                    })?
+                                    <span onClick={this.findAttach.bind(this,item.resource_id)}><svg t="1574996755967" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6151" width="16" height="16"><path d="M850.538343 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764L141.103692 204.669426c-17.548678-17.534352-17.548678-45.992497 0-63.525825 17.548678-17.548678 45.977147-17.548678 63.525825 0l677.671227 677.685553c17.548678 17.534352 17.548678 45.992497 0 63.525825C873.526917 891.128807 862.032118 895.516744 850.538343 895.516744z" p-id="6152"></path><path d="M172.867116 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764-17.548678-17.534352-17.548678-45.992497 0-63.525825l677.671227-677.685553c17.548678-17.548678 45.977147-17.548678 63.525825 0 17.548678 17.534352 17.548678 45.992497 0 63.525825L204.629517 882.354979C195.85569 891.128807 184.360891 895.516744 172.867116 895.516744z" p-id="6153"></path></svg></span>
+                                    :<span></span>
+                                }    
                                   </li>)
-                                    }
-                                  }
-                                  else{
+                                }):this.state.arr.map((item,index)=>{
+                
                                     return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                       <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
-                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
-                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>+文档</span></div>}  />
+                                    <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"150px"}}  >
+                                    <span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.resource_name}</span>
+                                      {item.tname!=true?<span></span>:<span onClick={this.updateFileName.bind(this,item)} style={{marginLeft:"1em"}}><svg t="1574994829624" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3135" width="16" height="16"><path d="M898.00592562 984.09757344H125.86445938A85.96208062 85.96208062 0 0 1 39.90237874 898.13549281V126.59460781A85.83564188 85.83564188 0 0 1 125.73802156 40.758965h514.93482938a28.80417188 28.80417188 0 1 1 0 57.60834469H154.21819625a57.0551775 57.0551775 0 0 0-57.11839688 57.11839593v714.5331225a57.03937312 57.03937312 0 0 0 57.11839688 57.18161531h715.007265a57.0551775 57.0551775 0 0 0 57.11839594-57.18161531V355.44750781a28.79626969 28.79626969 0 1 1 57.59253936 0v543.2095425a85.51954688 85.51954688 0 0 1-85.93047093 85.44052313zM431.22819406 605.5894175a28.70144063 28.70144063 0 1 1-40.58661937-40.58661937L904.7387525 48.66134469a28.68563625 28.68563625 0 1 1 40.52340094 40.58661937z m0 0" p-id="3136"></path><path d="M898.00592562 991.99995219H125.86445938A93.95928844 93.95928844 0 0 1 32 898.13549281V126.59460781A93.848655 93.848655 0 0 1 125.73802156 32.85658625h514.93482938a36.70655156 36.70655156 0 1 1 0 73.41310219H154.15497687a49.15279781 49.15279781 0 0 0-49.16860312 49.21601718v714.5331225a49.31084625 49.31084625 0 0 0 49.2318225 49.27923657h715.05467906a48.83670282 48.83670282 0 0 0 34.77046782-14.41393969 49.53211219 49.53211219 0 0 0 14.38233001-34.8494925V355.44750781a36.69864844 36.69864844 0 1 1 73.3972978 0v543.2095425a93.72221625 93.72221625 0 0 1-93.8170453 93.34290188zM125.73802156 48.66134469A78.02809125 78.02809125 0 0 0 47.80475845 126.59460781v771.540885a78.13872469 78.13872469 0 0 0 78.05970092 78.05970188h772.14146625a77.90165344 77.90165344 0 0 0 78.04389657-77.58555844v-543.2095425a20.89388999 20.89388999 0 1 0-41.78778094 0v514.61873438a65.43169969 65.43169969 0 0 1-18.96571031 46.03926093 64.53082781 64.53082781 0 0 1-46.00765125 19.04473407H154.21819625a65.13140906 65.13140906 0 0 1-65.02077561-65.083995V155.48570563A64.95755625 64.95755625 0 0 1 154.17078125 90.46492999h486.6759225a20.90179312 20.90179312 0 0 0-0.1580475-41.8035853z m285.19686281 573.30180187a36.60382031 36.60382031 0 0 1-25.84077938-62.58684281L899.12806345 43.09806969a36.588015 36.588015 0 1 1 51.68155966 51.79219312L436.79146906 611.1052775a36.68284406 36.68284406 0 0 1-25.85658468 10.85786906zM925.0004525 48.12398281a20.76745219 20.76745219 0 0 0-14.65101094 6.10063688L396.23645937 570.58187749a20.80380375 20.80380375 0 1 0 29.38104563 29.46006938l514.03395845-516.34145343a20.54618531 20.54618531 0 0 0 6.16385624-14.73003469 20.97291469 20.97291469 0 0 0-20.83067156-20.83067156z" p-id="3137"></path></svg></span>}
+                                    </span>
                                 
-                                </li>)
-                                  }
-                                  }):
-                                
-                                this.state.arr.map((item,index)=>{
-                                  if(item.flag){
-                                    if(item.flag===1){
-                                      return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                        <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
-                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
-                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>重传</span><svg style={{paddingTop:"0.2em",marginLeft:".5em"}} t="1574755155826" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1112" width="14" height="14"><path d="M632 364l-240 240s-40 2-32-36L736 198s88-96 154-22 48.016 90.016-18 154c-56.768 55.008-506 503.28-543.744 514.832-49.44 15.12-119.28 16.656-178.256-56.832-90-108-28-188 0-216l28-28 316-314s42-94-66-64c-80 72-398 400-398 400S-48 666 72 836c131.568 150.368 267.808 111.104 298.576 96.352C410.672 930.672 998.56 328 998.56 328s73.44-96-24.56-208c-104-112-218-70.816-236-50.096L250 544s-38 52 16 116 100 84 146 46S710 420 710 420s24.592-93.296-78-56z" p-id="1113"></path></svg></div>}  />
-                                      </li>)
-
+                                    <span  id={item.resource_id} style={{marginLeft:"3em"}} onClick={this.uptext.bind(this,item)}>
+                                      <svg  t="1574994459218" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2278" width="16" height="16"><path d="M768 256.576l-47.424-47.36-477.824 477.888a100.48 100.48 0 0 0 0 142.272c39.296 39.232 103.04 39.36 142.464 0.128l525.184-525.376a167.488 167.488 0 0 0 0-237.248 167.68 167.68 0 0 0-237.248-0.128L133.568 606.4c-0.256 0.128-0.384 0.384-0.64 0.64a233.92 233.92 0 0 0 0 330.88 233.792 233.792 0 0 0 331.072 0l0.576-0.64 0.064 0.128L909.184 492.8l-47.488-47.488-444.48 444.416a166.976 166.976 0 1 1-236.16-235.968l-0.064 0.128 539.648-539.648a100.736 100.736 0 0 1 142.4 142.4l-525.312 525.44a33.536 33.536 0 1 1-47.424-47.488L768 256.576z" p-id="2279" fill="#1b8cc8"></path></svg>
+                                    </span>
+                                   
+                                    {
+                                    this.props.Db.successFile.some((hello)=>{
+                                      return hello.textid==item.resource_id&&hello.attachment.length!=0;
+                                    })?
+                                    <span onClick={this.findAttach.bind(this,item)}><svg t="1574996755967" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6151" width="16" height="16"><path d="M850.538343 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764L141.103692 204.669426c-17.548678-17.534352-17.548678-45.992497 0-63.525825 17.548678-17.548678 45.977147-17.548678 63.525825 0l677.671227 677.685553c17.548678 17.534352 17.548678 45.992497 0 63.525825C873.526917 891.128807 862.032118 895.516744 850.538343 895.516744z" p-id="6152"></path><path d="M172.867116 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764-17.548678-17.534352-17.548678-45.992497 0-63.525825l677.671227-677.685553c17.548678-17.548678 45.977147-17.548678 63.525825 0 17.548678 17.534352 17.548678 45.992497 0 63.525825L204.629517 882.354979C195.85569 891.128807 184.360891 895.516744 172.867116 895.516744z" p-id="6153"></path></svg></span>
+                                    :<span></span>
                                     }
-                                  }else{
-                                    return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                     <Input id={item.resource_id} onChange={this.editFileName.bind(this)} defaultValue={item.name}
-                                                      addonAfter={<div><span style={{cursor:"pointer",color:"#3585FE",fontSize:"12px"}}  
-                                                      onClick={this.updateFileName.bind(this)}>修改</span><span id={item.resource_id} style={{cursor:"pointer",color:"#3585FE",fontSize:"12px",paddingLeft:".5em"}}  onClick={this.uptext.bind(this)}>+文档</span></div>}  />
                                     </li>)
-                                  }
-                                 
                                   })
                               }
                             
@@ -775,7 +832,19 @@ class VideoModel extends React.Component{
                           <AddTextForm textname={this.state.textname} textid={this.state.textid}></AddTextForm>
                         </div>
                         <Button id="submit_btn" onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
-                        </Modal>   
+                        <Modal
+                            title="修改视频文件名"
+                            visible={this.state.visible2}
+                            onOk={()=>{this.setState({tname:{},visible2:false})}}
+                            onCancel={()=>{this.setState({tname:{},visible2:false})}}
+                          >
+                            <div style={{display:'flex',justifyContent:"space-around"}}>
+                            <span style={{width:"100px"}}>视频名称：</span><Input size={'small'} onChange={this.editFileName.bind(this)} value={this.state.tname.resource_name!=undefined?this.state.tname.resource_name:""} />
+
+                            </div>
+                        </Modal>
+                        </Modal>
+                           
                         
             </div>
         );
