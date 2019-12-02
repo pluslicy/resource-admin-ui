@@ -1,7 +1,8 @@
 import React from 'react';
 import styles from './module.less';
-import { connect } from 'dva';
+import AuthenticationForm from './AuthenticationForm'
 
+import { connect } from 'dva';
 import { Table, Button, Modal, Icon, Input, Form, Divider } from 'antd';
 
 const { Search, TextArea } = Input;
@@ -10,6 +11,7 @@ class Authentication extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      ids:[],
       visible: false,
       form: {},
     };
@@ -25,25 +27,36 @@ class Authentication extends React.Component {
   };
   // 通过审核
 	pass = (record) => {
-		var obj = {
-			"apply_status": "1",//通过
-			"id": record.id,
-		}
-		// this.props.dispatch({ type: 'video/fetchCheck', payload: obj });
-	};
-  // 批量一键通过
-	passAll = () => {
-		var data = global.constants.ids
+		var data = {
+			ids:[record.id]
+    }
 		console.log(data)
-		this.props.dispatch({ type: 'authentication/pass', payload: data})
-  }
+    
+		this.props.dispatch({ type: 'authentication/passAll', payload: data });
+  };
+  
+  // 批量一键通过
+  passAll = () => {
+
+    var data ={ 
+      ids:this.state.ids,
+    }
+		console.log(data)
+    this.props.dispatch({ type: 'authentication/passAll', payload: data})
+    
+    setTimeout(() => {
+      this.setState({
+        ids:[]
+      })
+    }, 100);
+  };
   
   // 弹出拒绝理由
   reject = (record) => {
 		this.setState({
-			visible: true,
-			id: record.id
-		});
+      visible: true,
+      ids:[record.id]
+    });
 	};
   // 关闭并提交拒绝理由
   handleOk = e => {
@@ -68,12 +81,35 @@ class Authentication extends React.Component {
       }
     });
   };
+  // 将子组件的引用在父组件中进行保存，方便后期调用
+	saveFormRef = formRef => {
+		this.formRef = formRef;
+	};
+	// 提交拒绝理由
+	handleCreate = (record) => {
+		this.setState({
+			visible: false,
+		});
+		const form = this.formRef.props.form;
+		form.validateFields((err, values) => {
+			if (!err) {
+				console.log(this.state.id)
+				var obj = {
+					// "vr_audit_status": "2",//拒绝
+					"ids": this.state.ids,
+					"refuse_reason": values.test
+				}
+        this.props.dispatch({ type: 'authentication/reject', payload: obj})
+
+			}
+		});
+	};
   // 双向绑定form
-  changeForm = e => {
-    this.setState = {
-      form: e.target.value,
-    };
-  };
+  // changeForm = e => {
+  //   this.setState = {
+  //     form: e.target.value,
+  //   };
+  // };
 
   render() {
     const columns = [
@@ -112,21 +148,22 @@ class Authentication extends React.Component {
 			}
 		];
     const rowSelection = {
+      selectedRowKeys:this.state.ids,
       onChange: (selectedRowKeys, selectedRows) => {
+        this.setState({
+          ids:selectedRowKeys
+        })
         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      getCheckboxProps: record => ({
-        disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name,
-      }),
+      }
     };
+
     return (
       <div className={styles.content}>
         <div className="btns">
           {/* 表格 */}
           <Table
-								size="small"
-								// bordered
+                size="small"
+                rowKey="id"
 								rowSelection={rowSelection}
 								columns={columns}
 								dataSource={this.props.authentication.authentications}
@@ -158,18 +195,24 @@ class Authentication extends React.Component {
             一键通过
           </Button>
         </div>
-        <Modal
-          title="拒绝的理由"
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-        >
-          <Form onSubmit={this.handleSubmit} className="login-form">
-            <Form.Item label="">
-              <TextArea autosize={{ minRows: 6, maxRows: 10 }} onChange={this.changeForm} />
-            </Form.Item>
-          </Form>
-        </Modal>
+        {/* 表单 */}
+        <AuthenticationForm
+							title="拒绝的理由"
+							wrappedComponentRef={this.saveFormRef}
+							visible={this.state.visible}
+							onOk={this.handleOk}
+							onCancel={this.handleCancel}
+							onCreate={this.handleCreate}
+						>
+							<Form onSubmit={this.handleOk}>
+								<Form.Item>
+									<Input autosize={{ minRows: 6, maxRows: 10 }} placeholder="请输入拒绝理由..." />
+								</Form.Item>
+								<Form.Item >
+									<Button htmlType={'submit'}>提交</Button>
+								</Form.Item>
+							</Form>
+						</AuthenticationForm>
       </div>
     );
   }

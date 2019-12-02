@@ -1,4 +1,4 @@
-import {findAll,passAll} from "@/services/authentication" 
+import {findAll,passAndPassAll,reject} from "@/services/authentication" 
 
 const Authentication = {
     namespace:"authentication",
@@ -15,7 +15,13 @@ const Authentication = {
             });
         },
         *passAll(_, { call, put }) {
-            const response = yield call(passAll, _.payload);
+            const response = yield call(passAndPassAll, _.payload);
+            yield put({
+              type: 'findAll',
+            });
+          },
+        *reject(_, { call, put }) {
+            const response = yield call(reject, _.payload);
             yield put({
               type: 'findAll',
             });

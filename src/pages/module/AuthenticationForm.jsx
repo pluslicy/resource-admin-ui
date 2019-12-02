@@ -14,7 +14,7 @@ class AuthenticationForm extends React.Component {
     const { visible, onCancel, onCreate, form, create } = this.props;
     const { getFieldDecorator } = form;
     // 将表单中没有出现的值做一个双向数据绑定
-    getFieldDecorator('id');
+    getFieldDecorator('ids');
     return (
       <Modal visible={visible} title="拒绝的理由" okText="拒绝" onCancel={onCancel} onOk={onCreate}>
         <Form layout="vertical" id={1}>

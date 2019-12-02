@@ -7,15 +7,24 @@ export async function findAll(){
     return request(baseURL+"/mp_man_module/get_certification_list/");
 }
 //批量通过
-export async function passAll(ids) {
-    var obj = {
-      ids: ids,
-    };
+export async function passAndPassAll(param) {
     return request(baseURL + '/mp_man_module/audit_certification/', {
       method: 'post',
-      data: obj,
+      data:param,
       headers: { 'Content-Type': 'application/json' },
       getResponse: true,
     });
   }
-  
+
+//拒绝审核
+export async function reject(param) {
+  // var obj = {
+  //   ids: ids,
+  // };
+  return request(baseURL + '/mp_man_module/unaudit_certification/', {
+    method: 'post',
+    data: param,
+    headers: { 'Content-Type': 'application/json' },
+    getResponse: true,
+  });
+}

@@ -143,6 +143,7 @@ class Check extends React.Component {
 			}
 			this.props.dispatch({ type: 'word/fetchCheck', payload: obj });
 		});
+		form.resetFields();
 	};
 	// 关闭拒绝理由
 	handleCancel = e => {

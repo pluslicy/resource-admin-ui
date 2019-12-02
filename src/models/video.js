@@ -5,6 +5,7 @@ export default {
   state: {
     loading: true,
     videos: [],
+    count:"",
   },
   effects: {
     *findAll(_, { call, put }) {
@@ -15,10 +16,14 @@ export default {
       });
     },
     *fetchCheck(_, { call, put }) {
-      const response = yield call(fetchCheck, _.payload);
-      yield put({
-        type: 'findAll',
-      });
+      const response = yield call(fetchCheck, _.payload.obj);
+      yield put ({
+        type:'findAll',
+        payload:{
+          page:_.payload.page,
+          pageSize:_.payload.pageSize,
+        }
+      })
     },
     *findByCondidtion(_, { call, put }) {
       const response = yield call(findByCondidtion, _.payload);
@@ -28,10 +33,14 @@ export default {
       });
     },
     *passVideo(_, { call, put }) {
-      const response = yield call(passVideo, _.payload);
-      yield put({
-        type: 'findAll',
-      });
+      const response = yield call(passVideo, _.payload.obj);
+      yield put ({
+        type:'findAll',
+        payload:{
+          page:_.payload.page,
+          pageSize:_.payload.pageSize,
+        }
+      })
     },
   },
   reducers: {
@@ -39,6 +48,7 @@ export default {
       return {
         ...state,
         videos: action.payload,
+        count:action.payload.count,
         loading: false,
       };
     },

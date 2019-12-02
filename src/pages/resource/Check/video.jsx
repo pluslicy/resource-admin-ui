@@ -26,17 +26,18 @@ class Check extends React.Component {
 			selectedRowKeys: [],
 			date: [],
 			name: [],
-			// page:1,
+			pathurl:"",
+			page:1,
 		};
 	}
 	// 在渲染前调用
 	componentWillMount() {
 		this.props.dispatch({ 
 			type: 'video/findAll',
-			// payload:{
-			// 	page:1,
-			// 	pageSize:10,
-			// }
+			payload:{
+				page:1,
+				pageSize:10,
+			}
 		})
 	}
 	// 批量一键通过
@@ -45,9 +46,12 @@ class Check extends React.Component {
 		console.log(data)
 		this.props.dispatch({ 
 			type: 'video/passVideo', 
-			payload: data,
-			// page:this.state.page,
-            // pageSize:10,
+			payload: {
+				obj:data,
+				page:this.state.page,
+            	pageSize:10,
+			}
+			
 		 })
 	}
 	// 日期选择框
@@ -80,9 +84,10 @@ class Check extends React.Component {
 		});
 	};
 	// 弹出详细视频
-	showVideo = () => {
+	showVideo = record=> {
 		this.setState({
 			visible2: true,
+			pathurl:record.vr_url,
 		});
 	};
 	// 将子组件的引用在父组件中进行保存，方便后期调用
@@ -103,9 +108,12 @@ class Check extends React.Component {
 					"id": this.state.id,
 					"vr_audit_decs": values.test
 				}
-				this.props.dispatch({ type: 'video/fetchCheck', payload: obj });
+				this.props.dispatch({ type: 'video/fetchCheck', payload: {
+					obj,page:this.state.page,pageSize:10
+				}});
 			}
 		});
+		form.resetFields();
 	};
 	// 视频通过审核
 	passVideo = (record) => {
@@ -114,7 +122,10 @@ class Check extends React.Component {
 			"id": record.id,
 			"vr_audit_decs": "审核通过"
 		}
-		this.props.dispatch({ type: 'video/fetchCheck', payload: obj });
+		this.props.dispatch({ type: 'video/fetchCheck', payload: {
+			obj,page:this.state.page,pageSize:10
+		} });
+		
 	};
 	// 关闭拒绝理由弹框
 	handleCancel = e => {
@@ -171,11 +182,11 @@ class Check extends React.Component {
 				render: (record) => {
 					if (record.vr_audit_status === 1) {
 						return (
-							<div><span>已通过</span></div>
+							<div><span style={{ color: '#52a647' }}>已通过</span></div>
 						);
 					} else if (record.vr_audit_status === 2) {
 						return (
-							<div><span>已拒绝</span></div>
+							<div><span style={{ color: 'red' }}>已拒绝</span></div>
 						);
 					} else {
 						return (
@@ -208,18 +219,18 @@ class Check extends React.Component {
 								pagination={{
 									onChange: page => {
 									  console.log(page);
-									  let p = page - 1;
-									  console.log(p);
-									//   this.props.dispatch({
-									// 	type:"video/findAll",
-									// 	payload:{
-									// 	  page:page,
-									// 	  pageSize:10,
-									// 	}
-									//   })
-									//   this.setState({
-									// 	page:page
-									//   })
+									//   let p = page - 1;
+									//   console.log(p);
+									  this.props.dispatch({
+										type:"video/findAll",
+										payload:{
+										  page:page,
+										  pageSize:10,
+										}
+									  })
+									  this.setState({
+										page:page
+									  })
 									},
 									total:this.props.video.videos.count,
 									pageSize: 10,
@@ -267,7 +278,7 @@ class Check extends React.Component {
 							onCancel={this.handleCancel2}
 						>
 							<video width="100%" height="100%" controls>
-								<source src="D:/a.mp4" type="video/mp4" />
+								<source src={this.state.pathurl} />
 							</video>
 						</Modal>
 					</TabPane>
