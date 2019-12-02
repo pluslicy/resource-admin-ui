@@ -1,88 +1,112 @@
 import { message } from 'antd';
-import {queryUsers,queryRoles,DeleteAllUsers,AddUser,EnableOrFreeze,editUsersMessage, } from '@/services/User/user';
+import {
+  queryUsers,
+  queryRoles,
+  DeleteAllUsers,
+  AddUser,
+  EnableOrFreeze,
+  editUsersMessage,
+  editUsersRoles,
+} from '@/services/User/user';
 
 const UserModel = {
   namespace: 'users',
   state: {
     user: [],
-    userSearch:{
-        bytime:false,
-        user_gender:"",
-        is_active:"",
-        groups:undefined,
-        search:"",
-        page:1,
-        pageSize:10
+    userSearch: {
+      bytime: false,
+      user_gender: '',
+      is_active: '',
+      groups: undefined,
+      search: '',
+      page: 1,
+      pageSize: 10,
     },
     visible: false,
-    roles:[],
-    count:"",
-   
+    roles: [],
+    count: '',
   },
   effects: {
     // 获取所有用户信息
     *fetchUser(_, { call, put }) {
-      const response = yield call(queryUsers,_.payload);
+      // alert(JSON.stringify(_.payload))
+      const response = yield call(queryUsers, _.payload);
       yield put({
         type: 'reloadUsers',
-        payload: response});
+        payload: response,
+      });
     },
     // 获取所有角色信息
     *fetchRole(_, { call, put }) {
-        const response = yield call(queryRoles);
-        yield put({
-          type: 'reloadRoles',
-          payload: response});
+      const response = yield call(queryRoles);
+      yield put({
+        type: 'reloadRoles',
+        payload: response,
+      });
     },
-    
-    //批量设置用户状态
-    *fetchEnableOrFreeze(_, { call, put }) {
-      const response = yield call(EnableOrFreeze,_.payload.status);
+    // 修改用户角色信息
+    *editUsersRole(_, { call, put }) {
+      const response = yield call(editUsersRoles, _.payload.obj);
       yield put({
         type: 'fetchUser',
-        payload:{
-          page:_.payload.page,
-          pageSize:_.payload.pageSize
-        }
+        payload: {
+          page: _.payload.page,
+          pageSize: _.payload.pageSize,
+        },
+      });
+    },
+
+    //批量设置用户状态
+    *fetchEnableOrFreeze(_, { call, put }) {
+      const response = yield call(EnableOrFreeze, _.payload.status);
+      yield put({
+        type: 'fetchUser',
+        payload: {
+          page: _.payload.page,
+          pageSize: _.payload.pageSize,
+        },
       });
     },
     // 修改用户
     *editUsers(_, { call, put }) {
-      const response = yield call(editUsersMessage, _.payload);
+      const response = yield call(editUsersMessage, _.payload.va);
       yield put({
         type: 'fetchUser',
+        payload: {
+          page: _.payload.page,
+          pageSize: _.payload.pageSize,
+        },
       });
     },
     //批量删除用户
     *fetchDeleteUsers(_, { call, put }) {
-      const response = yield call(DeleteAllUsers,{ids:_.payload.values});
+      const response = yield call(DeleteAllUsers, { ids: _.payload.values });
       yield put({
         type: 'fetchUser',
-        payload:{
-          page:_.payload.page,
-          pageSize:_.payload.pageSize
-        }
+        payload: {
+          page: _.payload.page,
+          pageSize: _.payload.pageSize,
+        },
       });
     },
     // 搜索
     *fetchUsersQuery(_, { call, put }) {
-    
       yield put({
         type: 'reloadUserSearch',
-        payload: _.payload});
+        payload: _.payload,
+      });
     },
     //添加用户
     *AddUsers(_, { call, put }) {
-      const response = yield call(AddUser,_.payload.values);
+      const response = yield call(AddUser, _.payload.values);
       yield put({
         type: 'fetchUser',
-        payload:{
-          page:_.payload.page,
-          pageSize:_.payload.pageSize
-        }
+        payload: {
+          page: _.payload.page,
+          pageSize: _.payload.pageSize,
+        },
       });
     },
-
   },
   reducers: {
     // 更改模态框的显示状态
@@ -94,17 +118,18 @@ const UserModel = {
     },
     // 更新状态中的users
     reloadUsers(state, action) {
+      console.log(JSON.stringify(action.payload.results));
       return {
         ...state,
         user: action.payload.results,
-        count:action.payload.count,
+        count: action.payload.count,
       };
     },
-    reloadUserSearch(state,action){
-      return{
+    reloadUserSearch(state, action) {
+      return {
         ...state,
-        userSearch:action.payload
-      }
+        userSearch: action.payload,
+      };
     },
     reloadRoles(state, action) {
       return {
