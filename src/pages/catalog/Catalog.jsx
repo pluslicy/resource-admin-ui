@@ -14,10 +14,10 @@ class Catalog extends React.Component {
       id: '',
       cenid: '',
       cata_name: '',
-      new_name: '',
       value: '',
       moveCenId: '',
       target_id: '',
+      edit:{}
     };
   }
 
@@ -78,11 +78,13 @@ class Catalog extends React.Component {
       });
     }
   };
-
+  inputEdit=(e)=>{
+    console.log(e.target.value)
+  }
   handleOkEditName = e => {
     let edit = {
-      id: this.state.id,
-      catalogue_name: this.state.new_name,
+      id: this.state.edit.id,
+      catalogue_name: this.state.edit.catalogue_name,
     };
     // console.log(this.props.dispatch);
     this.props.dispatch({
@@ -93,7 +95,7 @@ class Catalog extends React.Component {
       visibleEdit: false,
     });
     this.setState({
-      new_name: '',
+      edit:{}
     });
   };
 
@@ -105,9 +107,11 @@ class Catalog extends React.Component {
   };
 
   setEditName = e => {
+    var obj=this.state.edit;
+    obj.catalogue_name=e.target.value;
     // console.log(e.target.value)
     this.setState({
-      new_name: e.target.value,
+      edit: obj
     });
   };
   // 删除目录模态框
@@ -193,8 +197,9 @@ class Catalog extends React.Component {
   }
 
   onSelect = (selectedKeys, e) => {
+    // console.log(e,selectedKeys)
     if (e.selectedNodes[0] != null) {
-      // console.log(e.selectedNodes[0].props.dataRef)
+      console.log(e.selectedNodes[0].props.dataRef)
       let str = e.selectedNodes[0].props.dataRef.catalogue_path;
       let arr = str.split('.');
       // console.log(arr.length)
@@ -202,6 +207,7 @@ class Catalog extends React.Component {
       this.setState({
         id: e.selectedNodes[0].props.dataRef.id,
         cenid: cenid,
+        edit:e.selectedNodes[0].props.dataRef
       });
     }
   };
@@ -304,11 +310,13 @@ class Catalog extends React.Component {
             >
               <Input
                 style={{ width: '200px', marginLeft: '2em', display: 'none' }}
-                value={this.state.id}
+                onChange={this.state.inputEdit}
+                
+
               />
               编目名称
               <Input
-                value={this.state.new_name}
+                value={this.state.edit.catalogue_name}
                 style={{ width: '200px', marginLeft: '2em' }}
                 onChange={this.setEditName}
               />
