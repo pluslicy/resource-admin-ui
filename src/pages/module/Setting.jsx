@@ -1,13 +1,67 @@
 import React from 'react';
 import { Button, Radio, Table, Input, Menu, Dropdown, Icon, Switch } from 'antd';
+import { connect } from 'dva';
 import styles from './Setting.less';
 class Setting extends React.Component {
-  state = {
-    value: 1,
-    switch1_value: 0,
-    switch2_value: 0,
-    switch3_value: 0,
-  };
+  constructor(props) {
+    console.log(props,'**********')
+    super(props);
+    this.state = {
+      isDisabled: true,
+      comment_status: false,
+      upload_status: false,
+      apply_status: false,
+    }
+  }
+
+  componentWillMount() {
+    // 需要异步一起执行的方法
+    this.props.dispatch({ type: 'setting/getSysSetting' });
+    this.props.dispatch({ type: 'setting/getCatalevelList' });
+    this.props.dispatch({ type: 'setting/getCatalevelSetting' });
+  }
+
+  componentDidMount() {
+    console.log()
+    // 组件挂载到DOM后调用
+    // this.changeSwitch('comment_status')
+    // this.changeSwitch('upload_status')
+    // this.changeSwitch('apply_status')
+
+  }
+  componentWillUpdate(){
+    // 在组件接收到新的props或者state但还没有render时被调用。在初始化时不会被调用。
+    console.log(this.props.setting.SysSettingDatas.data)
+    console.log(this.props.setting.SysSettingDatas.data)
+    console.log(this.props.setting.SysSettingDatas.data)
+
+    // this.changeSwitch('comment_status')
+    // this.changeSwitch('upload_status')
+    // this.changeSwitch('apply_status')
+  }
+
+  componentWillReceiveProps(nextProps) {
+  //   // 该方法当props发生变化时执行，初始化render时不执行
+  //   this.componentWillMount
+  //   console.log(nextProps.setting, '===')
+  //   console.log(this.props.setting, '---')
+  //   if (nextProps !== this.props) {
+  //     let set = nextProps.setting.SysSettingDatas.data
+  //     if (nextProps == ! null) {
+  //       alert(123)
+  //       this.setState({
+  //         comment_status: set.comment_status,
+  //         upload_status: set.upload_status,
+  //         apply_status: set.apply_status,
+  //       })
+  //     }
+  //     if (this.state === ! null) {
+  //       alert(999)
+  //       console.log(this.state)
+
+  //     }
+  //   }
+  }
 
   onChange = e => {
     console.log('radio checked', e.target.value);
@@ -15,94 +69,51 @@ class Setting extends React.Component {
       value: e.target.value,
     });
   };
-  changeSwitch1 = e => {
-    // document.getElementById('imgs1').setAttribute('style','background-image:url(https://gss0.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/8d5494eef01f3a29c3907a9c9725bc315c607c0c.jpg)')
-    if (this.state.switch1_value === 0) {
-      var oDiv = document.getElementById('switch1');
-      oDiv.removeChild(document.getElementById('img'));
-      var mytr = document.createElement('img');
-      mytr.id = 'img';
-      mytr.src = require('../../../images/setting/p1.png');
-      oDiv.appendChild(mytr);
-      this.setState({ switch1_value: 1 });
-    } else {
-      var oDiv = document.getElementById('switch1');
-      oDiv.removeChild(document.getElementById('img'));
-      var mytr = document.createElement('img');
-      mytr.id = 'img';
-      mytr.src = require('../../../images/setting/p0.png');
-      oDiv.appendChild(mytr);
-      this.setState({ switch1_value: 0 });
-    }
-  };
 
-  changeSwitch2 = e => {
-    if (this.state.switch2_value === 0) {
-      var oDiv = document.getElementById('switch2');
-      oDiv.removeChild(document.getElementById('img2'));
+  changeSwitch(x) {
+    console.log(this.props.setting.SysSettingDatas.data,'===---')
+    if (this.props.setting.SysSettingDatas.data[x] === true) {
+      console.log('true')
+      var oDiv = document.getElementById(x);
+      oDiv.removeChild(document.getElementById('img_' + x));
       var mytr = document.createElement('img');
-      mytr.id = 'img2';
+      mytr.id = 'img_' + x;
       mytr.src = require('../../../images/setting/p1.png');
       oDiv.appendChild(mytr);
-      this.setState({ switch2_value: 1 });
-    } else {
-      var oDiv = document.getElementById('switch2');
-      oDiv.removeChild(document.getElementById('img2'));
+      this.setState({ [x]: false });
+    } else if (this.props.setting.SysSettingDatas.data[x] === false) {
+      console.log('false')
+      var oDiv = document.getElementById(x);
+      oDiv.removeChild(document.getElementById('img_' + x));
       var mytr = document.createElement('img');
-      mytr.id = 'img2';
+      mytr.id = 'img_' + x;
       mytr.src = require('../../../images/setting/p0.png');
       oDiv.appendChild(mytr);
-      this.setState({ switch2_value: 0 });
-    }
-  };
-  changeSwitch3 = e => {
-    if (this.state.switch3_value === 0) {
-      var oDiv = document.getElementById('switch3');
-      oDiv.removeChild(document.getElementById('img3'));
-      var mytr = document.createElement('img');
-      mytr.id = 'img3';
-      mytr.src = require('../../../images/setting/p1.png');
-      oDiv.appendChild(mytr);
-      this.setState({ switch3_value: 1 });
-    } else {
-      var oDiv = document.getElementById('switch3');
-      oDiv.removeChild(document.getElementById('img3'));
-      var mytr = document.createElement('img');
-      mytr.id = 'img3';
-      mytr.src = require('../../../images/setting/p0.png');
-      oDiv.appendChild(mytr);
-      this.setState({ switch3_value: 0 });
+      this.setState({ [x]: true });
     }
   };
 
   render() {
-    // 下拉菜单
-    const menu = (
-      <Menu>
-        <Menu.Item key="0">
-          <a href="http://www.alipay.com/">1st menu item</a>
-        </Menu.Item>
-        <Menu.Item key="1">
-          <a href="http://www.taobao.com/">2nd menu item</a>
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="3">3rd menu item</Menu.Item>
-      </Menu>
-    );
-
     return (
       <div>
         <div className={styles.contain}>
+          <Button onClick={() => {
+            console.log(this.props.setting)
+          }}>设置状态</Button>
+
+          {/* <Button onClick={() => this.changeSwitch('comment_status')}>设置状态</Button>
+          <Button onClick={() => this.changeSwitch('upload_status')}>设置状态</Button>
+          <Button onClick={() => this.changeSwitch('apply_status')}>设置状态</Button> */}
           <p>系统一键开关</p>
           <div className={styles.switch_div}>
             <div
-              id="switch1"
+              id="comment_status"
               className={styles.imgs}
               onClick={() => {
-                this.changeSwitch1();
+                this.changeSwitch('comment_status');
               }}
             >
-              <img id="img" src={require('../../../images/setting/p0.png')} />
+              <img id="img_comment_status" src={require('../../../images/setting/p0.png')} />
             </div>
             <div>
               <p className={styles.imgsp}>评论开关</p>
@@ -113,13 +124,13 @@ class Setting extends React.Component {
           </div>
           <div className={styles.switch_div}>
             <div
-              id="switch2"
+              id="upload_status"
               className={styles.imgs}
               onClick={() => {
-                this.changeSwitch2();
+                this.changeSwitch('upload_status');
               }}
             >
-              <img id="img2" src={require('../../../images/setting/p0.png')} />
+              <img id="img_upload_status" src={require('../../../images/setting/p0.png')} />
             </div>
             <div className={styles.imgsp}>
               <p>上传开关</p>
@@ -130,13 +141,13 @@ class Setting extends React.Component {
           </div>
           <div className={styles.switch_div}>
             <div
-              id="switch3"
+              id="apply_status"
               className={styles.imgs}
               onClick={() => {
-                this.changeSwitch3();
+                this.changeSwitch('apply_status');
               }}
             >
-              <img id="img3" src={require('../../../images/setting/p0.png')} />
+              <img id="img_apply_status" src={require('../../../images/setting/p0.png')} />
             </div>
             <div className={styles.imgsp}>
               <p>申请认证开关</p>
@@ -168,6 +179,7 @@ class Setting extends React.Component {
               size="small"
               placeholder="给你的编目起名"
             />
+            <Button type="dashed" disabled={this.state.isDisabled}>Dashed(disabled)</Button>
           </div>
         </div>
         <div
@@ -204,9 +216,10 @@ class Setting extends React.Component {
             &nbsp;级编目&nbsp;<a>设置</a>
           </div>
         </div>
-      </div>
+      </div >
     );
   }
 }
 
-export default Setting;
+export default connect(({ setting }) => ({ setting }))(Setting);
+

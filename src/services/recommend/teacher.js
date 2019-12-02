@@ -1,8 +1,8 @@
 import request from '@/utils/request';
 /**
- * @Description: 模块管理>资源榜单>文档榜单
- * @ClassAuthor: rendc
- * @Date: 2019-11-08 16:27:59
+ * @Description: 模块管理>资源榜单>教师推荐页面
+ * @PageAuthor: rendc
+ * @Date: 2019-11-22 10:27:45
  */
 
 var baseURL = 'http://10.0.6.5:16012';
