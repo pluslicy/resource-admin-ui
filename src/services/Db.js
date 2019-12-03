@@ -54,7 +54,6 @@ export async function UpdateVideoBian(param) {
   })
 }
 export async function DeleteAllVideo(param) {
-
   return request(baseURL+'/mp_man_res/del_videos/', {
     method: 'post',
     data:param,

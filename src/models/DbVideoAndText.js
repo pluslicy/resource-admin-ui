@@ -13,7 +13,9 @@ const DbVideoAndTextModel = {
         vr_permission:"",
         vr_enable:'',
         catalogue_path:"",
-        catalogue:""
+        catalogue:"",
+        page:1,
+        page_size:5
     },
     tq:{
         dr_created_time_start:"",
@@ -25,7 +27,9 @@ const DbVideoAndTextModel = {
         dr_format:"",
         dr_enable:"",
         catalogue_path:"",
-        catalogue:""
+        catalogue:"",
+        page:1,
+        page_size:5
     },
     flag:""
   },

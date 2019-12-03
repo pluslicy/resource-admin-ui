@@ -19,6 +19,7 @@ class TextModel extends React.Component{
             filelist:[],
             file:{},
             ids:[],
+            length:0,
             visible1:false,
             visible2:false,
             visible3: false,
@@ -30,29 +31,11 @@ class TextModel extends React.Component{
       
         }
     }
-    handleCancel = e => {
-    
-        this.setState({
-          visible1: false,
-          visible3:false,
-          filelist:[],
-          percent:0,
-          file:{}
-        });
-        // this.props.dispatch({
-        //   type:"Db/fetchUpdateFlag",payload:""
-        // })
-    };
     componentDidMount(){
-        this.props.dispatch({
-            type:"Db/fetchText"
-     })
+      this.props.dispatch({
+          type:"Db/fetchText",payload:{...this.props.vt.tq,...{page:1}}
+       })
     }
-    handleCancel1 = e => {
-        this.setState({
-          visible1: false,
-        });
-    };
     showEditFileName(record,e){
       var arr=this.state.arr;
       arr.forEach((item)=>{
@@ -62,6 +45,24 @@ class TextModel extends React.Component{
       })
       this.setState({
         arr
+      })
+    }
+    componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
+      this.setState({textQuery:{...this.state.textQuery,...{catalogue_path:nextProps.treekey}}});
+    }
+    selectFang(value){ 
+      var a=this.props.Db.catalist[0].childs.filter((item,index)=>{
+        if(item.id==value) return item;
+      })
+      this.setState({
+        childs:a[0].childs,
+        value
+      })
+     
+    }
+    setBianMu=(value, selectedOptions)=>{
+      this.setState({
+        catalogue:value[value.length-1]
       })
     }
      //根据日期查询
@@ -89,13 +90,22 @@ class TextModel extends React.Component{
             type:"Db/fetchText",payload:tq
           }) 
     }
+    setSearch(e){
+      //  console.log(e.target.value)
+       var tq={...this.props.vt.tq,...{search:e.target.value}};
+       this.props.dispatch({
+        type:"vt/fetchTextQuery",payload:tq
+      })
+   }
     //批量删除文档完成
     batchDelete=()=>{
         this.props.dispatch({
             type:"Db/fetchDeleteText",
-            payload:this.state.ids
+            payload:{ids:this.state.ids,tq:this.props.vt.tq}
         })
-        
+        setTimeout(()=>{
+          this.setState({ids:[]})
+        },200)
     }
   // 批量启用和冻结 视频和文档完成
     batchEnableOrFreeze=(e)=>{
@@ -103,22 +113,26 @@ class TextModel extends React.Component{
         this.props.dispatch({
             type:"Db/fetchEnableOrFreeze",
             payload:{
-            dr_enable:0,
-            ids:this.state.ids
-            }
+              params:{
+              dr_enable:0,
+              ids:this.state.ids
+            },tq:this.props.vt.tq}
         })
         }else{
         this.props.dispatch({
             type:"Db/fetchEnableOrFreeze",
             payload:{
-            dr_enable:1,
-            ids:this.state.ids
-            }
+              params:{
+              dr_enable:1,
+              ids:this.state.ids
+            },tq:this.props.vt.tq}
         }) }
+        setTimeout(()=>{
+          this.setState({ids:[]})
+        },200)
     }
-  //根据权限查询（完成）
+    //根据权限查询（完成）
     handleChange3=(value)=>{
-        
         var tq={...this.props.vt.tq,...{dr_permission:value}};
         this.props.dispatch({
           type:"vt/fetchTextQuery",payload:tq
@@ -126,7 +140,7 @@ class TextModel extends React.Component{
         this.props.dispatch({
         type:"Db/fetchText",payload:tq
         })
-    
+        
     }
     //根据格式查询(完成)
     handleChange4=(value)=>{
@@ -151,27 +165,30 @@ class TextModel extends React.Component{
         })
 
     }
+    //设置权限
     handleChange=(record,e)=>{
        if(e._owner.key=="dr_permission"){
         this.props.dispatch({
             type:"Db/fetchPermissionText",payload:{
-            dr_permission: record,
-            id: e._owner.pendingProps.record.id
+              params:{  dr_permission: record,
+                id: e._owner.pendingProps.record.id},
+              tq:this.props.vt.tq
             }
         })
         }else{
             this.props.dispatch({
                 type:"Db/fetchEnableOrFreeze",
                 payload:{
-                dr_enable:record,
-                ids:[e._owner.pendingProps.record.id]
+                params:{ dr_enable:record,
+                  ids:[e._owner.pendingProps.record.id]},
+                tq:this.props.vt.tq
                 }
             })
         }
     }
-      //根据时间排序(完毕)
+    //根据时间排序(完毕)
     checkTimeChange=(e)=> { 
-        var tq={...this.props.vt.tq,...{bytime:`${e.target.checked}`}};
+        var tq={...this.props.vt.tq,...{bytime:e.target.checked}};
         this.props.dispatch({
           type:"vt/fetchTextQuery",payload:tq
         })
@@ -181,12 +198,12 @@ class TextModel extends React.Component{
     }
     //根据热度排序(完毕)
     checkHotChange=(e)=>{
-        var tq={...this.props.vt.tq,...{byhot:`${e.target.checked}`}};
+        var tq={...this.props.vt.tq,...{byhot:e.target.checked}};
         this.props.dispatch({
           type:"vt/fetchTextQuery",payload:tq
         })
         this.props.dispatch({
-        type:"Db/fetchText",payload:tq
+          type:"Db/fetchText",payload:tq
         })
     }
     //展示调整编目
@@ -196,6 +213,19 @@ class TextModel extends React.Component{
         childs:"",
         value:"请选择方向"
         });
+    }
+    //调整编目
+    closeTiaoZheng=()=>{
+      this.props.dispatch({
+        type:"Db/fetchUpdateText",payload:{params:{ids:this.state.ids,catalogue:this.state.catalogue},tq:this.props.vt.tq}
+      })
+     
+      this.setState({
+        visible1:false
+      })
+      setTimeout(()=>{
+        this.setState({ids:[]})
+      },200)
     }
     showModal=(file,fileList)=>{
         
@@ -210,6 +240,7 @@ class TextModel extends React.Component{
     // 关闭模态框
     handleOk = e => {
     // 提交表单
+    console.log(this.state.arr)
     e.preventDefault();
     const { form } = this.formRef.props;
     form.validateFields((err, values) => {
@@ -282,17 +313,24 @@ class TextModel extends React.Component{
           visible3:false
       })
     };
-    closeTiaoZheng=()=>{
-      this.props.dispatch({
-        type:"Db/fetchUpdateText",payload:{ids:this.state.ids,catalogue:this.state.catalogue}
-      })
-      this.props.dispatch({
-        type:"Db/fetchText",payload:this.state.textQuery
-      })
+    handleCancel = e => {
       this.setState({
-        visible1:false
-      })
-    }
+        visible1: false,
+        visible3:false,
+        filelist:[],
+        percent:0,
+        file:{}
+      });
+      // this.props.dispatch({
+      //   type:"Db/fetchUpdateFlag",payload:""
+      // })
+    };
+    handleCancel1 = e => {
+        this.setState({
+          visible1: false,
+        });
+    };
+    
      //修改文档名字
     editFileName=(e)=>{
       
@@ -353,24 +391,7 @@ class TextModel extends React.Component{
         }
         
       }
-    componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
-      this.setState({textQuery:{...this.state.textQuery,...{catalogue_path:nextProps.treekey}}});
-    }
-    selectFang(value){ 
-      var a=this.props.Db.catalist[0].childs.filter((item,index)=>{
-        if(item.id==value) return item;
-      })
-      this.setState({
-        childs:a[0].childs,
-        value
-      })
-     
-    }
-    setBianMu=(value, selectedOptions)=>{
-      this.setState({
-        catalogue:value[value.length-1]
-      })
-    }
+   
     updateFileName(record,e){
       var arr=this.state.arr;
       arr.forEach((item)=>{
@@ -394,6 +415,77 @@ class TextModel extends React.Component{
       })
       this.setState({
         arr
+      })
+    }
+    // 文档续添
+    
+    TextEWAddChange=(info)=>{
+      var upobj={
+        resource_id:"",
+        resource_name:"",
+        resource_url:"",
+        resource_enable:"",
+        resource_type:"",
+        resource_size:"",
+        created_time:""
+      }
+      this.setState({
+        file:info.file
+      })
+      this.setState({
+        percent:Math.round(info.file.percent)
+      })
+      if (info.file.status == 'uploading') {
+          console.log(info.file)
+      }
+      // this.showModal();
+      if (info.file.status === 'done') {
+        var arr=this.state.arr;
+        var length=this.state.length+1;
+        const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
+        upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
+        let a=this.state.ok+1;
+        arr.unshift(upobj)
+        this.setState({
+          ok:a,
+          file:info.file,
+          arr:arr,
+          length
+        })
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        var arr=this.state.names;
+        arr.forEach((item,index,arr)=>{
+          if(item==info.file.name){
+            arr.splice(index,index)
+          }
+        })
+        message.error(`${info.file.name} file upload failed.`);
+      }
+      
+    }
+    deleteTextFile(record){
+    
+      var newArr=this.state.arr;
+      var length=this.state.length;
+      var ok=this.state.ok;
+      newArr.forEach((item,index,arr)=>{
+        if(item.resource_id==record.resource_id){
+          this.props.dispatch({
+            type:"Db/fetchDeleteAttach",payload:{
+              urls:[item.resource_url]
+            }
+          })
+          arr.splice(index,1)
+          length--;
+          ok--
+        }
+      })
+    
+      
+      this.setState({
+        arr:newArr,
+        length,ok
       })
     }
     render(){
@@ -490,10 +582,10 @@ class TextModel extends React.Component{
           ];
         const dateFormat = 'YYYY-MM-DD';
         const rowSelection = {
+        selectedRowKeys:this.state.ids,
         columnTitle:"#",
-        fixed:"left",
+        // fixed:"left",
         onChange: (selectedRowKeys, selectedRows) => {
-  
             this.setState({
             ids:selectedRowKeys
             })
@@ -503,20 +595,31 @@ class TextModel extends React.Component{
           action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
           // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
           onChange: this.handleChange2,
-          accept:".doc,.docx,.mp4",
+          accept:".doc,.docx",
           data:{
             file:this.state.file,
             token:"dddd",
-            resource_name:this.state.names.map((item)=>{
-              if(item===this.state.file.name) {return item;}
-            })
+            resource_name:this.state.file.name
           }
-    };
+        };
+        const props2 = {
+          action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+          // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+          onChange: this.TextEWAddChange,
+          accept:".doc,.docx",
+          data:{
+            file:this.state.file,
+            token:"dddd",
+            resource_name:this.state.file.name
+          }
+        };
         return (
             <div className="table">
                 {/* 文件上传组件 */}
                 <Upload  {...props} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
-
+                  this.setState({
+                    length:fileList.length
+                  })
                   if(fileList.length==1){
 
                     this.props.dispatch({
@@ -547,21 +650,23 @@ class TextModel extends React.Component{
                     format={dateFormat} />
 
                     <Search
-                    placeholder="请输入搜索内容"
-                    onSearch={this.searchName}
-                    style={{ marginLeft:"2em",width: "222px",height:"30px"}}
+                      placeholder="请输入搜索内容"
+                      onSearch={this.searchName}
+                      onChange={this.setSearch.bind(this)}
+                      value={this.props.vt.tq.search}
+                      style={{ marginLeft:"2em",width: "222px",height:"30px"}}
                     />
                     <br/>
                     <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
                         <span style={{marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>权限 </span>
-                        <Select  size="small" placeholder="权限" defaultValue="" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange3}>
+                        <Select  size="small" value={this.props.vt.tq.dr_permission} placeholder="权限" defaultValue="" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange3}>
                             <Option style={{fontSize:"12px"}} value="">权限</Option>
                             <Option style={{fontSize:"12px"}} value={0}>Vip</Option>
                             <Option style={{fontSize:"12px"}} value={1}>Free</Option>
                             <Option style={{fontSize:"12px"}} value={2}>Other</Option>
                         </Select>
                         <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>格式 </span>
-                        <Select className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
+                        <Select value={this.props.vt.tq.dr_format} className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
                             <Option style={{fontSize:"12px"}} value="">格式</Option>
                             <Option style={{fontSize:"12px"}} value="文档">文档</Option>
                             <Option style={{fontSize:"12px"}} value="专辑">专辑</Option>
@@ -569,28 +674,33 @@ class TextModel extends React.Component{
                         </Select>
                        
                         <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>状态 </span>
-                        <Select size="small" placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
+                        <Select value={this.props.vt.tq.dr_enable} size="small" placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
                             <Option style={{fontSize:"12px"}} value="">状态</Option>
                             <Option style={{fontSize:"12px"}} value={1}>启用中</Option>
                             <Option style={{fontSize:"12px"}} value={0}>冻结</Option>
                         </Select>
-                        <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
-                        <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange}  style={{fontSize:"12px"}} >按热度</Checkbox></span>
+                        <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox checked={this.props.vt.tq.bytime} onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
+                        <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox checked={this.props.vt.tq.byhot} onChange={this.checkHotChange}  style={{fontSize:"12px"}} >按热度</Checkbox></span>
                 </div>
                 <Table className="text_table"
-                    size="small" 
+                    size="middle" 
                     style={{marginTop:"1em"}}
                     rowKey="id"
                     pagination={{
                         onChange: page => {
-                        console.log(page);
-                        let p = page - 1;
-                        console.log(p);
+                        // console.log(page);
+                        var query={...this.props.vt.tq,...{page}}
+                        // console.log(query)
+                        this.props.dispatch({
+                          type:"vt/fetchTextQuery",payload:query
+                        })
+                        this.props.dispatch({
+                          type:"Db/fetchText",payload:query
+                        })
                         },
-                        pageSize: 2,
-                        total:this.props.Db.textlist.count,
+                        pageSize: 5,
+                        total:this.props.Db.tcount,
                         size:'small',
-                        
                         hideOnSinglePage: false,
                         itemRender: (current, type, originalElement) => {
                         if (type === 'prev') {
@@ -604,9 +714,9 @@ class TextModel extends React.Component{
                     }}
                     rowSelection={rowSelection} columns={columns2}  dataSource={this.props.Db.textlist.results} />
                     <Button type="primary" style={{top:"0em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
-                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
-                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
-                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
+                    <Button  style={{top:"0em",color:"white",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
+                    <Button  style={{top:"0em",color:"white",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
+                    <Button  style={{top:"0em",color:"white",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
                     <Modal
                         onCancel={this.handleCancel1}
                         title="请选择资源所在编目"
@@ -646,7 +756,7 @@ class TextModel extends React.Component{
                             percent={this.state.percent}
                         />
                         
-                    <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.filelist.length}</span>
+                    <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.length}</span>
                     
                     </div>
                     }
@@ -656,17 +766,38 @@ class TextModel extends React.Component{
                     width={850}
                     >
                     <div className={styles.left}>
-                    <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的文档:
+                    <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的文档: 
+                    <Upload  {...props2} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
+                          this.props.dispatch({
+                            type:'Db/fetchUpdateFlag',payload:"专辑"
+                          })
+                      var b=[];
+                      fileList.forEach((item)=>{
+                          b.push(item.name);
+                      })
+                      var a=this.state.names;
+                      var length=this.state.length+fileList.length+1;
+                      var newArr = a.concat(b);
+                      this.setState({
+                          names:newArr,
+                          file:file,
+                          filelist:fileList
+                      })}}>
+                <Button size="small" style={{marginLeft:"1.3em"}} >
+                  添加
+                </Button>
+                </Upload>
                         <br/>
-                        <div style={{border:"1px solid #efefef"}}>
+                        <div style={{border:"1px dashed black",width:"156px",height:"170px",marginLeft:"2em",marginTop:"1em"}}>
                         <ol>
                         {
                          
-                          this.state.arr.length!=this.state.filelist.length?this.state.filelist.map((item,index)=>{
+                          this.state.arr.length!=this.state.length?this.state.filelist.map((item,index)=>{
                             return ( <li    style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
                            
-                            <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"100px"}}  ><span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.name}</span>
-                            {item.tname!=true?<span></span>:<span onClick={this.updateFileName.bind(this)} style={{marginLeft:"2em"}}><svg  t="1574929148750" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1316" width="16" height="16"><path d="M328.602 628.43l-61.008 137.999 138.226-60.781 0.146-0.146-77.218-77.218zM804.15 152.874l77.217 77.217-453.475 453.475-77.217-77.217zM903.297 208.17l86.973-86.973c22.604-22.604 26.036-55.821 7.666-74.192l-10.692-10.692c-18.371-18.371-51.587-14.939-74.192 7.666l-86.973 86.973 77.218 77.218z" p-id="1317"></path><path d="M940.399 902.532c0 21.328-17.289 38.617-38.617 38.617H121.718c-21.328 0-38.617-17.289-38.617-38.617V122.468c0-21.328 17.289-38.617 38.617-38.617h649.827L830.897 24.5H67.714c-24.281 0-43.964 19.683-43.964 43.964v888.072c0 24.281 19.683 43.964 43.964 43.964h888.072c24.281 0 43.964-19.683 43.964-43.964V214.874l-59.351 59.351v628.307z" p-id="1318"></path></svg></span>}
+                            <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"100px",display:"flex"}}  ><span style={{width:"80px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block",marginLeft:"-2em"}}>{item.name}</span>
+                            {item.tname!=true?<span></span>:<span style={{marginLeft:"1em",display:"inline-block"}}><Icon type="edit" onClick={this.updateFileName.bind(this,item)}/><Icon onClick={this.deleteTextFile.bind(this,item)} style={{marginLeft:"0.3em"}} type="delete" /></span>}
+
                             </span>
                             
                            
@@ -676,8 +807,8 @@ class TextModel extends React.Component{
                               
                               return ( <li   style={{marginLeft:"-10px",marginTop:".5em",display:"flex",width:"100px"}}>
                            
-                              <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"100px"}} ><span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.resource_name}</span>
-                                {item.tname!=true?<span></span>:<span style={{marginLeft:"2em"}}><svg  onClick={this.updateFileName.bind(this,item)}  t="1574929148750" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1316" width="16" height="16"><path d="M328.602 628.43l-61.008 137.999 138.226-60.781 0.146-0.146-77.218-77.218zM804.15 152.874l77.217 77.217-453.475 453.475-77.217-77.217zM903.297 208.17l86.973-86.973c22.604-22.604 26.036-55.821 7.666-74.192l-10.692-10.692c-18.371-18.371-51.587-14.939-74.192 7.666l-86.973 86.973 77.218 77.218z" p-id="1317"></path><path d="M940.399 902.532c0 21.328-17.289 38.617-38.617 38.617H121.718c-21.328 0-38.617-17.289-38.617-38.617V122.468c0-21.328 17.289-38.617 38.617-38.617h649.827L830.897 24.5H67.714c-24.281 0-43.964 19.683-43.964 43.964v888.072c0 24.281 19.683 43.964 43.964 43.964h888.072c24.281 0 43.964-19.683 43.964-43.964V214.874l-59.351 59.351v628.307z" p-id="1318"></path></svg></span>}
+                              <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"100px",display:"flex"}} ><span style={{width:"80px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block",marginLeft:"-2em"}}>{item.resource_name}</span>
+                              {item.tname!=true?<span></span>:<span style={{marginLeft:"1em",display:"inline-block"}}><Icon type="edit" onClick={this.updateFileName.bind(this,item)}/><Icon onClick={this.deleteTextFile.bind(this,item)} style={{marginLeft:"0.3em"}} type="delete" /></span>}
                               </span>
                               
                              
@@ -685,7 +816,7 @@ class TextModel extends React.Component{
                                </li>)
                               })
                         }
-                        
+                         
                         </ol>
                         </div>
                     </span> <br/><br/>

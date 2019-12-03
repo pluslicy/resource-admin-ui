@@ -38,76 +38,90 @@ class VideoModel extends React.Component{
         }
     }
     componentDidMount(){
+      // alert(JSON.stringify(this.state.query))
         this.props.dispatch({
-            type:"Db/fetchVideo",payload:this.state.query
+            type:"Db/fetchVideo",payload:{page:this.props.vt.vq.page,page_size:5}
          })
     }
-    saveFormRef = formRef => {
-        this.formRef = formRef;
-      };
-    handleCancel1 = e => {
-        this.setState({
-          visible1: false,
-          add:false
-        });
-    };
-    //根据日期查询
+    componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
+      this.setState({query:{...this.state.query,...{catalogue_path:nextProps.treekey}}});
+    }
+    //根据日期查询(完成)
     onChange2=(date, dateString)=>{
          var par={
            vr_created_time_start:dateString[0],
            vr_created_time_end:dateString[1]
          }
-       var vq={...this.props.vt.vq,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end}};
+       var vq={...this.props.vt.vq,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end,page:1}};
         this.props.dispatch({
           type:"vt/fetchVideoQuery",payload:vq
         })
        this.props.dispatch({
-         type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{vr_created_time_start:par.vr_created_time_start,vr_created_time_end:par.vr_created_time_end}}
+         type:"Db/fetchVideo",payload:vq
         })
     }
-    //根据名字查询
+    //根据视频名字查询(完成)
     searchName=(value)=>{
       console.log(this.props.vt.vq)
-      var vq={...this.props.vt.vq,...{search:value}};
+      var vq={...this.props.vt.vq,...{search:value,page:1}};
       this.props.dispatch({
         type:"vt/fetchVideoQuery",payload:vq
       })
+      console.log(vq)
       this.props.dispatch({
-        type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{search:value}}
+        type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{search:value,page:1}}
       })
     }
-    //批量删除 视频和文档完成
+    setSearch(e){
+    //  console.log(e.target.value)
+     var vq={...this.props.vt.vq,...{search:e.target.value}};
+     this.props.dispatch({
+      type:"vt/fetchVideoQuery",payload:vq
+    })
+    }
+    //批量删除视频完成
     batchDelete=()=>{
       this.props.dispatch({
             type:"Db/fetchDeleteVideo",
-            payload:this.state.ids
+            payload:{ids:this.state.ids,vq:this.props.vt.vq}
         })
+      setTimeout(()=>{
+        this.setState({ids:[]})
+      },200)
     }
-  // 批量启用和冻结 视频和文档完成
+    // 批量启用和冻结视频完成
     batchEnableOrFreeze=(e)=>{
-  
+      
         if(e.target.textContent=="冻 结"){
         this.props.dispatch({
             type:"Db/fetchEnableOrFreezeVideo",
             payload:{
-            vr_enable:0,
-            ids:this.state.ids
+              vq:this.props.vt.vq,
+              params: {vr_enable:0,
+              ids:this.state.ids}
             }
         })
         }else{
         this.props.dispatch({
             type:"Db/fetchEnableOrFreezeVideo",
             payload:{
-            vr_enable:1,
-            ids:this.state.ids
+              vq:this.props.vt.vq,
+              params: {vr_enable:1,
+              ids:this.state.ids}
             }
         })
+        
         }
+       
+        setTimeout(()=>{
+          this.setState({ids:[]})
+        },200)
+        
     }
-  //根据权限查询（完成）
+    //根据权限查询（完成）
     handleChange3=(value)=>{
         // console.log(value)
-        var vq={...this.props.vt.vq,...{vr_permission:value}};
+        var vq={...this.props.vt.vq,...{vr_permission:value,page:1}};
         this.props.dispatch({
           type:"vt/fetchVideoQuery",payload:vq
         })
@@ -117,12 +131,12 @@ class VideoModel extends React.Component{
     }
     //根据格式查询(完成)
     handleChange4=(value)=>{
-        var vq={...this.props.vt.vq,...{vr_format:value}};
+        var vq={...this.props.vt.vq,...{vr_format:value,page:1}};
         this.props.dispatch({
           type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-            type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{vr_format:value}}
+            type:"Db/fetchVideo",payload:vq
         });
     }
     //根据状态查询(完成)
@@ -132,64 +146,105 @@ class VideoModel extends React.Component{
           type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-        type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{vr_enable:value}}
+          type:"Db/fetchVideo",payload:vq
         })
     }
-    //修改权限和状态
+    //修改权限和状态(完成)
     handleChange=(record,e)=>{
           if(e._owner.key=="vr_permission"){
+            
                 this.props.dispatch({
                 type:"Db/fetchPermissionVideo",payload:{
-                vr_permission: record,
-                id: e._owner.pendingProps.record.id
-                }
+                    params:{vr_permission: record,
+                      id: e._owner.pendingProps.record.id},
+                    vq:this.props.vt.vq
+                  }
                 })
             }else{
             this.props.dispatch({
                 type:"Db/fetchEnableOrFreezeVideo",
                 payload:{
-                vr_enable:record,
-                ids:[e._owner.pendingProps.record.id]
+                  params:{ vr_enable:record,
+                    ids:[e._owner.pendingProps.record.id]},
+                  vq:this.props.vt.vq
                 }
             })
           }
+          setTimeout(()=>{
+            this.setState({ids:[]})
+          },200)
     }
     //根据时间排序(完毕)
     checkTimeChange=(e)=> {  
-      
-        var vq={...this.props.vt.vq,...{bytime:`${e.target.checked}`}};
+        console.log(e.target.checked)
+        var vq={...this.props.vt.vq,...{bytime:e.target.checked}};
+        console.log(vq)
         this.props.dispatch({
           type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-        type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{bytime:`${e.target.checked}`}}
+        type:"Db/fetchVideo",payload:vq
         })
 
     }
     //根据热度排序(完毕)
     checkHotChange=(e)=>{
        
-        var vq={...this.props.vt.vq,...{byhot:`${e.target.checked}`}};
+        var vq={...this.props.vt.vq,...{byhot:e.target.checked}};
         this.props.dispatch({
           type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-          type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{byhot:`${e.target.checked}`}}
+          type:"Db/fetchVideo",payload:vq
         })
         
     }
-    componentWillReceiveProps(nextProps) { // 父组件重传props时就会调用这个方法
-      this.setState({query:{...this.state.query,...{catalogue_path:nextProps.treekey}}});
-    }
-   
-     //展示调整编目
+    //展示调整编目
     showModal1=()=>{
-        this.setState({
-        childs:"",
-        visible1: true,
-        value:"请选择方向"
-        });
+      this.setState({
+      childs:"",
+      visible1: true,
+      value:"请选择方向"
+      });
     }
+    //修改文档名字
+    editFileName=(e)=>{
+      console.log(this.state.arr)
+        var arr=this.state.arr;
+        arr.forEach((item)=>{
+            if(item.resource_id===this.state.tname.resource_id){
+              item.resource_name=e.target.value;
+            }
+        })
+        console.log(arr)
+        this.setState({
+          arr
+        })
+    }
+    //调整资源编目
+    closeTiaoZheng=()=>{
+      this.props.dispatch({
+        type:"Db/fetchUpdateVideo",payload:{params:{ids:this.state.ids,catalogue:this.state.catalogue},vq:this.props.vt.vq}
+      })
+      this.setState({
+        visible1:false
+      })
+      setTimeout(()=>{
+        this.setState({ids:[]})
+      },200)
+    }
+    saveFormRef = formRef => {
+      this.formRef = formRef;
+    };
+    handleCancel1 = e => {
+        this.setState({
+          visible1: false,
+          add:false
+        });
+    };
+   
+   
+   
     showModal=(file,fileList)=>{
       if(add_text!=null){
         var add_text=document.getElementById("add_text")
@@ -366,31 +421,7 @@ class VideoModel extends React.Component{
         btn.style.pointerEvents="auto"
         btn.style.background="rgba(22, 155, 213, 1)"
     };
-     //修改文档名字
-    editFileName=(e)=>{
-      console.log(this.state.arr)
-        var arr=this.state.arr;
-        arr.forEach((item)=>{
-            if(item.resource_id===this.state.tname.resource_id){
-              item.resource_name=e.target.value;
-            }
-        })
-        console.log(arr)
-        this.setState({
-          arr
-        })
-    }
-    closeTiaoZheng=()=>{
-      this.props.dispatch({
-        type:"Db/fetchUpdateVideo",payload:{ids:this.state.ids,catalogue:this.state.catalogue}
-      })
-      this.props.dispatch({
-        type:"Db/fetchVideo",payload:this.state.query
-      })
-      this.setState({
-        visible1:false
-      })
-    }
+    
     updateFileName(record,e){
       var arr=this.state.arr;
       arr.forEach((item)=>{
@@ -598,12 +629,12 @@ class VideoModel extends React.Component{
           ];
         const dateFormat = 'YYYY-MM-DD';
         const rowSelection = {
+        selectedRowKeys: this.state.ids,
         columnTitle:"#",
-        fixed:"left",
         onChange: (selectedRowKeys, selectedRows) => {
               
                 this.setState({
-                ids:selectedRowKeys
+                  ids:selectedRowKeys
                 })
             },
         };
@@ -655,23 +686,24 @@ class VideoModel extends React.Component{
                     </Upload>
                     <RangePicker  onChange={this.onChange2} style={{width:"220px"}} defaultValue={[moment('2018/12/11', dateFormat), moment('2018/12/12', dateFormat)]}
                     format={dateFormat} />
-                    {JSON.stringify(this.props.treeKey)}
                     <Search
                     placeholder="请输入搜索内容"
+                    onChange={this.setSearch.bind(this)}
+                    value={this.props.vt.vq.search}
                     onSearch={this.searchName}
                     style={{ marginLeft:"2em",width: "222px",height:"30px"}}
                     />
                     <br/>
                     <div className="select-div" style={{width:"60%",marginTop:"2em",display:"inline",overflow:"hidden"}}>
                         <span style={{marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>权限 </span>
-                        <Select  size="small" placeholder="权限" defaultValue="" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange3}>
+                        <Select value={this.props.vt.vq.vr_permission} size="small" placeholder="权限" defaultValue="" style={{ marginTop:"2em",marginLeft:"1em",fontSize:"12px",width:60}} onChange={this.handleChange3}>
                             <Option style={{fontSize:"12px"}} value="">权限</Option>
                             <Option style={{fontSize:"12px"}} value={0}>Vip</Option>
                             <Option style={{fontSize:"12px"}} value={1}>Free</Option>
                             <Option style={{fontSize:"12px"}} value={2}>Other</Option>
                         </Select>
                         <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>格式 </span>
-                        <Select className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
+                        <Select value={this.props.vt.vq.vr_format} className="video_select" size="small" defaultValue="" style={{  width:"62px",height:"22px",marginLeft:"1em" ,fontSize:"12px"}} onChange={this.handleChange4}>
                             <Option style={{fontSize:"12px"}} value="">格式</Option>
                             <Option style={{fontSize:"12px"}} value="视频">视频</Option>
                             <Option style={{fontSize:"12px"}} value="专辑">专辑</Option>
@@ -679,29 +711,35 @@ class VideoModel extends React.Component{
                         </Select>
                        
                         <span style={{marginLeft:"2em",fontWeight:"700",fontSize:"12px"}}>状态 </span>
-                        <Select size="small" placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
+                        <Select size="small" value={this.props.vt.vq.vr_enable} placeholder="状态" defaultValue="" style={{  width:62,height:22,marginLeft:"1em",fontSize:"12px" }} onChange={this.handleChange5}>
                             <Option style={{fontSize:"12px"}} value="">状态</Option>
                             <Option style={{fontSize:"12px"}} value={1}>启用中</Option>
                             <Option style={{fontSize:"12px"}} value={0}>冻结</Option>
                         </Select>
-                        <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
-                        <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
+                        <span style={{marginLeft:"2em",fontWeight:"bold"}}><Checkbox checked={this.props.vt.vq.bytime} onChange={this.checkTimeChange} style={{fontSize:"12px"}} >按时间</Checkbox></span>
+                        <span style={{marginLeft:"1em",fontWeight:"bold"}}><Checkbox checked={this.props.vt.vq.byhot} onChange={this.checkHotChange} style={{fontSize:"12px"}} >按热度</Checkbox></span>
                     </div>
                     <Table 
                         className="video_table"
-                        size="small" 
+                        size="middle" 
                         style={{marginTop:"1em"}}
                         rowKey="id"
                         pagination={{
                         onChange: page => {
-                            console.log(page);
-                            let p = page - 1;
-                            console.log(p);
+                            // console.log(page);
+                            var query={...this.props.vt.vq,...{page}}
+                            // console.log(query)
+                            this.props.dispatch({
+                              type:"vt/fetchVideoQuery",payload:query
+                            })
+                            this.props.dispatch({
+                              type:"Db/fetchVideo",payload:query
+                            })
                         },
-                        pageSize: 2,
-                        total:this.props.Db.videolist.count,
+                        pageSize: 5,
+                        total:this.props.Db.vcount,
                         size:'small',
-                        
+                        current:this.props.vt.vq.page,
                         hideOnSinglePage: false,
                         itemRender: (current, type, originalElement) => {
                             if (type === 'prev') {
@@ -715,9 +753,9 @@ class VideoModel extends React.Component{
                         }}
                         rowSelection={rowSelection} columns={columns} dataSource={this.props.Db.videolist.results} />
                     <Button type="primary" style={{top:"0em",width:"35px",height:"21px",fontSize:"12px",padding:"0"}} onClick={this.batchEnableOrFreeze}>启用</Button>
-                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
-                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
-                    <Button  style={{top:"0em",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
+                    <Button  style={{top:"0em",color:"white",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(255, 0, 0, 1)"}} onClick={this.batchEnableOrFreeze}>冻结</Button>
+                    <Button  style={{top:"0em",color:"white",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(102, 102, 102, 1)"}} onClick={this.batchDelete}>删除</Button>
+                    <Button  style={{top:"0em",color:"white",marginLeft:"1em",width:"35px",height:"21px",fontSize:"12px",padding:"0",backgroundColor:"rgba(22, 142, 194, 1)"}} onClick={this.showModal1}>调整</Button>
                     <Modal
                         onCancel={this.handleCancel1}
                         title="请选择资源所在编目"

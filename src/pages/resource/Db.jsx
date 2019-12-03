@@ -41,6 +41,7 @@ class Db extends React.Component{
   callback(key) {
     console.log(key);
   }
+  //选择编目
   selectTree=(selectedKeys,e)=>{
     if(e.selectedNodes[0]!=null){
       this.setState({
@@ -48,23 +49,67 @@ class Db extends React.Component{
       })
       
         
-        var vq={...this.props.vt.vq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}};
+        var vq={...this.props.vt.vq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path,page:1}};
         this.props.dispatch({
           type:"vt/fetchVideoQuery",payload:vq
         })
         this.props.dispatch({
-          type:"Db/fetchVideo",payload:{...this.props.vt.vq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}}
+          type:"Db/fetchVideo",payload:vq
         })
         
-        var tq={...this.props.vt.tq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}};
+        var tq={...this.props.vt.tq,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path,page:1}};
         this.props.dispatch({
           type:"vt/fetchTextQuery",payload:tq
         })
         this.props.dispatch({
-          type:"Db/fetchText",payload:{...this.state.textQuery,...{catalogue_path:e.selectedNodes[0].props.dataRef.catalogue_path}}
+          type:"Db/fetchText",payload:tq
         })
     
     } 
+  }
+  //重置查询条件完成
+  resetVT(){
+      var  vq={
+        vr_created_time_start:"",
+        vr_created_time_end:"",
+        bytime:false,
+        byhot:false,
+        search:"",
+        vr_format:"",
+        vr_permission:"",
+        vr_enable:'',
+        catalogue_path:"",
+        catalogue:"",
+        page:1,
+        page_size:5
+    };
+    this.props.dispatch({
+      type:"Db/fetchVideo",payload:vq
+    })
+    this.props.dispatch({
+      type:"vt/fetchVideoQuery",payload:vq
+    })
+    var tq={
+      dr_created_time_start:"",
+      dr_created_time_end:"",
+      bytime:false,
+      byhot:false,
+      search:"",
+      dr_permission:"",
+      dr_format:"",
+      dr_enable:"",
+      catalogue_path:"",
+      catalogue:"",
+      page:1,
+      page_size:5
+   };
+    this.props.dispatch({
+      type:"Db/fetchText",payload:tq
+    })
+    this.props.dispatch({
+      type:"vt/fetchTextQuery",payload:tq
+    })
+   
   }
   //生成树，已完成
   componentDidMount(){
@@ -72,30 +117,31 @@ class Db extends React.Component{
       type:"Db/fetchCata"
     })
   }
+  //加载树节点
   renderTreeNodes = data =>
-  data.map(item => {
-    if (item.childs) {
-      return (
-        <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
-          { 
-            this.renderTreeNodes(item.childs)
-          }
-        </TreeNode>
-      );
-    }
-     return <TreeNode {...item} />;
-  }); 
+    data.map(item => {
+      if (item.childs) {
+        return (
+          <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
+            { 
+              this.renderTreeNodes(item.childs)
+            }
+          </TreeNode>
+        );
+      }
+      return <TreeNode {...item} />;
+    }); 
   render(){
     const {childs} =this.props.Db.catalist[0];
     return (
       <div className={styles.content}>
            <div className="left-div" style={{borderRight:"1px solid #e8e8e8",minWidth:"145px"}}>
               <img style={{position:"absolute",marginLeft:"-1.8em",marginTop:"1em"}} src={require('./u578.png')} alt=""/>
-              <div  style={{position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1em",marginLeft:"-1em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
+              <div onClick={this.resetVT.bind(this)} style={{cursor:"pointer",position:"absolute",width:"89px",height:"24px",backgroundColor:"rgba(15, 105, 255, 1)",marginTop:"1em",marginLeft:"-1em",fontSize:"12px",color:"#ffffff",textAlign:"center",paddingTop:"2px"}}>
                 {this.props.Db.catalist[0].catalogue_name}
               </div>
               <div style={{marginTop:"3em",marginLeft:".2em"}}>
-                  <Tree onSelect={this.selectTree}>
+                  <Tree onSelect={this.selectTree} selectedKeys={this.state.treekey}>
                     {this.renderTreeNodes(childs)}
                   </Tree>
               </div>

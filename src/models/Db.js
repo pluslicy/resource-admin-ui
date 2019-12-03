@@ -14,7 +14,9 @@ const DbModel = {
     flag:"",
     successFile:[],
     textLength:0,
-    attachment:[]
+    attachment:[],
+    vcount:0,
+    tcount:0
   },
   effects: {
     // 获取所有编目
@@ -69,44 +71,45 @@ const DbModel = {
     },
     //批量删除文档资源
     *fetchDeleteText(_, { call, put }) {
-      const response = yield call(DeleteAllText,{ids:_.payload});
+      const response = yield call(DeleteAllText,{ids:_.payload.ids});
       yield put({
-        type: 'fetchText'
+        type: 'fetchText',payload:_.payload.tq
       });
     },
     //批量删除视频资源
     *fetchDeleteVideo(_, { call, put }) {
-      const response = yield call(DeleteAllVideo,{ids:_.payload});
+      const response = yield call(DeleteAllVideo,{ids:_.payload.ids});
       yield put({
-        type: 'fetchVideo'
+        type: 'fetchVideo',payload:_.payload.vq
       });
     },
     //批量设置文本资源状态
     *fetchEnableOrFreeze(_, { call, put }) {
-      const response = yield call(EnableOrFreeze,_.payload);
+      const response = yield call(EnableOrFreeze,_.payload.params);
       yield put({
-        type: 'fetchText'
+        type: 'fetchText',payload:_.payload.tq
       });
     },
     //批量设置视频资源状态
     *fetchEnableOrFreezeVideo(_, { call, put }) {
-      const response = yield call(EnableOrFreezeVideo,_.payload);
+      console.log(_.payload)
+      const response = yield call(EnableOrFreezeVideo,_.payload.params);
       yield put({
-        type: 'fetchVideo'
+        type: 'fetchVideo',payload:_.payload.vq
       });
     },
     //设置文本权限
     *fetchPermissionText(_, { call, put }) {
-      const response = yield call(PermissionText,_.payload);
+      const response = yield call(PermissionText,_.payload.params);
       yield put({
-        type: 'fetchText'
+        type: 'fetchText',payload:_.payload.tq
       });
     },
     //设置视频权限
     *fetchPermissionVideo(_, { call, put }) {
-      const response = yield call(PermissionVideo,_.payload);
+      const response = yield call(PermissionVideo,_.payload.params);
       yield put({
-        type: 'fetchVideo'
+        type: 'fetchVideo',payload:_.payload.vq
       });
     },
      //查询视频专辑
@@ -126,12 +129,17 @@ const DbModel = {
     },
      //修改文档编目
      *fetchUpdateText(_, { call, put }) {
-      const response = yield call(UpdateTextBian,_.payload);
-    
+      const response = yield call(UpdateTextBian,_.payload.params);
+      yield put({
+        type: 'fetchText',payload:_.payload.tq
+      });
     },
     //修改视频编目
     *fetchUpdateVideo(_, { call, put }) {
-      const response = yield call(UpdateVideoBian,_.payload);
+      const response = yield call(UpdateVideoBian,_.payload.params);
+      yield put({
+        type: 'fetchVideo',payload:_.payload.vq
+      });
     },
     *fetchUpdateFlag(_, { call, put }) {
       yield put({
@@ -185,15 +193,18 @@ const DbModel = {
       };
     },
     reloadVideolist(state, action) {
+      // alert(action.payload.count)
       return {
         ...state,
-       videolist:action.payload
+       videolist:action.payload,vcount:action.payload.count
+
       };
     },
     reloadTextlist(state, action) {
       return {
         ...state,
         textlist: action.payload,
+        tcount:action.payload.count
       };
     },
     reloadVideoDalBum(state, action) {
