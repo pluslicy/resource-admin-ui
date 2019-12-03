@@ -35,6 +35,7 @@ export default {
             const response = yield call(setSysSetting, _.payload);
             yield put({
                 type: 'getSysSetting',
+                payload: response,
             });
         },
         *getCatalevelList(_, { call, put }) {

@@ -13,9 +13,18 @@ export async function getSysSetting() {
     return request(baseURL + '/mp_man_module/get_sys_setting/');
 }
 // 设置系统设置
-export async function setSysSetting() {
-    return request(baseURL + '/mp_man_module/set_sys_setting/');
+export async function setSysSetting(param) {
+    console.log(param)
+    return request(baseURL + '/mp_man_module/set_sys_setting/', {
+        method: 'post',
+        data: {
+            ...param,
+        },
+        headers: { 'Content-Type': 'application/json' },
+        getResponse: true,
+    });
 }
+
 // 获取编目级别列表
 export async function getCatalevelList() {
     return request(baseURL + '/mp_man_module/get_catalevel_list/');
