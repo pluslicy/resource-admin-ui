@@ -24,7 +24,8 @@ class Check extends React.Component {
 			form: {},
 			selectedRowKeys: [],
 			date: ['',''],
-			name: []
+			name: [],
+			pdfContent:'',
 		};
 	}
 	componentWillMount() {
@@ -47,18 +48,6 @@ class Check extends React.Component {
 		this.props.dispatch({ type: 'word/findByCondidtion', payload: values });
 	};
 	// 名称搜索框
-	// onSearch = (value) => {
-	// 	// console.log('1'+value);
-	// 	this.setState({
-	// 		name: value,
-	// 	});
-	// 	var values1 = this.state.date;
-	// 	var values2 = value;
-	// 	var values = new Array();
-	// 	values.push(values1,values2)
-	// 	console.log(values)
-	// 	this.props.dispatch({ type: 'word/findByCondidtion', payload: values });
-	// }
 	onSearch = (value) => {
 		this.setState({
 			name: value,
@@ -74,9 +63,10 @@ class Check extends React.Component {
 	};
 
 	// 弹出详细文档
-	showWord = () => {
+	showWord = (record) => {
 		this.setState({
 			visible2: true,
+			pdfContent:record.dr_url
 		});
 	};
 	// 关闭并提交文档
@@ -181,7 +171,7 @@ class Check extends React.Component {
 				render: (text, record) => {
 					return (
 						<div>
-							<Icon type="eye" onClick={this.showWord} />
+							<Icon type="eye" onClick={this.showWord.bind(this, record)} />
 						</div>
 					);
 				},
@@ -228,6 +218,7 @@ class Check extends React.Component {
 				</div>
 				<div>
 					<Table
+						rowKey="id"
 						size="small"
 						// bordered
 						rowSelection={rowSelection}
@@ -294,8 +285,8 @@ class Check extends React.Component {
 					onOk={this.handleOk2}
 					onCancel={this.handleCancel2}
 				>
-					<iframe src='https://view.officeapps.live.com/op/view.aspx?src=http://storage.xuetangx.com/public_assets/xuetangx/PDF/1.xls'
-						style={{ width: '100%', height: '350px', }} frameborder='1'>
+					<iframe src={this.state.pdfContent}
+						style={{ width: '100%', height: '600px', }} frameborder='1'>
 					</iframe>
 				</Modal>
 			</div>

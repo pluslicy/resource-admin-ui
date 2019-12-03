@@ -112,7 +112,8 @@ class Check extends React.Component {
     this.setState({
       visible: true,
       pathurl:record.object_infor.path,
-    });    
+    });  
+    console.log(record)
 		this.props.dispatch({ type: 'comment/findReplyById', payload: record.id });
 
   };
@@ -171,11 +172,6 @@ class Check extends React.Component {
               <div>
                 <span style={{color:"red"}}>已拒绝</span>
               </div>
-              // <div style={{width:"75px",marginLeft:"20px",height:"20px",overflow:"hidden"}}>
-              //   <Select defaultValue={"已拒绝"} style={{ width:"100px",marginLeft:"-12px",marginTop:"-5px",color:"red"}}>
-              //       <Option value={1} onClick={this.pass.bind(this, record)}>通过</Option>
-              //     </Select>
-              // </div>
             );
           } else {
             return (

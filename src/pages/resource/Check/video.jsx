@@ -171,7 +171,7 @@ class Check extends React.Component {
 				align: 'center',
 				render: (text, record) => {
 					return (
-						<div><Icon type="eye" onClick={this.showVideo} /></div>
+						<div><Icon type="eye" onClick={this.showVideo.bind(this,record)} /></div>
 					);
 				},
 			},
@@ -182,7 +182,7 @@ class Check extends React.Component {
 				render: (record) => {
 					if (record.vr_audit_status === 1) {
 						return (
-							<div><span style={{ color: '#52a647' }}>已通过</span></div>
+							<div><span>已通过</span></div>//style={{ color: '#52a647' }}
 						);
 					} else if (record.vr_audit_status === 2) {
 						return (
@@ -211,6 +211,7 @@ class Check extends React.Component {
 						</div>
 						<div>
 							<Table
+                				rowKey="id"
 								size="small"
 								// bordered
 								rowSelection={rowSelection}
@@ -277,9 +278,9 @@ class Check extends React.Component {
 							onOk={this.handleOk2}
 							onCancel={this.handleCancel2}
 						>
-							<video width="100%" height="100%" controls>
+							 <video width="850px" height="500px" controls>
 								<source src={this.state.pathurl} />
-							</video>
+					   		 </video>
 						</Modal>
 					</TabPane>
 					{/* <TabPane tab={'文档 (' + this.props.word.words.count + ')'} key='2'> */}
