@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './catelog.less';
-import { Tree, Input, Button, Modal, Form, Radio, Select, Cascader } from 'antd';
+import { Tree, Input, Button, Modal, Form, Radio, Select, Cascader,Icon } from 'antd';
 // import DagreD3, { d3 } from './react-dagre-d3';
 import { connect } from 'dva';
 import DirectoryTree from 'antd/lib/tree/DirectoryTree';
@@ -19,6 +19,12 @@ class Catalog extends React.Component {
       target_id: '',
       edit:{}
     };
+  }
+
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'catalog/fetchCatalog',
+    });
   }
 
   // 迁移目录级联选项
@@ -190,11 +196,10 @@ class Catalog extends React.Component {
     });
   };
 
-  componentDidMount() {
-    this.props.dispatch({
-      type: 'catalog/fetchCatalog',
-    });
+  showCatalog(){
+
   }
+ 
 
   onSelect = (selectedKeys, e) => {
     // console.log(e,selectedKeys)
@@ -230,7 +235,7 @@ class Catalog extends React.Component {
     // const { cities } = this.state;
     return (
       <div className={styles.content}>
-        {/* 左边面板 */}
+        {/* 左边面板
         <div className={styles.left}>
           <img
             style={{ position: 'absolute', marginLeft: '-0.8em', marginTop: '1em' }}
@@ -257,28 +262,77 @@ class Catalog extends React.Component {
           <div style={{ marginTop: '2.5em', marginLeft: '1.5em' }}>
             <Tree>{this.renderTreeNodes(this.props.catalog.roles[0].childs)}</Tree>
           </div>
-        </div>
+        </div> */}
 
         <div className={styles.right}>
           <div className={styles.middle}>操作面板 ｜ 视频库编目</div>
           <div>
             {/* {console.log(this.props.catalog.roles)} */}
-            <Button
-              type="primary"
-              size="small"
-              onClick={this.showModalAdd}
-              style={{ marginLeft: '2em', marginTop: '2em' }}
-            >
-              新增
-            </Button>
-            &nbsp;
-            <Button type="danger" size="small" onClick={this.showModalRemove}>
-              删除
-            </Button>
-            &nbsp;
-            <Button type="delete" size="small" onClick={this.showModalEditName}>
-              修改
-            </Button>
+            {/* button */}
+            <div className="button">
+              <Button
+                type="primary"
+                size="small"
+                onClick={this.showModalAdd}
+                style={{ marginLeft: '2em', marginTop: '2em' }}
+              >
+                新增
+              </Button>
+              &nbsp;
+              <Button type="danger" size="small" onClick={this.showModalRemove}>
+                删除
+              </Button>
+              &nbsp;
+              <Button type="delete" size="small" onClick={this.showModalEditName}>
+                修改
+              </Button>
+            </div>
+
+            {/* 一级编目div */}
+            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '1em', marginLeft:'1em' }}>
+              <div
+                style={{
+                  border: '1px solid #e8e8e8',
+                  width: '200px',
+                  height: '450px',
+                  overflow: 'auto',
+                  marginLeft:'1em',
+                  borderRadius:'7px'
+                }}
+              >
+                <div style={{border:'1px solid #3e82a6',backgroundColor:"#3e82a6",color:"#FFFFFF",borderRadius:'7px'}}>
+                  <span>一级编目</span>
+                  <Button type="link" size='small' style={{color:'#FFFFFF',marginLeft:'8em'}} onClick={this.showCatalog.bind()}>+</Button>
+                </div>
+                {/* <ul>
+                 
+                </ul> */}
+                 <Tree>{this.renderTreeNodes(this.props.catalog.roles[0].childs)}</Tree>
+              </div>
+              
+       
+
+              {/* 二级编目div */}
+              <div
+                style={{
+                  border: '1px solid #e8e8e8',
+                  width: '200px',
+                  height: '450px',
+                  overflow: 'auto',
+                  marginLeft:'1em',
+                  borderRadius:'7px'
+                }}
+              >
+                <div style={{border:'1px solid #ffa846',backgroundColor:"#ffa846",color:"#FFFFFF",borderRadius:'7px'}}>
+                  <span>二级编目</span>
+                  <Button type="link" size='small' style={{color:'#FFFFFF',marginLeft:'8em'}} onClick={this.showCatalog.bind()}>+</Button>
+                </div>
+                {/* <ul>
+                 
+                </ul> */}
+                 <Tree>{this.renderTreeNodes(this.props.catalog.roles[0].childs)}</Tree>
+              </div>
+            </div>
             {/* 增加编目模态框 */}
             <Modal
               title="增加编目名称"
