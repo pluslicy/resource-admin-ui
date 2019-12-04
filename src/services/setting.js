@@ -38,10 +38,24 @@ export async function getCatalevelSetting() {
     return request(baseURL + '/mp_man_module/get_catalevel_setting/');
 }
 // 设置搜索编目级别设置
-export async function updateCatalevelSearch() {
-    return request(baseURL + '/mp_man_module/update_catalevel_search/');
+export async function updateCatalevelSearch(param) {
+    return request(baseURL + '/mp_man_module/update_catalevel_search/',{
+        method: 'post',
+        data: {
+            ...param,
+        },
+        headers: { 'Content-Type': 'application/json' },
+        getResponse: true,
+    });
 }
 // 设置上传编目级别设置
-export async function updateCatalevelUpload() {
-    return request(baseURL + '/mp_man_module/update_catalevel_upload/');
+export async function updateCatalevelUpload(param) {
+    return request(baseURL + '/mp_man_module/update_catalevel_upload/',{
+        method: 'post',
+        data: {
+            ...param,
+        },
+        headers: { 'Content-Type': 'application/json' },
+        getResponse: true,
+    });
 }

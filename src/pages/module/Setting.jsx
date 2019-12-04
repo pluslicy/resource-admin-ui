@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, Radio, Table, Input, Menu, Dropdown, Icon, Checkbox,Popover } from 'antd';
+import { Button, Radio, Table, Input, Menu, Dropdown, Icon, Checkbox, Popover, TextArea} from 'antd';
 import { connect } from 'dva';
 import styles from './Setting.less';
+// import TextArea from 'antd/lib/input/TextArea';
+import $ from 'jquery'
 const CheckboxGroup = Checkbox.Group;
-const plainOptions = ['一级编目', '二级编目', '三级编目'];
-const defaultCheckedList = ['一级编目', '二级编目'];
 
 class Setting extends React.Component {
   constructor(props) {
@@ -14,30 +14,71 @@ class Setting extends React.Component {
       comment_status: false,
       upload_status: false,
       apply_status: false,
-      // catalevelList:[],
+      checkedList: [],
+      visible: false,
+      visible1: false,
+      disabled: true,
     }
   }
-  state = {
-    checkedList: defaultCheckedList,
-    indeterminate: true,
-    checkAll: false,
-  };
 
   onChange = checkedList => {
+    // 选一级编目和三级编目时务必同时选二级编目
+    if (checkedList.length === 2 && checkedList[0] === '1' && checkedList[1] === '3' || checkedList.length === 2 && checkedList[0] === '3' && checkedList[1] === '1') {
+      checkedList.push('2')
+    }
     this.setState({
       checkedList,
-      indeterminate: !!checkedList.length && checkedList.length < plainOptions.length,
-      checkAll: checkedList.length === plainOptions.length,
+    }, () => {
+      console.log(this.state.checkedList)
+    });
+  };
+  handleVisibleChange = visible => {
+    this.setState({ visible }, () => {
+      if (this.state.visible === false && this.state.checkedList.length !== 0) {
+        // 气泡弹出框关闭且多选框有改动,则发送设置请求
+        var arr = this.state.checkedList
+        // 数组中的最大最小值
+        var max = Math.max.apply(null, arr)
+        var min = Math.min.apply(null, arr)
+        var values = {
+          search_level_start: min,
+          search_level_end: max
+        }
+        console.log(values)
+        this.props.dispatch({ type: 'setting/updateCatalevelSearch', payload: values });
+      }
     });
   };
 
-  onCheckAllChange = e => {
+  onChange1 = checkedList => {
+    // 选一级编目和三级编目时务必同时选二级编目
+    if (checkedList.length === 2 && checkedList[0] === '1' && checkedList[1] === '3' || checkedList.length === 2 && checkedList[0] === '3' && checkedList[1] === '1') {
+      checkedList.push('2')
+    }
     this.setState({
-      checkedList: e.target.checked ? plainOptions : [],
-      indeterminate: false,
-      checkAll: e.target.checked,
+      checkedList,
+    }, () => {
+      console.log(this.state.checkedList)
     });
   };
+  handleVisibleChange1 = visible1 => {
+    this.setState({ visible1 }, () => {
+      if (this.state.visible1 === false && this.state.checkedList.length !== 0) {
+        // 气泡弹出框关闭且多选框有改动,则发送设置请求
+        var arr = this.state.checkedList
+        // 数组中的最大最小值
+        var max = Math.max.apply(null, arr)
+        var min = Math.min.apply(null, arr)
+        var values = {
+          upload_level_start: min,
+          upload_level_end: max
+        }
+        console.log(values)
+        this.props.dispatch({ type: 'setting/updateCatalevelUpload', payload: values });
+      }
+    });
+  };
+
   componentWillMount() {
     // 需要异步一起执行的方法
     this.props.dispatch({ type: 'setting/getSysSetting' });
@@ -102,40 +143,58 @@ class Setting extends React.Component {
   };
 
   render() {
-    //定义一个数组，将数据存入数组
+    // 定义一个数组，将数据存入数组
     const elements = [];
     var list = this.props.setting.CatalevelListDatas;
     list.forEach((item) => {
       elements.push(
-        <div key={item.id} style={{ marginBottom:'0.5em' }}>
+        <div key={item.id} style={{ marginBottom: '0.5em' }}>
           {item.cata_level_num}:
-          <span style={{ fontSize: '16px', marginLeft: '1em', color: 'blue' ,}}>{item.cata_level_name}</span>&nbsp;<a>修改</a>
+          <input
+            id="inp"
+            style={{
+              width: '80px',
+              border: 'none',
+              outline: 'none',
+              marginLeft: '1em',
+            }}
+            onBlur={() => {
+              this.setState({
+                disabled: true
+              })
+              // var mobi = $("#inp").val();
+              // console.log(mobi)
+            }}
+            disabled={this.state.disabled}
+            size="small"
+            placeholder={item.cata_level_name}
+          />
+          {/* <span style={{ fontSize: '16px', marginLeft: '1em', color: 'blue', }}>{item.cata_level_name}</span> */}
+          &nbsp;<a onClick={() => {
+            this.setState({
+              disabled: false
+            })
+          }}>修改</a>
         </div>
       )
     });
+    // 编目应用设置
     var CDs = this.props.setting.CatalevelSettingDatas;
     if (CDs.length !== 0) {
-      console.log(CDs)
       var ss_se = CDs.data.search_level_start + '~' + CDs.data.search_level_end;
       var us_ue = CDs.data.upload_level_start + '~' + CDs.data.upload_level_end;
     }
     const text = <span>编目设置</span>;
     const content = (
-      <div style={{width:'177px'}}>
-        <div style={{ borderBottom: '1px solid #E9E9E9' }}>
-          <Checkbox
-            indeterminate={this.state.indeterminate}
-            onChange={this.onCheckAllChange}
-            checked={this.state.checkAll}
-          >全选
-          </Checkbox>
-        </div>
-        <br />
+      <div style={{ width: '100px', textAlign: 'right' }}>
         <CheckboxGroup
-          options={plainOptions}
           value={this.state.checkedList}
           onChange={this.onChange}
-        />
+        >
+          <Checkbox value="1">一级编目</Checkbox>
+          <Checkbox value="2">二级编目</Checkbox>
+          <Checkbox value="3">三级编目</Checkbox>
+        </CheckboxGroup>
       </div>
     );
 
@@ -243,25 +302,25 @@ class Setting extends React.Component {
             <hr />
             首页检索编目级别
             <Input
-              style={{ width: '3em', marginLeft: '0.5em', marginBottom:'0.8em' ,height:'1em'}}
+              style={{ width: '3em', marginLeft: '0.5em', marginBottom: '0.8em', height: '1em' }}
               size="small"
               placeholder={ss_se}
               disabled
             />
             &nbsp;级编目&nbsp;
-            <Popover placement="bottomRight" title={text} content={content} trigger="click" >
+            <Popover placement="bottomRight" title={text} content={content} visible={this.state.visible} onVisibleChange={this.handleVisibleChange} trigger="click" >
               <a>设置</a>
             </Popover>
             <br />
             用户上传编目级别
             <Input
-              style={{ width: '3em', marginLeft: '0.5em' ,height:'1em'}}
+              style={{ width: '3em', marginLeft: '0.5em', height: '1em' }}
               size="small"
               placeholder={us_ue}
               disabled
             />
             &nbsp;级编目&nbsp;
-            <Popover placement="bottomRight" title={text} content={content} trigger="click">
+            <Popover placement="bottomRight" title={text} content={content} visible={this.state.visible1} onVisibleChange={this.handleVisibleChange1} trigger="click">
               <a>设置</a>
             </Popover>
           </div>

@@ -72,7 +72,6 @@ export default {
                 payload: response,
             });
         },
-
     },
     reducers: {
         reloadAllSysSetting(state, action) {
