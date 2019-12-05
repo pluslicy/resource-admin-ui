@@ -15,8 +15,11 @@ const DbModel = {
     successFile:[],
     textLength:0,
     attachment:[],
+    newAttach:[],
+    upList:[],
     vcount:0,
-    tcount:0
+    tcount:0,
+    visible:false
   },
   effects: {
     // 获取所有编目
@@ -51,7 +54,10 @@ const DbModel = {
     },
     //访问后台接口，上传视频
     *fetchUploadVideoOneOrMore(_, { call, put }) {
-      yield call(UploadVideoOneOrMore,_.payload);
+      const response=yield call(UploadVideoOneOrMore,_.payload);
+      if(response.data.code==200){
+        message.success("操作成功");
+      }
     },
     //获取所有视频列表
     *fetchVideo(_, { call, put }) {
@@ -154,14 +160,43 @@ const DbModel = {
         type: 'reloadSuccessFile',payload:response.data
       });
     },
+    //删除附件
     *fetchDeleteAttach(_, { call, put }) {
       const response = yield call(DeleteAttach,_.payload.urls);
       yield put({
         type: 'deleteSuccessFile',payload:_.payload.successFile
       });
+      if(response.data.code==200){
+        message.success("删除附件成功");
+      }
+    },
+    //删除视频
+    *fetchDeleteVideo(_, { call, put }) {
+      const response = yield call(DeleteAttach,_.payload.urls);
+      if(response.data.code==200){
+        message.success("删除文件成功");
+      }
+    },
+    *fetchNewAttach(_, { call, put }) {
+      // console.log(response,"返回的数据")
+      yield put({
+        type: 'reloadNewAttach',payload:_.payload
+      });
+    },
+    *fetchVisible(_, { call, put }) {
+      // console.log(response,"返回的数据")
+      yield put({
+        type: 'reloadVisible',payload:_.payload
+      });
     },
   },
   reducers: {
+    reloadVisible(state,action){
+      return {
+        ...state,
+        visible: action.payload,
+      };
+    },
     // 更新状态中的catalist
     reloadCatalist(state, action) {
       return {
@@ -223,6 +258,13 @@ const DbModel = {
       return {
         ...state,
         flag: action.payload,
+      };
+    },
+    reloadNewAttach(state,action){
+      return {
+        ...state,
+        newAttach: action.payload.arr,
+        upList:action.payload.up
       };
     },
     reloadTextLength(state,action){

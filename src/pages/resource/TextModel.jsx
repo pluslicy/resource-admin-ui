@@ -445,6 +445,11 @@ class TextModel extends React.Component{
         const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
         upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
         let a=this.state.ok+1;
+        if(length>1){
+          this.props.dispatch({
+            type:'Db/fetchUpdateFlag',payload:"专辑"
+          })
+        }
         arr.unshift(upobj)
         this.setState({
           ok:a,
@@ -472,7 +477,7 @@ class TextModel extends React.Component{
       newArr.forEach((item,index,arr)=>{
         if(item.resource_id==record.resource_id){
           this.props.dispatch({
-            type:"Db/fetchDeleteAttach",payload:{
+            type:"Db/fetchDeleteVideo",payload:{
               urls:[item.resource_url]
             }
           })
@@ -481,7 +486,11 @@ class TextModel extends React.Component{
           ok--
         }
       })
-    
+      if(length==1){
+        this.props.dispatch({
+          type:'Db/fetchUpdateFlag',payload:"文档"
+        })
+      }
       
       this.setState({
         arr:newArr,
@@ -768,9 +777,15 @@ class TextModel extends React.Component{
                     <div className={styles.left}>
                     <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的文档: 
                     <Upload  {...props2} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
-                          this.props.dispatch({
-                            type:'Db/fetchUpdateFlag',payload:"专辑"
-                          })
+                          if(this.state.length==0){
+                            this.props.dispatch({
+                              type:'Db/fetchUpdateFlag',payload:"文档"
+                            })
+                          }else{
+                            this.props.dispatch({
+                              type:'Db/fetchUpdateFlag',payload:"专辑"
+                            })
+                          }
                       var b=[];
                       fileList.forEach((item)=>{
                           b.push(item.name);

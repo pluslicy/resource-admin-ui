@@ -251,6 +251,7 @@ class TextForm extends React.Component{
               </TabPane>
             </Tabs>
             <Modal
+            
                         onCancel={this.closeBum}
                         title="自定义创建专辑"
                         visible={this.state.visible}

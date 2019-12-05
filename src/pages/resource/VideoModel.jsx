@@ -7,7 +7,7 @@ const {RangePicker} = DatePicker;
 const { Option } = Select;
 import VideoForm from './VideoForm'
 import styles from './db.less'
-import AddTextForm from './addTextForm';
+import AddTextForm from './addTextForm2';
 var treeKey="";
 class VideoModel extends React.Component{
     constructor(props){
@@ -34,7 +34,10 @@ class VideoModel extends React.Component{
             textname:"",
             textid:"",
             tname:{},
-            ataArr:[]
+            ataArr:[],
+            length:0,
+            visible4:false,
+            flag1:false
         }
     }
     componentDidMount(){
@@ -264,7 +267,7 @@ class VideoModel extends React.Component{
     handleOk = e => {
       e.preventDefault();
       console.log(this.props.Db.successFile)
-      console.log(e);
+      console.log(this.state.arr);
       const { form } = this.formRef.props;
       form.validateFields((err, values) => {
           if (err) {
@@ -344,15 +347,20 @@ class VideoModel extends React.Component{
             })
             
           }
-          console.log(saveArr)
+          console.log(saveArr,"aaa")
           this.props.dispatch({
             type:"Db/fetchUploadVideoOneOrMore",payload:saveArr
           })
           form.resetFields();
       });
-      this.props.dispatch({
-        type:"Db/fetchTextLength",payload:""
-      })
+    
+      // this.props.dispatch({
+      //   type:"Db/fetchTextLength",payload:""
+      // })
+      
+      // this.props.dispatch({
+      //   type:"Db/fetchUpdateAttach",payload:[]
+      // })
       this.setState({
         visible:false,
         visible1:false
@@ -408,18 +416,11 @@ class VideoModel extends React.Component{
           visible:false,
           filelist:[],
           percent:0,
-          file:{}
+          file:{},ok:0,length:0
         });
         this.props.dispatch({
           type:"Db/fetchUpdateFlag",payload:""
         })
-        var add_text=document.getElementById("add_text")
-        console.log(add_text.style)
-        add_text.style.display="none"
-        var btn=document.getElementById("submit_btn")
-        btn.style.opacity="1";
-        btn.style.pointerEvents="auto"
-        btn.style.background="rgba(22, 155, 213, 1)"
     };
     
     updateFileName(record,e){
@@ -452,32 +453,32 @@ class VideoModel extends React.Component{
     }
     uptext(record,e){
       // if(e.target.__reactInternalInstance$q2jug5y2evp)
-
-      this.props.dispatch({
-        type:"Db/fetchTextLength",payload:record.resource_id
-      })
-     
-      // console.log(e.target.id)
-      // console.log(e.currentTarget.parentNode.parentNode.previousSibling.value)
-      // console.log(e.target.previousElementSibling.previousElementSibling.innerText);
-      var add_text=document.getElementById("add_text")
-      
-      add_text.style.display="block"
-      add_text.style.zIndex="1";
-      var btn=document.getElementById("submit_btn")
-      btn.style.opacity="0.5";
-      btn.style.pointerEvents="none"
-      btn.style.background="grey"
-      this.setState({
-        textname:record.resource_name,
-        textid:record.resource_id
-      })
-      if(e.target!=undefined){
+      if(record.resource_id){
+        this.setState({
+          visible4:true
+        })
+        this.props.dispatch({
+          type:"Db/fetchTextLength",payload:record.resource_id
+        })
+        this.props.dispatch({
+          type:"Db/fetchVisible",payload:true
+        })
         this.setState({
           textname:record.resource_name,
+          textid:record.resource_id,
+          visible4:true
         })
+        if(e.target!=undefined){
+          this.setState({
+            textname:record.resource_name,
+          })
+        }
+       
       }
-     
+      else{
+        message.info("请等待上传成功");
+      }
+      
       // this.setState({
       //   vtext:e.target.__reactInternalInstance$htlud7b3i2u
       // })
@@ -505,34 +506,147 @@ class VideoModel extends React.Component{
       })
     }
     findAttach(record,e){
+        console.log(record,"fgg",this.props.Db.successFile)
         var arr=this.props.Db.successFile;
+        console.log(arr)
         var indexs=[];
-        var brr=arr.map((item,index)=>{
-          
-          if(item.textid==record.resource_id) {
-            indexs.push(index)
-            return item;
+        if(this.props.Db.successFile.length==0){
+          message.info("请等待附件上传成功后操作");
+        }else{
+          var brr=arr.map((item,index)=>{
+            if(item.textid==record.resource_id) {
+              indexs.push(index)
+              return item;
+            }
+          })
+          indexs.forEach((item)=>{
+            arr.splice(item,1);
+          })
+          console.log("删除后的附件还有",arr)
+          console.log("删除的附件",brr)
+          var urls=[];
+          brr.forEach((item)=>{
+            if(item.attachment.length!=0){
+              item.attachment.forEach((item,index)=>{
+                urls.push(item.attach_url);
+              })
+            } 
+          })
+          console.log(urls,arr,"参数准备")
+          this.props.dispatch({
+            type:"Db/fetchDeleteAttach",payload:{
+              urls,successFile:arr
+            }
+          })
+        }
+        
+    }
+    VideoEWAddChange=(info)=>{
+      var upobj={
+        resource_id:"",
+        resource_name:"",
+        resource_url:"",
+        resource_enable:"",
+        resource_type:"",
+        resource_size:"",
+        created_time:""
+      }
+      this.setState({
+        file:info.file
+      })
+      this.setState({
+        percent:Math.round(info.file.percent)
+      })
+      if (info.file.status == 'uploading') {
+          console.log(info.file)
+      }
+      // this.showModal();
+      if (info.file.status === 'done') {
+        var arr=this.state.arr;
+        var length=this.state.length+1;
+        const {resource_id,resource_name,resource_url,resource_enable,resource_type,resource_size,created_time}=info.file.response;
+        upobj={resource_id:resource_id,resource_name:resource_name,resource_url:resource_url,resource_enable:resource_enable,resource_type:resource_type,resource_size:resource_size,created_time:created_time};
+        let a=this.state.ok+1;
+        arr.unshift(upobj)
+        if(length>1){
+          this.props.dispatch({
+            type:'vt/fetchUpdateFlag',payload:"专辑"
+          })
+        }
+        this.setState({
+          ok:a,
+          file:info.file,
+          arr:arr,
+          length
+        })
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        var arr=this.state.names;
+        arr.forEach((item,index,arr)=>{
+          if(item==info.file.name){
+            arr.splice(index,index)
           }
         })
-        indexs.forEach((item)=>{
-          arr.splice(item,1);
-        })
-        console.log("删除后的附件还有",arr)
-        console.log("删除的附件",brr)
-        var urls=[];
-        brr.forEach((item)=>{
-          if(item.attachment.length!=0){
-            item.attachment.forEach((item,index)=>{
-              urls.push(item.attach_url);
-            })
-          } 
-        })
-        console.log(urls,arr,"参数准备")
+        message.error(`${info.file.name} file upload failed.`);
+      }
+      
+    }
+    deleteVideoFile(record){
+    
+      var newArr=this.state.arr;
+      var length=this.state.length;
+      var ok=this.state.ok;
+      newArr.forEach((item,index,arr)=>{
+        if(item.resource_id==record.resource_id){
+          this.props.dispatch({
+            type:"Db/fetchDeleteVideo",payload:{
+              urls:[item.resource_url]
+            }
+          })
+          arr.splice(index,1)
+          length--;
+          ok--
+        }
+      })
+    
+      console.log(newArr)
+      this.setState({
+        arr:newArr,
+        length,ok
+      })
+      if(length==1){
         this.props.dispatch({
-          type:"Db/fetchDeleteAttach",payload:{
-            urls,successFile:arr
-          }
+          type:'vt/fetchUpdateFlag',payload:"视频"
         })
+      }
+    }
+    showDeleteAttach(record,e){
+      console.log(record)
+     var deleteAttach=document.getElementById(record.resource_id);
+     deleteAttach.style.display="inline-block";
+    }
+    closeDeleteAttach(record,e){
+      console.log(record)
+      var deleteAttach=document.getElementById(record.resource_id);
+       deleteAttach.style.display="none";
+    }
+    handleUpAttach=()=>{
+      this.setState({visible4:false,flag1:false});
+      console.log(this.props.Db.newAttach,"上传的对象")
+      console.log(this.props.Db.upList,"上传的文件对象")
+      var up=this.props.Db.upList;
+      
+      var that=this;
+      this.props.Db.newAttach.forEach((item,index)=>{
+       if(up[index].uid==item.uid){
+        that.props.dispatch({
+          type:"Db/fetchUpdateAttach",payload:{file:up[index],token:"dddd",resource_name:item.name}
+        })
+       }
+      })
+      that.props.dispatch({
+        type:"Db/fetchNewAttach",payload:{arr:[],up:[]}
+      })
     }
     render(){
         const columns = [
@@ -642,33 +756,42 @@ class VideoModel extends React.Component{
               action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
               // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
               onChange: this.handleChange2,
-              accept:".doc,.docx,.mp4",
+              accept:".mp4",
               data:{
                 file:this.state.file,
                 token:"dddd",
-                resource_name:this.state.names.map((item)=>{
-                  if(item===this.state.file.name) return item;
-                })
+                resource_name:this.state.file.name
               }
         };
-       
+        const props2 = {
+          action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+          // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+          onChange: this.VideoEWAddChange,
+          accept:".mp4",
+          data:{
+            file:this.state.file,
+            token:"dddd",
+            resource_name:this.state.file.name
+          }
+        };
         return (
             <div className="table">
                     {/* 文件上传组件 */}
                    
                     <Upload  multiple={true} {...props} showUploadList={false}  beforeUpload={(file,fileList)=>{
-                        console.log(file)
-                        if(fileList.length==1){
-                         
-                          this.props.dispatch({
-                            type:"vt/fetchUpdateFlag",payload:"视频"
-                          })
-                        }else{
-          
-                          this.props.dispatch({
-                            type:"vt/fetchUpdateFlag",payload:"专辑"
-                          })
-                        }
+                              this.setState({
+                                length:fileList.length
+                              })
+                              if(fileList.length==1){
+                                this.props.dispatch({
+                                  type:'vt/fetchUpdateFlag',payload:"视频"
+                                })
+                              }else{
+
+                                this.props.dispatch({
+                                  type:'vt/fetchUpdateFlag',payload:"专辑"
+                                })
+                            }
                       var b=[];
                       fileList.forEach((item)=>{
                           b.push(item.name);
@@ -795,7 +918,7 @@ class VideoModel extends React.Component{
                                 percent={this.state.percent}
                             />
                             
-                        <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.filelist.length}</span>
+                        <span style={{display:"block",position:"absolute",top:"4em",left:"2em",fontSize:"normal"}}>已上传：{this.state.ok}/{this.state.length}</span>
                         
                         </div>
                         }
@@ -806,59 +929,85 @@ class VideoModel extends React.Component{
                         >
                         <div className={styles.left}>
                         <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的视频:
+                        <Upload  {...props2} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
+                               if(this.state.length==0){
+                                this.props.dispatch({
+                                  type:'vt/fetchUpdateFlag',payload:"视频"
+                                })
+                              }else{
+                                this.props.dispatch({
+                                  type:'vt/fetchUpdateFlag',payload:"专辑"
+                                })
+                              }
+                              var b=[];
+                              fileList.forEach((item)=>{
+                                  b.push(item.name);
+                              })
+                              var a=this.state.names;
+                              var length=this.state.length+fileList.length+1;
+                              var newArr = a.concat(b);
+                              this.setState({
+                                  names:newArr,
+                                  file:file,
+                                  filelist:fileList
+                              })}}>
+                          <Button size="small" style={{marginLeft:"1.3em"}} >
+                            添加
+                          </Button>
+                          </Upload>
                             <br/>
+                            <div style={{border:"1px dashed black",width:"156px",height:"170px",marginLeft:"2em",marginTop:"1em"}}>
                             <ol>
-                            
+                            {/* <li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                <span  onMouseOut={this.closeEditFileName.bind(this,"ds")} onMouseOver={this.showEditFileName.bind(this,"ss")} style={{cursor:"pointer",fontSize:"12px",width:"150px",display:"flex"}}  >
+                                   <span style={{width:"80px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block",marginLeft:"-2em"}}>{"sdas"}</span>
+                                 <span style={{marginLeft:"-2.5em",display:"inline-block"}}><Icon type="edit" onClick={this.updateFileName.bind(this,"aa")}/><Icon onClick={this.deleteVideoFile.bind(this,"aa")} style={{marginLeft:"0.3em"}} type="delete" /></span>
+                                  <span  id={"sad"} style={{fontSize:"12px",marginLeft:"2em"}} >
+                                  {
+                                    <div style={{color:"#3585FE",fontSize:"12px"}} onClick={this.uptext.bind(this,"aa")}>+附件</div>
+                                  }
+                                  </span>
+                                </span>
+                                </li> */}
                             {
                               
                                
-                               this.state.arr.length!=this.state.filelist.length?
-                                this.state.filelist.map((item,index)=>{
-                              
-                                      return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-
-                              <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"150px"}}  >
-                                <span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.name}</span>
-                                  {item.tname!=true?<span></span>:<span onClick={this.updateFileName.bind(this,item)} style={{marginLeft:"1em"}}><svg t="1574994829624" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3135" width="16" height="16"><path d="M898.00592562 984.09757344H125.86445938A85.96208062 85.96208062 0 0 1 39.90237874 898.13549281V126.59460781A85.83564188 85.83564188 0 0 1 125.73802156 40.758965h514.93482938a28.80417188 28.80417188 0 1 1 0 57.60834469H154.21819625a57.0551775 57.0551775 0 0 0-57.11839688 57.11839593v714.5331225a57.03937312 57.03937312 0 0 0 57.11839688 57.18161531h715.007265a57.0551775 57.0551775 0 0 0 57.11839594-57.18161531V355.44750781a28.79626969 28.79626969 0 1 1 57.59253936 0v543.2095425a85.51954688 85.51954688 0 0 1-85.93047093 85.44052313zM431.22819406 605.5894175a28.70144063 28.70144063 0 1 1-40.58661937-40.58661937L904.7387525 48.66134469a28.68563625 28.68563625 0 1 1 40.52340094 40.58661937z m0 0" p-id="3136"></path><path d="M898.00592562 991.99995219H125.86445938A93.95928844 93.95928844 0 0 1 32 898.13549281V126.59460781A93.848655 93.848655 0 0 1 125.73802156 32.85658625h514.93482938a36.70655156 36.70655156 0 1 1 0 73.41310219H154.15497687a49.15279781 49.15279781 0 0 0-49.16860312 49.21601718v714.5331225a49.31084625 49.31084625 0 0 0 49.2318225 49.27923657h715.05467906a48.83670282 48.83670282 0 0 0 34.77046782-14.41393969 49.53211219 49.53211219 0 0 0 14.38233001-34.8494925V355.44750781a36.69864844 36.69864844 0 1 1 73.3972978 0v543.2095425a93.72221625 93.72221625 0 0 1-93.8170453 93.34290188zM125.73802156 48.66134469A78.02809125 78.02809125 0 0 0 47.80475845 126.59460781v771.540885a78.13872469 78.13872469 0 0 0 78.05970092 78.05970188h772.14146625a77.90165344 77.90165344 0 0 0 78.04389657-77.58555844v-543.2095425a20.89388999 20.89388999 0 1 0-41.78778094 0v514.61873438a65.43169969 65.43169969 0 0 1-18.96571031 46.03926093 64.53082781 64.53082781 0 0 1-46.00765125 19.04473407H154.21819625a65.13140906 65.13140906 0 0 1-65.02077561-65.083995V155.48570563A64.95755625 64.95755625 0 0 1 154.17078125 90.46492999h486.6759225a20.90179312 20.90179312 0 0 0-0.1580475-41.8035853z m285.19686281 573.30180187a36.60382031 36.60382031 0 0 1-25.84077938-62.58684281L899.12806345 43.09806969a36.588015 36.588015 0 1 1 51.68155966 51.79219312L436.79146906 611.1052775a36.68284406 36.68284406 0 0 1-25.85658468 10.85786906zM925.0004525 48.12398281a20.76745219 20.76745219 0 0 0-14.65101094 6.10063688L396.23645937 570.58187749a20.80380375 20.80380375 0 1 0 29.38104563 29.46006938l514.03395845-516.34145343a20.54618531 20.54618531 0 0 0 6.16385624-14.73003469 20.97291469 20.97291469 0 0 0-20.83067156-20.83067156z" p-id="3137"></path></svg></span>}
-                                </span>
-                            
-                                <span id={item.resource_id} style={{marginLeft:"3em"}} onClick={this.uptext.bind(this,item)}>
-                                  <svg  t="1574994459218" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2278" width="16" height="16"><path d="M768 256.576l-47.424-47.36-477.824 477.888a100.48 100.48 0 0 0 0 142.272c39.296 39.232 103.04 39.36 142.464 0.128l525.184-525.376a167.488 167.488 0 0 0 0-237.248 167.68 167.68 0 0 0-237.248-0.128L133.568 606.4c-0.256 0.128-0.384 0.384-0.64 0.64a233.92 233.92 0 0 0 0 330.88 233.792 233.792 0 0 0 331.072 0l0.576-0.64 0.064 0.128L909.184 492.8l-47.488-47.488-444.48 444.416a166.976 166.976 0 1 1-236.16-235.968l-0.064 0.128 539.648-539.648a100.736 100.736 0 0 1 142.4 142.4l-525.312 525.44a33.536 33.536 0 1 1-47.424-47.488L768 256.576z" p-id="2279" fill="#1b8cc8"></path></svg>
-
-                                </span>
-                                {
-                                    this.props.Db.successFile.some((hello)=>{
-                                      return hello.textid==item.resource_id&&hello.attachment.length!=0;
-                                    })?
-                                    <span onClick={this.findAttach.bind(this,item.resource_id)}><svg t="1574996755967" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6151" width="16" height="16"><path d="M850.538343 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764L141.103692 204.669426c-17.548678-17.534352-17.548678-45.992497 0-63.525825 17.548678-17.548678 45.977147-17.548678 63.525825 0l677.671227 677.685553c17.548678 17.534352 17.548678 45.992497 0 63.525825C873.526917 891.128807 862.032118 895.516744 850.538343 895.516744z" p-id="6152"></path><path d="M172.867116 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764-17.548678-17.534352-17.548678-45.992497 0-63.525825l677.671227-677.685553c17.548678-17.548678 45.977147-17.548678 63.525825 0 17.548678 17.534352 17.548678 45.992497 0 63.525825L204.629517 882.354979C195.85569 891.128807 184.360891 895.516744 172.867116 895.516744z" p-id="6153"></path></svg></span>
-                                    :<span></span>
-                                }    
-                                  </li>)
-                                }):this.state.arr.map((item,index)=>{
-                
-                                    return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
-                                    <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"150px"}}  >
-                                    <span style={{width:"32px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block"}}>{item.resource_name}</span>
-                                      {item.tname!=true?<span></span>:<span onClick={this.updateFileName.bind(this,item)} style={{marginLeft:"1em"}}><svg t="1574994829624" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3135" width="16" height="16"><path d="M898.00592562 984.09757344H125.86445938A85.96208062 85.96208062 0 0 1 39.90237874 898.13549281V126.59460781A85.83564188 85.83564188 0 0 1 125.73802156 40.758965h514.93482938a28.80417188 28.80417188 0 1 1 0 57.60834469H154.21819625a57.0551775 57.0551775 0 0 0-57.11839688 57.11839593v714.5331225a57.03937312 57.03937312 0 0 0 57.11839688 57.18161531h715.007265a57.0551775 57.0551775 0 0 0 57.11839594-57.18161531V355.44750781a28.79626969 28.79626969 0 1 1 57.59253936 0v543.2095425a85.51954688 85.51954688 0 0 1-85.93047093 85.44052313zM431.22819406 605.5894175a28.70144063 28.70144063 0 1 1-40.58661937-40.58661937L904.7387525 48.66134469a28.68563625 28.68563625 0 1 1 40.52340094 40.58661937z m0 0" p-id="3136"></path><path d="M898.00592562 991.99995219H125.86445938A93.95928844 93.95928844 0 0 1 32 898.13549281V126.59460781A93.848655 93.848655 0 0 1 125.73802156 32.85658625h514.93482938a36.70655156 36.70655156 0 1 1 0 73.41310219H154.15497687a49.15279781 49.15279781 0 0 0-49.16860312 49.21601718v714.5331225a49.31084625 49.31084625 0 0 0 49.2318225 49.27923657h715.05467906a48.83670282 48.83670282 0 0 0 34.77046782-14.41393969 49.53211219 49.53211219 0 0 0 14.38233001-34.8494925V355.44750781a36.69864844 36.69864844 0 1 1 73.3972978 0v543.2095425a93.72221625 93.72221625 0 0 1-93.8170453 93.34290188zM125.73802156 48.66134469A78.02809125 78.02809125 0 0 0 47.80475845 126.59460781v771.540885a78.13872469 78.13872469 0 0 0 78.05970092 78.05970188h772.14146625a77.90165344 77.90165344 0 0 0 78.04389657-77.58555844v-543.2095425a20.89388999 20.89388999 0 1 0-41.78778094 0v514.61873438a65.43169969 65.43169969 0 0 1-18.96571031 46.03926093 64.53082781 64.53082781 0 0 1-46.00765125 19.04473407H154.21819625a65.13140906 65.13140906 0 0 1-65.02077561-65.083995V155.48570563A64.95755625 64.95755625 0 0 1 154.17078125 90.46492999h486.6759225a20.90179312 20.90179312 0 0 0-0.1580475-41.8035853z m285.19686281 573.30180187a36.60382031 36.60382031 0 0 1-25.84077938-62.58684281L899.12806345 43.09806969a36.588015 36.588015 0 1 1 51.68155966 51.79219312L436.79146906 611.1052775a36.68284406 36.68284406 0 0 1-25.85658468 10.85786906zM925.0004525 48.12398281a20.76745219 20.76745219 0 0 0-14.65101094 6.10063688L396.23645937 570.58187749a20.80380375 20.80380375 0 1 0 29.38104563 29.46006938l514.03395845-516.34145343a20.54618531 20.54618531 0 0 0 6.16385624-14.73003469 20.97291469 20.97291469 0 0 0-20.83067156-20.83067156z" p-id="3137"></path></svg></span>}
-                                    </span>
-                                
-                                    <span  id={item.resource_id} style={{marginLeft:"3em"}} onClick={this.uptext.bind(this,item)}>
-                                      <svg  t="1574994459218" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2278" width="16" height="16"><path d="M768 256.576l-47.424-47.36-477.824 477.888a100.48 100.48 0 0 0 0 142.272c39.296 39.232 103.04 39.36 142.464 0.128l525.184-525.376a167.488 167.488 0 0 0 0-237.248 167.68 167.68 0 0 0-237.248-0.128L133.568 606.4c-0.256 0.128-0.384 0.384-0.64 0.64a233.92 233.92 0 0 0 0 330.88 233.792 233.792 0 0 0 331.072 0l0.576-0.64 0.064 0.128L909.184 492.8l-47.488-47.488-444.48 444.416a166.976 166.976 0 1 1-236.16-235.968l-0.064 0.128 539.648-539.648a100.736 100.736 0 0 1 142.4 142.4l-525.312 525.44a33.536 33.536 0 1 1-47.424-47.488L768 256.576z" p-id="2279" fill="#1b8cc8"></path></svg>
-                                    </span>
+                              this.state.arr.length!=this.state.length?this.state.filelist.map((item,index)=>{
                                    
-                                    {
-                                    this.props.Db.successFile.some((hello)=>{
-                                      return hello.textid==item.resource_id&&hello.attachment.length!=0;
-                                    })?
-                                    <span onClick={this.findAttach.bind(this,item)}><svg t="1574996755967" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6151" width="16" height="16"><path d="M850.538343 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764L141.103692 204.669426c-17.548678-17.534352-17.548678-45.992497 0-63.525825 17.548678-17.548678 45.977147-17.548678 63.525825 0l677.671227 677.685553c17.548678 17.534352 17.548678 45.992497 0 63.525825C873.526917 891.128807 862.032118 895.516744 850.538343 895.516744z" p-id="6152"></path><path d="M172.867116 895.516744c-11.494799 0-22.988574-4.386914-31.763424-13.161764-17.548678-17.534352-17.548678-45.992497 0-63.525825l677.671227-677.685553c17.548678-17.548678 45.977147-17.548678 63.525825 0 17.548678 17.534352 17.548678 45.992497 0 63.525825L204.629517 882.354979C195.85569 891.128807 184.360891 895.516744 172.867116 895.516744z" p-id="6153"></path></svg></span>
-                                    :<span></span>
-                                    }
+                                return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"150px",display:"flex"}}  >
+                                   <span style={{width:"80px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block",marginLeft:"-2em"}}>{item.name}</span>
+                                  {item.tname!=true?<span></span>:<span style={{marginLeft:"-2.5em",display:"inline-block"}}><Icon type="edit" onClick={this.updateFileName.bind(this,item)}/><Icon onClick={this.deleteVideoFile.bind(this,item)} style={{marginLeft:"0.3em"}} type="delete" /></span>}
+                                  <span  id={item.uid} style={{fontSize:"12px",marginLeft:"2em"}} >
+                                  {
+                                    <div style={{color:"#3585FE",fontSize:"12px"}} onClick={this.uptext.bind(this,item)}>+附件</div>
+                                  }
+                                  </span>
+                                </span>
+                                </li>)
+                              }):this.state.arr.map((item,index)=>{
+                                   
+                                    return (<li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
+                                    <span  onMouseOut={this.closeEditFileName.bind(this,item)} onMouseOver={this.showEditFileName.bind(this,item)} style={{cursor:"pointer",fontSize:"12px",width:"150px",display:"flex"}}  >
+                                       <span style={{width:"60px",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",display:"inline-block",marginLeft:"-2em"}}>{item.resource_name}</span>
+                                      {item.tname!=true?<span></span>:<span style={{display:"inline-block"}}><Icon type="edit" onClick={this.updateFileName.bind(this,item)}/><Icon onClick={this.deleteVideoFile.bind(this,item)} style={{marginLeft:"0.3em"}} type="delete" /></span>}
+                                      <span  key={item.resource_id} style={{fontSize:"12px",marginLeft:"2em"}} >
+                                      {
+                                        this.props.Db.successFile.some((hello)=>{
+                                          return hello.textid==item.resource_id&&hello.attachment.length!=0;
+                                        })?
+                                        <span  style={{borderRadius:"50px",border:"1px solid #efefef",boxShadow:"0px 0px 1px rgba(0,0,0,0.349)"}} onMouseOut={this.closeDeleteAttach.bind(this,item)} onMouseOver={this.showDeleteAttach.bind(this,item)}><Icon style={{width:"19px",height:"19px"}} type="cloud-upload" onClick={this.uptext.bind(this,"hello")}/> <Icon style={{width:"19px"}} onClick={this.findAttach.bind(this,item)} style={{display:"none"}} id={item.resource_id} type="close" /></span>
+                                        :<div style={{color:"#3585FE",fontSize:"12px"}} onClick={this.uptext.bind(this,item)}>+附件</div>
+                                      }
+                                      </span>
+                                    </span>
                                     </li>)
                                   })
                               }
-                            
+                             
                             
                             </ol>
+                            </div>
                         </span> <br/><br/>
 
                             
@@ -866,9 +1015,13 @@ class VideoModel extends React.Component{
                         </div>
                         
                         <VideoForm id="v_form" wrappedComponentRef={this.saveFormRef} vtest={{flag:this.state.flag,name:this.state.vtext.key}} add={this.state.add} />
-                        <div id="add_text" style={{display:"none",width:"570px",height:"405px",left:"260px",top:"150px",position:"absolute",background:"#fff",overflowY:"auto"}}>
+                        {/* <div id="add_text" style={{display:"none",width:"570px",height:"405px",left:"260px",top:"150px",position:"absolute",background:"#fff",overflowY:"auto"}}>
                           <AddTextForm textname={this.state.textname} textid={this.state.textid}></AddTextForm>
-                        </div>
+                        </div> */}
+                       
+                         {this.props.Db.visible==true?<AddTextForm  textname={this.state.textname}   textid={this.state.textid}></AddTextForm>:<AddTextForm style={{display:"none"}} textname={this.state.textname} textid={this.state.textid}></AddTextForm>
+                          }
+                       
                         <Button id="submit_btn" onClick={this.handleOk} style={{left:"37.5%",top:"-25px",height:"34px",width:"157px",backgroundColor:"rgba(22, 155, 213, 1)",fontWeight:"700",fontSize:"14px",color:"#ffffff",borderRadius:"10px"}}>确认</Button>
                         <Modal
                             title="修改视频文件名"
