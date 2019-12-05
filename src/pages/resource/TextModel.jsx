@@ -490,6 +490,8 @@ class TextModel extends React.Component{
         this.props.dispatch({
           type:'Db/fetchUpdateFlag',payload:"文档"
         })
+      }else if(length==0){
+        this.handleCancel()
       }
       
       this.setState({

@@ -27,7 +27,7 @@ class VideoModel extends React.Component{
             flag:"",
             visible1:false,
             visible2:false,
-            visible:false,
+            visible:true,
             vtext:{},
             percent:0,
             ok:0,
@@ -618,6 +618,8 @@ class VideoModel extends React.Component{
         this.props.dispatch({
           type:'vt/fetchUpdateFlag',payload:"视频"
         })
+      }else if(length==0){
+        this.handleCancel();
       }
     }
     showDeleteAttach(record,e){
@@ -956,7 +958,7 @@ class VideoModel extends React.Component{
                           </Button>
                           </Upload>
                             <br/>
-                            <div style={{border:"1px dashed black",width:"156px",height:"170px",marginLeft:"2em",marginTop:"1em"}}>
+                            <div style={{border:"1px dashed black",width:"156px",height:"170px",marginLeft:"2em",marginTop:"1em",position:"relative"}}>
                             <ol>
                             {/* <li  style={{marginLeft:"-10px",marginTop:".5em",display:"flex"}}>
                                 <span  onMouseOut={this.closeEditFileName.bind(this,"ds")} onMouseOver={this.showEditFileName.bind(this,"ss")} style={{cursor:"pointer",fontSize:"12px",width:"150px",display:"flex"}}  >
@@ -980,7 +982,7 @@ class VideoModel extends React.Component{
                                   {item.tname!=true?<span></span>:<span style={{marginLeft:"-2.5em",display:"inline-block"}}><Icon type="edit" onClick={this.updateFileName.bind(this,item)}/><Icon onClick={this.deleteVideoFile.bind(this,item)} style={{marginLeft:"0.3em"}} type="delete" /></span>}
                                   <span  id={item.uid} style={{fontSize:"12px",marginLeft:"2em"}} >
                                   {
-                                    <div style={{color:"#3585FE",fontSize:"12px"}} onClick={this.uptext.bind(this,item)}>+附件</div>
+                                    <div style={{color:"#3585FE",fontSize:"12px",position:"absolute",right:"0",height:"20px"}} onClick={this.uptext.bind(this,item)}>+附件</div>
                                   }
                                   </span>
                                 </span>
@@ -996,8 +998,8 @@ class VideoModel extends React.Component{
                                         this.props.Db.successFile.some((hello)=>{
                                           return hello.textid==item.resource_id&&hello.attachment.length!=0;
                                         })?
-                                        <span  style={{borderRadius:"50px",border:"1px solid #efefef",boxShadow:"0px 0px 1px rgba(0,0,0,0.349)"}} onMouseOut={this.closeDeleteAttach.bind(this,item)} onMouseOver={this.showDeleteAttach.bind(this,item)}><Icon style={{width:"19px",height:"19px"}} type="cloud-upload" onClick={this.uptext.bind(this,"hello")}/> <Icon style={{width:"19px"}} onClick={this.findAttach.bind(this,item)} style={{display:"none"}} id={item.resource_id} type="close" /></span>
-                                        :<div style={{color:"#3585FE",fontSize:"12px"}} onClick={this.uptext.bind(this,item)}>+附件</div>
+                                        <span  style={{borderRadius:"50px",border:"1px solid #efefef",boxShadow:"0px 0px 1px rgba(0,0,0,0.349)",position:"absolute",right:"0",height:"20px"}} onMouseOut={this.closeDeleteAttach.bind(this,item)} onMouseOver={this.showDeleteAttach.bind(this,item)}><Icon style={{width:"19px",height:"19px"}} type="cloud-upload" onClick={this.uptext.bind(this,"hello")}/> <Icon style={{width:"19px"}} onClick={this.findAttach.bind(this,item)} style={{display:"none"}} id={item.resource_id} type="close" /></span>
+                                        :<div style={{color:"#3585FE",fontSize:"12px",position:"absolute",right:"0"}} onClick={this.uptext.bind(this,item)}>+附件</div>
                                       }
                                       </span>
                                     </span>
