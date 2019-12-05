@@ -31,9 +31,8 @@ class bangDan extends React.Component {
   };
 
   handleOk = e => {
-    alert('提交...');
     this.setState({
-      // visible: false,
+      visible: false,
     });
   };
 
@@ -51,12 +50,13 @@ class bangDan extends React.Component {
   delrank(id) {
     this.props.dispatch({ type: 'videobangdan/delrank', payload: id });
   }
+
   render() {
     // 视频列表表格列的配置描述
     const columns = [
       {
         title: '#',
-        // dataIndex: 'grade',
+        dataIndex: 'id',
       },
       {
         title: '名称',
@@ -98,26 +98,67 @@ class bangDan extends React.Component {
     // 自定义榜单(5项)表格列的配置描述
     const columns1 = [
       {
+        dataIndex: 'id',
+      },
+      {
         dataIndex: 'videorank_order',
       },
       {
         dataIndex: 'name',
+        width: '100px',
       },
       {
-        render: (text, record) => <a>↑</a>,
+        render: (record, index) =>
+          <a
+            onClick={
+              () => {
+                if (index === 0) {
+                  alert('已经是第一位了哦!')
+                } else {
+                  // 上一行数据的id
+                  var pre_id = this.props.videobangdan.customVideorank[index -= 1].id;
+                  var values = {
+                    "down_id": pre_id, // 下调对象的id
+                    "up_id": record.id // 上调对象的id
+                  }
+                  this.props.dispatch({ type: 'videobangdan/changeOrderVideorank', payload: values })
+                }
+              }
+            }>↑</a>,
       },
       {
-        render: (text, record) => <a>↓</a>,
+        render: (record, index) =>
+          <a
+            onClick={
+              () => {
+                if (index === 4) {
+                  alert('已经是最后一位了哦!')
+                } else {
+                  // 下一行数据的id
+                  var next_id = this.props.videobangdan.customVideorank[index += 1].id;
+                  var values = {
+                    "down_id": record.id, // 下调对象的id
+                    "up_id": next_id // 上调对象的id
+                  }
+                  this.props.dispatch({ type: 'videobangdan/changeOrderVideorank', payload: values })
+                }
+              }
+            }>↓</a>,
       },
       {
-        render: (text, record) => <a onClick={() => this.delrank(record.id)}>×</a>,
+        render: (record) => <a onClick={() => this.delrank(record.id)}>×</a>,
       },
     ];
     // 自定义榜单中视频列表表格列的配置描述
     const columns2 = [
       {
+        title: 'ID',
+        dataIndex: 'id',
+      },
+      {
         title: '名称',
         dataIndex: 'vr_name',
+        width: '100px',
       },
       {
         title: '作者',
@@ -141,7 +182,17 @@ class bangDan extends React.Component {
       columnTitle: '#',
       onChange: (selectedRowKeys, selectedRows) => {
         // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-        console.log('selectedRowKeys', selectedRowKeys);
+        // console.log('selectedRowKeys', selectedRowKeys);
+        // 每选择一次就提交一次请求
+        if (selectedRowKeys.length !== 0) {
+          var value = {
+            object_type: 'video',
+            object_id: selectedRowKeys[0]
+          }
+          this.props.dispatch({ type: 'videobangdan/addCustomVideorank', payload: value })
+          // 请求完成后置空selectedRowKeys
+          selectedRowKeys.length = 0;
+        }
         this.setState({
           selectedRowKeys: selectedRowKeys,
         });
@@ -175,18 +226,18 @@ class bangDan extends React.Component {
                 size="small"
                 columns={columns}
                 dataSource={this.props.videobangdan.videos.results}
-                // scroll={{ x: 1300 }}
+              // scroll={{ x: 1300 }}
               />
             </div>
             <Modal
               visible={this.state.visible}
-              okText="完成"
+              // okText="完成"
               onCancel={this.handleCancel}
               width="1000px"
               height="514px"
               footer={
                 <Button type="primary" onClick={this.handleOk}>
-                  确定
+                  完成
                 </Button>
               }
             >
@@ -198,7 +249,7 @@ class bangDan extends React.Component {
                     <Table
                       showHeader={false} //不显示表头
                       pagination={false} //不需要分页
-                      bordered
+                      bordered={false}
                       rowKey="id"
                       size="small"
                       columns={columns1}

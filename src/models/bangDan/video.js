@@ -4,6 +4,8 @@ import {
   findCustomVideolist,
   findByName,
   delrank,
+  addCustomVideorank,
+  changeOrderVideorank,
 } from '@/services/bangDan/video';
 export default {
   namespace: 'videobangdan',
@@ -44,6 +46,20 @@ export default {
     },
     *delrank(_, { call, put }) {
       const response = yield call(delrank, _.payload);
+      yield put({
+        type: 'findCustomVideorank',
+        payload: response,
+      });
+    },
+    *addCustomVideorank(_, { call, put }) {
+      const response = yield call(addCustomVideorank, _.payload);
+      yield put({
+        type: 'findCustomVideorank',
+        payload: response,
+      });
+    },
+    *changeOrderVideorank(_, { call, put }) {
+      const response = yield call(changeOrderVideorank, _.payload);
       yield put({
         type: 'findCustomVideorank',
         payload: response,
