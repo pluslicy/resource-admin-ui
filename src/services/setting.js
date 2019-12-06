@@ -30,8 +30,15 @@ export async function getCatalevelList() {
     return request(baseURL + '/mp_man_module/get_catalevel_list/');
 }
 // 修改编目级别列表名称
-export async function updateCatalevelname() {
-    return request(baseURL + '/mp_man_module/update_catalevelname/');
+export async function updateCatalevelname(param) {
+    return request(baseURL + '/mp_man_module/update_catalevelname/', {
+        method: 'post',
+        data: {
+            ...param,
+        },
+        headers: { 'Content-Type': 'application/json' },
+        getResponse: true,
+    });
 }
 // 获取编目级别检索设置
 export async function getCatalevelSetting() {
@@ -39,7 +46,7 @@ export async function getCatalevelSetting() {
 }
 // 设置搜索编目级别设置
 export async function updateCatalevelSearch(param) {
-    return request(baseURL + '/mp_man_module/update_catalevel_search/',{
+    return request(baseURL + '/mp_man_module/update_catalevel_search/', {
         method: 'post',
         data: {
             ...param,
@@ -50,7 +57,7 @@ export async function updateCatalevelSearch(param) {
 }
 // 设置上传编目级别设置
 export async function updateCatalevelUpload(param) {
-    return request(baseURL + '/mp_man_module/update_catalevel_upload/',{
+    return request(baseURL + '/mp_man_module/update_catalevel_upload/', {
         method: 'post',
         data: {
             ...param,

@@ -1,11 +1,13 @@
 import React from 'react';
-import { Button, Radio, Table, Modal, Input, Select, Divider } from 'antd';
+import { Button, Radio, Table, Modal, Input, Select, } from 'antd';
 import { connect } from 'dva';
 const { Search } = Input;
 const { Option } = Select;
 class bangDan extends React.Component {
   state = {
     value: 1,
+    selectedRowKeys: [],
+    display: 'none'
   };
   componentWillMount() {
     this.props.dispatch({ type: 'wordbangdan/findAll' });
@@ -17,6 +19,27 @@ class bangDan extends React.Component {
       value: e.target.value,
     });
   };
+
+  componentWillReceiveProps(nextProps) {
+    // 该方法当props发生变化时执行，初始化render时不执行
+    if (nextProps !== this.props) {
+      let set = nextProps.wordbangdan.customWordrank
+      if (nextProps !== null && set !== undefined) {
+        this.props = nextProps;
+        // 当自定义榜单数量大于 5 时进行提示
+        if (this.props.wordbangdan.customWordrank.length >= 5) {
+          this.setState({
+            display: 'inline',
+          })
+        } else {
+          this.setState({
+            display: 'none',
+          })
+        }
+        return;
+      }
+    }
+  }
 
   // 开启模态框
   showModal = () => {
@@ -34,7 +57,6 @@ class bangDan extends React.Component {
   };
 
   handleCancel = e => {
-    console.log(e);
     this.setState({
       visible: false,
     });
@@ -51,7 +73,7 @@ class bangDan extends React.Component {
     const columns = [
       {
         title: '#',
-        dataIndex: 'grade',
+        dataIndex: 'id',
       },
       {
         title: '名称',
@@ -90,19 +112,55 @@ class bangDan extends React.Component {
         dataIndex: 'dr_created_time',
       },
     ];
-
+    // 自定义榜单(5项)表格列的配置描述
     const columns1 = [
+      {
+        dataIndex: 'id',
+      },
       {
         dataIndex: 'docsrank_order',
       },
       {
         dataIndex: 'name',
+        width: '100px',
       },
       {
-        render: (text, record) => <a>↑</a>,
+        render: (text, record, index) =>
+          <a
+            onClick={
+              () => {
+                if (index === 0) {
+                  alert('已经是第一位了哦!')
+                } else {
+                  // 上一行数据的id
+                  var pre_id = this.props.wordbangdan.customWordrank[index -= 1].id;
+                  var values = {
+                    "down_id": pre_id, // 下调对象的id
+                    "up_id": record.id // 上调对象的id
+                  }
+                  this.props.dispatch({ type: 'wordbangdan/changeOrderWordrank', payload: values })
+                }
+              }
+            }>↑</a>,
       },
       {
-        render: (text, record) => <a>↓</a>,
+        render: (text, record, index) =>
+          <a
+            onClick={
+              () => {
+                if (index + 1 === this.props.wordbangdan.customWordrank.length) {
+                  alert('已经是最后一位了哦!')
+                } else {
+                  // 下一行数据的id
+                  var next_id = this.props.wordbangdan.customWordrank[index += 1].id;
+                  var values = {
+                    "down_id": record.id, // 下调对象的id
+                    "up_id": next_id // 上调对象的id
+                  }
+                  this.props.dispatch({ type: 'wordbangdan/changeOrderWordrank', payload: values })
+                }
+              }
+            }>↓</a>,
       },
       {
         render: (text, record) => <a onClick={() => this.delrank(record.id)}>×</a>,
@@ -134,7 +192,20 @@ class bangDan extends React.Component {
     const rowSelection = {
       columnTitle: '#',
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        // 每选择一次就提交一次请求
+        if (selectedRowKeys.length !== 0) {
+          var value = {
+            object_type: 'docs', // 默认为文档类型,未考虑专辑有bug
+            object_id: selectedRowKeys[0]
+          }
+          this.props.dispatch({ type: 'wordbangdan/addCustomWordrank', payload: value })
+          // 请求完成后置空selectedRowKeys
+          selectedRowKeys.length = 0;
+        }
+        this.setState({
+          selectedRowKeys: selectedRowKeys,
+        });
       },
       getCheckboxProps: record => ({
         disabled: record.name === 'Disabled User', // Column configuration not to be checked
@@ -180,13 +251,13 @@ class bangDan extends React.Component {
                 <Table
                   showHeader={false} //不显示表头
                   pagination={false} //不需要分页
-                  bordered
+                  bordered={false}
                   rowKey="id"
                   size="small"
                   columns={columns1}
                   dataSource={this.props.wordbangdan.customWordrank}
                 />
-                <span style={{ color: 'red' }}>不能选择更多了!!!</span>
+                <span style={{ color: 'red',display:this.state.display }}>不能选择更多了!!!</span>
               </div>
             </div>
             <div style={{ float: 'right' }}>

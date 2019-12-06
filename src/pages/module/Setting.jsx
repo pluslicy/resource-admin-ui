@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Radio, Table, Input, Menu, Dropdown, Icon, Checkbox, Popover, TextArea} from 'antd';
+import { Button, Radio, Table, Input, Menu, Dropdown, Icon, Checkbox, Popover, TextArea } from 'antd';
 import { connect } from 'dva';
 import styles from './Setting.less';
 // import TextArea from 'antd/lib/input/TextArea';
@@ -97,8 +97,6 @@ class Setting extends React.Component {
     // 该方法当props发生变化时执行，初始化render时不执行
     if (nextProps !== this.props) {
       let set = nextProps.setting.SysSettingDatas.data
-      // 这里有一处bug
-      console.log(set)
       if (nextProps !== null && set !== undefined) {
         this.props = nextProps;
         this.setState({
@@ -141,6 +139,24 @@ class Setting extends React.Component {
       oDiv.appendChild(mytr);
     }
   };
+   check(e){
+     alert(2222)
+    //获取键盘输入的keyCode         
+   var keycode = (Number)(e.keyCode);         
+    //键盘上方数字键        
+    if(keycode >= 48 && keycode <= 57){            
+    e.returnValue = true;         
+   //小数字键盘         
+   }else if(keycode >=96 && keycode <= 105){
+    e.returnValue = true;         
+   //删除键和delete         
+   }else if(keycode == 8 || keycode == 46){
+    e.returnValue = true;         
+   //除此之外，其他的不允许输入         
+   }else{             
+    e.returnValue = false;         
+   }    
+ }
 
   render() {
     // 定义一个数组，将数据存入数组
@@ -151,7 +167,8 @@ class Setting extends React.Component {
         <div key={item.id} style={{ marginBottom: '0.5em' }}>
           {item.cata_level_num}:
           <input
-            id="inp"
+            ref={item.id}
+            id={item.id}
             style={{
               width: '80px',
               border: 'none',
@@ -159,21 +176,27 @@ class Setting extends React.Component {
               marginLeft: '1em',
             }}
             onBlur={() => {
-              this.setState({
-                disabled: true
-              })
-              // var mobi = $("#inp").val();
-              // console.log(mobi)
-            }}
-            disabled={this.state.disabled}
-            size="small"
+            // 禁用输入框
+            this.refs[item.id].disabled = true;
+            if (this.refs[item.id].value) {
+              // 提交更改
+              var values = {
+                "cata_level_name": this.refs[item.id].value,
+                "id": item.id
+              }
+              this.props.dispatch({ type: 'setting/updateCatalevelname', payload: values });
+            }
+
+          }}
+          disabled={this.state.disabled}
+          size="small"
             placeholder={item.cata_level_name}
           />
           {/* <span style={{ fontSize: '16px', marginLeft: '1em', color: 'blue', }}>{item.cata_level_name}</span> */}
           &nbsp;<a onClick={() => {
-            this.setState({
-              disabled: false
-            })
+            // 设置输入框可用同时获得焦点
+            this.refs[item.id].disabled = false;
+            this.refs[item.id].focus();
           }}>修改</a>
         </div>
       )
@@ -202,9 +225,6 @@ class Setting extends React.Component {
     return (
       <div>
         <div className={styles.contain}>
-          {/* <Button onClick={() => {
-            console.log(this.props.setting)
-          }}>测试按钮</Button> */}
           <p>系统一键开关</p>
           <div className={styles.switch_div}>
             <div

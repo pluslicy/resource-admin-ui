@@ -4,6 +4,8 @@ import {
   findCustomWordlist,
   findByName,
   delrank,
+  addCustomWordrank,
+  changeOrderWordrank,
 } from '@/services/bangDan/word';
 export default {
   namespace: 'wordbangdan',
@@ -44,6 +46,20 @@ export default {
     },
     *delrank(_, { call, put }) {
       const response = yield call(delrank, _.payload);
+      yield put({
+        type: 'findCustomWordrank',
+        payload: response,
+      });
+    },
+    *addCustomWordrank(_, { call, put }) {
+      const response = yield call(addCustomWordrank, _.payload);
+      yield put({
+        type: 'findCustomWordrank',
+        payload: response,
+      });
+    },
+    *changeOrderWordrank(_, { call, put }) {
+      const response = yield call(changeOrderWordrank, _.payload);
       yield put({
         type: 'findCustomWordrank',
         payload: response,

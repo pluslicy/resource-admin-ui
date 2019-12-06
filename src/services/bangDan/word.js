@@ -10,9 +10,35 @@ var baseURL = 'http://10.0.6.5:16012';
 export async function findAll() {
   return request(baseURL + '/mp_man_module/get_default_docslist/');
 }
-// 自定义榜单(5项)
+// 查找自定义文档榜单(5项)
 export async function findCustomWordrank() {
   return request(baseURL + '/mp_man_module/get_custom_docsrank/');
+}
+// 添加自定义文档榜单
+export async function addCustomWordrank(value) {
+  return request.post(baseURL + '/mp_man_module/add_custom_docsrank/', {
+    method: 'post',
+    data: {
+      ...value,
+    },
+    headers: { 'Content-Type': 'application/json' },
+    getResponse: true,
+  });
+}
+// 删除自定义文档榜单
+export async function delrank(value) {
+  return request.post(baseURL + '/mp_man_module/del_custom_docsrank/' + value + '/');
+}
+// 改变自定义文档榜单顺序
+export async function changeOrderWordrank(value) {
+  return request.post(baseURL + '/mp_man_module/change_order_docsrank/', {
+    method: 'post',
+    data: {
+      ...value,
+    },
+    headers: { 'Content-Type': 'application/json' },
+    getResponse: true,
+  });
 }
 // 自定义榜单
 export async function findCustomWordlist() {
@@ -21,8 +47,4 @@ export async function findCustomWordlist() {
 // 自定义榜单搜索
 export async function findByName(value) {
   return request(baseURL + '/mp_man_module/get_custom_docslist/?search=' + value);
-}
-// 删除自定义文档榜单
-export async function deldocsrank(value) {
-  return request.post(baseURL + '/mp_man_module/del_custom_docsrank/' + value + '/');
 }

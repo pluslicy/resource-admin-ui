@@ -9,6 +9,7 @@ class bangDan extends React.Component {
   state = {
     value: 1,
     selectedRowKeys: [],
+    display:'none'
   };
   componentWillMount() {
     this.props.dispatch({ type: 'videobangdan/findAll' });
@@ -20,6 +21,27 @@ class bangDan extends React.Component {
       value: e.target.value,
     });
   };
+
+  componentWillReceiveProps(nextProps) {
+    // 该方法当props发生变化时执行，初始化render时不执行
+    if (nextProps !== this.props) {
+      let set = nextProps.videobangdan.customVideorank
+      if (nextProps !== null && set !== undefined) {
+        this.props = nextProps;
+        // 当自定义榜单数量大于 5 时进行提示
+        if(this.props.videobangdan.customVideorank.length>=5){
+          this.setState({
+            display:'inline',
+          })
+        }else{
+          this.setState({
+            display:'none',
+          })
+        }
+        return;
+      }
+    }
+  }
 
   // 开启模态框
   showModal = () => {
@@ -186,7 +208,7 @@ class bangDan extends React.Component {
         // 每选择一次就提交一次请求
         if (selectedRowKeys.length !== 0) {
           var value = {
-            object_type: 'video', // 默认为视频类型,未考虑专辑有bug
+            object_type: 'video', // 此处有bug,默认为视频类型,未考虑专辑
             object_id: selectedRowKeys[0]
           }
           this.props.dispatch({ type: 'videobangdan/addCustomVideorank', payload: value })
@@ -255,7 +277,7 @@ class bangDan extends React.Component {
                       columns={columns1}
                       dataSource={this.props.videobangdan.customVideorank}
                     />
-                    <span style={{ color: 'red' }}>不能选择更多了!!!</span>
+                    <span style={{ color: 'red',display:this.state.display  }} >不能选择更多了!!!</span>
                   </div>
                 </div>
                 <div style={{ float: 'right' }}>
