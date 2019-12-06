@@ -48,4 +48,3 @@ export async function findCustomVideolist() {
 export async function findByName(value) {
   return request(baseURL + '/mp_man_module/get_custom_videolist/?search=' + value);
 }
-

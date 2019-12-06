@@ -108,7 +108,7 @@ class bangDan extends React.Component {
         width: '100px',
       },
       {
-        render: (record, index) =>
+        render: (text,record, index) =>
           <a
             onClick={
               () => {
@@ -127,11 +127,11 @@ class bangDan extends React.Component {
             }>↑</a>,
       },
       {
-        render: (record, index) =>
+        render: (text,record, index) =>
           <a
             onClick={
               () => {
-                if (index === 4) {
+                if (index+1 === this.props.videobangdan.customVideorank.length) {
                   alert('已经是最后一位了哦!')
                 } else {
                   // 下一行数据的id
@@ -186,7 +186,7 @@ class bangDan extends React.Component {
         // 每选择一次就提交一次请求
         if (selectedRowKeys.length !== 0) {
           var value = {
-            object_type: 'video',
+            object_type: 'video', // 默认为视频类型,未考虑专辑有bug
             object_id: selectedRowKeys[0]
           }
           this.props.dispatch({ type: 'videobangdan/addCustomVideorank', payload: value })
