@@ -27,7 +27,7 @@ class VideoModel extends React.Component{
             flag:"",
             visible1:false,
             visible2:false,
-            visible:true,
+            visible:false,
             vtext:{},
             percent:0,
             ok:0,
@@ -1032,7 +1032,7 @@ class VideoModel extends React.Component{
                             onCancel={()=>{this.setState({tname:{},visible2:false})}}
                           >
                             <div style={{display:'flex',justifyContent:"space-around"}}>
-                            <span style={{width:"100px"}}>视频名称：</span><Input size={'small'} onChange={this.editFileName.bind(this)} value={this.state.tname.resource_name!=undefined?this.state.tname.resource_name:""} />
+                            <span style={{width:"100px"}}>视频名称：</span><Input size={'small'} onChange={this.editFileName.bind(this)} value={this.state.tname.resource_name!=undefined?this.state.tname.resource_name.split(".")[0]:""} />
 
                             </div>
                         </Modal>

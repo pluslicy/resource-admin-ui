@@ -78,7 +78,7 @@ class AddTextForm2 extends React.Component{
                 fileList,
                 file,
                 visible:true,
-                textName:file.name,
+                textName:file.name.split(".")[0],
                 suffix:"类型",
                 UpList:crr
             })
