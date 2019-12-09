@@ -1,24 +1,40 @@
 import React from 'react';
-import { Form, Input,Select,Button,Upload,Icon} from 'antd';
+import { Form, Input,Select,Button,Upload,Icon,message} from 'antd';
 class UserForm extends React.Component {
+  constructor(props){
+    super(props);
+    this.state={
+      file:"",fileList:""
+    }
+  }
+  componentWillReceiveProps(nextProps){
+    console.log(this.props.flag,"ggg",nextProps.flag)
+    this.setState({
+      flag:nextProps.flag
+    })
+  }
+  
   render() {
   
    
     // 上传
     const props = {
       name: 'file',
-      action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+      action: this.state.flag!=false?'http://10.0.6.5:16012/mp_man_users/import_studentuser/':"http://10.0.6.5:16012/mp_man_users/import_teacheruser/",
       headers: {
         authorization: 'authorization-text',
+      },
+      data:{
+          xlsx_file:this.state.file
       },
       onChange(info) {
         if (info.file.status !== 'uploading') {
           console.log(info.file, info.fileList);
         }
         if (info.file.status === 'done') {
-          message.success(`${info.file.name} file uploaded successfully`);
+          message.success(`${info.file.name} 文件上传成功`);
         } else if (info.file.status === 'error') {
-          message.error(`${info.file.name} file upload failed.`);
+          message.error(`${info.file.name} 文件上传失败`);
         }
       },
     };
@@ -36,7 +52,7 @@ class UserForm extends React.Component {
           </Form.Item>
           <Form.Item>
             {getFieldDecorator('description')(
-              <Upload {...props} style={{marginLeft:'14em'}}>
+              <Upload {...props} style={{marginLeft:'14em'}}  beforeUpload={(file,fileList)=>{this.setState({file,fileList})}}>
                 <Button>
                   <Icon type="upload" />请选择你的文件
                 </Button>

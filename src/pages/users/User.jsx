@@ -50,6 +50,7 @@ class User extends React.Component {
       flag: false,
       juese: undefined,
       id: '',
+      flag2:false,
     };
   }
 
@@ -277,14 +278,25 @@ class User extends React.Component {
     this.setState({
       value: e.target.value,
     });
+    if(e.target.value==1){
+      console.log("学生")
+      this.setState({
+        flag2:true
+      })
+    }else{
+      console.log("教师")
+      this.setState({
+        flag2:false
+      })
+    }
   };
 
-  handleOk = e => {
-    console.log(e);
-    this.setState({
-      visible: false,
-    });
-  };
+  // handleOk = e => {
+  //   console.log(e);
+  //   this.setState({
+  //     visible: false,
+  //   });
+  // };
 
   handleCancel = e => {
     console.log(e);
@@ -292,6 +304,7 @@ class User extends React.Component {
       visible: false,
     });
   };
+
 
   // 导入模态框
   showImport = () => {
@@ -315,7 +328,7 @@ class User extends React.Component {
       });
     } else {
       this.setState({
-        visibleTeacher: true,
+        visibleStudent: true,
       });
     }
     this.setState({
@@ -334,7 +347,10 @@ class User extends React.Component {
     console.log(e);
     this.setState({
       visibleStudent: false,
+      visibleImport: false,
     });
+    // const { form } = this.formRef.props;
+    // form.resetFields()
   };
   // 学生用户关闭
   handleCancelStud = e => {
@@ -349,6 +365,8 @@ class User extends React.Component {
     console.log(e);
     this.setState({
       visibleTeacher: false,
+      visibleImport: false,
+
     });
   };
 
@@ -473,6 +491,7 @@ class User extends React.Component {
         导入时需要按模板填写,点击<a>下载</a>
       </span>
     );
+
     // 表格第一列选框
     const rowSelection = {
       selectedRowKeys: this.state.ids,
@@ -516,7 +535,7 @@ class User extends React.Component {
           });
 
           str = str.slice(0, str.length - 1);
-          console.log('str', str);
+          // console.log('str', str);
           return (
             <div>
               <Input style={{ width: '100px' }} size="small" disabled={true} value={str} />
@@ -578,6 +597,8 @@ class User extends React.Component {
         },
       },
     ];
+
+    
 
     return (
       <div className={style.Back}>
@@ -771,17 +792,17 @@ class User extends React.Component {
         </Modal>
         {/* 学生用户模态框 */}
         <Modal
-          title="导入学生用户"
+          title={this.state.flag2!=false?"导入学生用户":"导入教师用户"}
           visible={this.state.visibleStudent}
           onOk={this.handleOkStu}
           onCancel={this.handleCancelStud}
           width="600px"
           height="400px"
         >
-          <UserForm />
+          <UserForm handleOk={this.handleOk} flag={this.state.flag2}/>
         </Modal>
         {/* 教师用户模态框 */}
-        <Modal
+        {/* <Modal
           title="导入教师用户"
           visible={this.state.visibleTeacher}
           onOk={this.handleOkTea}
@@ -790,7 +811,7 @@ class User extends React.Component {
           height="400px"
         >
           <UserForm />
-        </Modal>
+        </Modal> */}
         {/* 添加角色模态框 */}
         <Modal
           width="600px"
