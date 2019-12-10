@@ -9,7 +9,7 @@ class bangDan extends React.Component {
   state = {
     value: 1,
     selectedRowKeys: [],
-    display:'none'
+    display: 'none'
   };
   componentWillMount() {
     this.props.dispatch({ type: 'videobangdan/findAll' });
@@ -29,13 +29,13 @@ class bangDan extends React.Component {
       if (nextProps !== null && set !== undefined) {
         this.props = nextProps;
         // 当自定义榜单数量大于 5 时进行提示
-        if(this.props.videobangdan.customVideorank.length>=5){
+        if (this.props.videobangdan.customVideorank.length >= 5) {
           this.setState({
-            display:'inline',
+            display: 'inline',
           })
-        }else{
+        } else {
           this.setState({
-            display:'none',
+            display: 'none',
           })
         }
         return;
@@ -130,7 +130,7 @@ class bangDan extends React.Component {
         width: '100px',
       },
       {
-        render: (text,record, index) =>
+        render: (text, record, index) =>
           <a
             onClick={
               () => {
@@ -149,11 +149,11 @@ class bangDan extends React.Component {
             }>↑</a>,
       },
       {
-        render: (text,record, index) =>
+        render: (text, record, index) =>
           <a
             onClick={
               () => {
-                if (index+1 === this.props.videobangdan.customVideorank.length) {
+                if (index + 1 === this.props.videobangdan.customVideorank.length) {
                   alert('已经是最后一位了哦!')
                 } else {
                   // 下一行数据的id
@@ -276,8 +276,9 @@ class bangDan extends React.Component {
                       size="small"
                       columns={columns1}
                       dataSource={this.props.videobangdan.customVideorank}
+                      scroll={{ x: 300 }}
                     />
-                    <span style={{ color: 'red',display:this.state.display  }} >不能选择更多了!!!</span>
+                    <span style={{ color: 'red', display: this.state.display }} >不能选择更多了!!!</span>
                   </div>
                 </div>
                 <div style={{ float: 'right' }}>
@@ -306,6 +307,7 @@ class bangDan extends React.Component {
                     size="small"
                     columns={columns2}
                     dataSource={this.props.videobangdan.customVideolist.results}
+                    scroll={{ x: 500 }}
                   />
                 </div>
               </div>
