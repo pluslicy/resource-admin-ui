@@ -52,6 +52,8 @@
     "classnames": "^2.2.6",
     "dagre-d3": "^0.6.3",
     "dva": "^2.4.1",
+    "echarts": "^4.5.0",
+    "echarts-for-react": "^2.0.15-beta.1",
     "lodash-decorators": "^6.0.1",
     "memoize-one": "^5.0.4",
     "moment": "^2.24.0",

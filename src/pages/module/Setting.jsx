@@ -139,24 +139,6 @@ class Setting extends React.Component {
       oDiv.appendChild(mytr);
     }
   };
-   check(e){
-     alert(2222)
-    //获取键盘输入的keyCode         
-   var keycode = (Number)(e.keyCode);         
-    //键盘上方数字键        
-    if(keycode >= 48 && keycode <= 57){            
-    e.returnValue = true;         
-   //小数字键盘         
-   }else if(keycode >=96 && keycode <= 105){
-    e.returnValue = true;         
-   //删除键和delete         
-   }else if(keycode == 8 || keycode == 46){
-    e.returnValue = true;         
-   //除此之外，其他的不允许输入         
-   }else{             
-    e.returnValue = false;         
-   }    
- }
 
   render() {
     // 定义一个数组，将数据存入数组

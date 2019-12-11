@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { getLevelonecata, getCustomTeacherrank, getTeacherrankList,changeOrderTeacherrank } from '@/services/recommend/teacher';
+import { getLevelonecata, getCustomTeacherrank, getTeacherrankList, changeOrderTeacherrank, delrank,addCustomTeacherrank} from '@/services/recommend/teacher';
 /**
  * @Description: 教师模块页面
  * @PageAuthor: rendc
@@ -37,7 +37,21 @@ const RecommendModel = {
         },
         *changeOrderTeacherrank(_, { call, put }) {
             const response = yield call(changeOrderTeacherrank, _.payload);
-          },
+        },
+        *delrank(_, { call, put }) {
+            const response = yield call(delrank, _.payload);
+            // yield put({
+            //     type: 'getCustomTeacherrank',
+            //     payload: response,
+            // });
+        },
+        *addCustomTeacherrank(_, { call, put }) {
+            const response = yield call(addCustomTeacherrank, _.payload);
+            // yield put({
+            //     type: 'getCustomTeacherrank',
+            //     payload: response,
+            // });
+        },
     },
 
     reducers: {

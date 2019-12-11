@@ -9,7 +9,8 @@ const { Option } = Select;
 class recommend extends React.Component {
   state = {
     value: 1,
-    activeKey: 0,
+    activeKey: 0,// 编目id
+    display: 'none'
   };
 
   componentWillMount() {
@@ -49,8 +50,8 @@ class recommend extends React.Component {
   // 开启模态框
   showModal = () => {
     // 此处为假数据
-    // this.state.activeKey
-    this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: 24 });
+    // 
+    this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
     this.setState({
       visible: true,
     });
@@ -86,7 +87,9 @@ class recommend extends React.Component {
   }
   // 删除自定义榜单
   delrank(id) {
-    this.props.dispatch({ type: 'recommend/delrank', payload: id });
+    this.props.dispatch({ type: 'recommend/delrank', payload: id }).then(() => {
+      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
+    });
   }
 
   render() {
@@ -167,7 +170,7 @@ class recommend extends React.Component {
                     () => {
                       // 此处为假数据
                       // this.state.activeKey
-                      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: 24 });
+                      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
                     }
                   )
                 }
@@ -192,7 +195,7 @@ class recommend extends React.Component {
                     () => {
                       // 此处为假数据
                       // this.state.activeKey
-                      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: 24 });
+                      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
                     }
                   )
                 }
@@ -233,6 +236,32 @@ class recommend extends React.Component {
         dataIndex: 'times_num',
       },
     ];
+    // 自定义榜单的选择框
+    const rowSelection = {
+      columnTitle: '#',
+      onChange: (selectedRowKeys, selectedRows) => {
+        // console.log('selectedRowKeys', selectedRowKeys);
+        // 每选择一次就提交一次请求
+        if (selectedRowKeys.length !== 0) {
+          var value = {
+            user: selectedRowKeys[0],
+            catalogue: this.state.activeKey
+          }
+          this.props.dispatch({ type: 'recommend/addCustomTeacherrank', payload: value }).then(() => {
+            this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
+          });
+          // 请求完成后置空selectedRowKeys
+          selectedRowKeys.length = 0;
+        }
+        this.setState({
+          selectedRowKeys: selectedRowKeys,
+        });
+      },
+      getCheckboxProps: record => ({
+        disabled: record.name === 'Disabled User',
+        name: record.name,
+      }),
+    };
     // 定义一个数组，将数据存入数组
     const elements = [];
     var list = this.props.recommend.roles;
@@ -284,7 +313,7 @@ class recommend extends React.Component {
             onCancel={this.handleCancel}
             width="1000px"
             height="514px"
-            maskStyle={{backgroundColor:'rgba(0,0,0,.05)'}}// 调高遮罩层透明度
+            maskStyle={{ backgroundColor: 'rgba(0,0,0,.05)' }}// 调高遮罩层透明度
           >
             <div style={{ overflow: 'hidden' }}>
               <div style={{ float: 'left' }}>
@@ -300,7 +329,7 @@ class recommend extends React.Component {
                     columns={columns1}
                     dataSource={this.props.recommend.customTeacherrank}
                   />
-                  <span style={{ color: 'red' }}>不能选择更多了!!!</span>
+                  <span style={{ color: 'red', display: this.state.display }} >不能选择更多了!!!</span>
                 </div>
               </div>
               <div style={{ float: 'right' }}>
@@ -311,7 +340,7 @@ class recommend extends React.Component {
                 />
                 <br />
                 <Radio style={{ marginTop: '1em', marginBottom: '1em' }}>按热度</Radio>
-                <Table bordered rowKey="id" size="small" columns={columns2} dataSource={this.props.recommend.teacherrankList} />
+                <Table rowSelection={rowSelection} bordered rowKey="id" size="small" columns={columns2} dataSource={this.props.recommend.teacherrankList} />
               </div>
             </div>
           </Modal>
