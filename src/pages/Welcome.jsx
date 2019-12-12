@@ -1,21 +1,48 @@
 import React from 'react';
 import styles from './Welcome.less';
 import { Table, Tabs, Button, DatePicker } from 'antd';
-import { Bar, TimelineChart } from 'ant-design-pro/lib/Charts';
 import { connect } from 'dva'
 import $ from 'jquery'
 import ReactEcharts from 'echarts-for-react';
-import { thisExpression } from '@babel/types';
+import moment from 'moment';
+import { whileStatement } from '@babel/types';
 const { TabPane } = Tabs;
 const { MonthPicker } = DatePicker;
 class index extends React.Component {
 	state = {
 		all: [],
 		month: [],
+		monthd: [],
+		shangc: [],
+		tongg: [],
+		backgroundColor: '#3AA0FF',
+		fontcolor: 'white',
+		backgroundColor1: 'white',
+		fontcolor1: 'black',
+		display: true,
+		option: [],
+	}
+	getListData() {
+		// 条形统计图数据源
+		var list = this.state.month
+		if (list.length > 0) {
+			var monthd = []
+			var shangc = []
+			var tongg = []
+			list.forEach((item) => {
+				monthd.push(item.day)
+				shangc.push(item.upload_works_num);
+				tongg.push(item.audit_passed_works_num);
+			})
+			this.setState({
+				monthd: monthd,
+				shangc: shangc,
+				tongg: tongg
+			})
+		}
 	}
 	componentWillMount() {
 		this.props.dispatch({ type: 'welcome/findAll' }).then(() => {
-			console.log(this.props.welcome)
 			this.setState({
 				all: this.props.welcome.all.data
 			})
@@ -26,9 +53,11 @@ class index extends React.Component {
 		arr.push(day.getMonth() + 1) // 获取当前月份+1(0-11,0代表1月)
 		arr.push(new Date(arr[0], arr[1], 0).getDate()) // 获取当月天数
 		this.props.dispatch({ type: 'welcome/findMonth', payload: arr }).then(() => {
-			console.log(this.props.welcome)
 			this.setState({
 				month: this.props.welcome.month.data.data
+			}, () => {
+				this.getListData()
+				this.setOption('bar')
 			})
 		});
 	}
@@ -39,41 +68,82 @@ class index extends React.Component {
 			var day = new Date(arr[0], arr[1], 0).getDate();   //最后一个参数为0,意为获取当月一共多少天
 			arr.push(day)
 			this.props.dispatch({ type: 'welcome/findMonth', payload: arr }).then(() => {
-				console.log(this.props.welcome)
 				this.setState({
 					month: this.props.welcome.month.data.data
+				}, () => {
+					this.getListData()
 				})
 			});
 		}
 	}
-
+	// 切换条形/折线统计图
+	onChangeSpan(key) {
+		var a = 'backgroundColor' + [key]
+		var b = 'fontcolor' + [key]
+		this.setState({
+			display: !this.state.display,
+			[a]: this.state[a] === 'white' ? '#3AA0FF' : 'white',
+			[b]: this.state[b] === 'white' ? 'black' : 'white',
+		})
+	}
+	setOption(type) {
+		var color = ['#3AA0FF', '#4ECB73', '#675bba']
+		var option = {
+			title: {
+				text: '上传量与通过量统计'
+			},
+			color: color,
+			tooltip: {
+				trigger: 'none',
+				axisPointer: {
+					type: 'cross'
+				}
+			},
+			legend: {
+				data: ['上传量', '通过量']
+			},
+			xAxis:
+			{
+				data: this.state.monthd
+			},
+			yAxis:
+			{
+				name: '人次'
+			},
+			series: [
+				{
+					type: type,
+					smooth: false,//是否平滑曲线显示
+					name: '上传量',
+					data: this.state.shangc,
+					emphasis: {
+						label: {
+							show: true,
+						}
+					}
+				},
+				{
+					type: type,
+					smooth: false,//是否平滑曲线显示
+					name: '通过量',
+					data: this.state.tongg,
+					emphasis: {
+						label: {
+							show: true,
+						}
+					}
+				}
+			]
+		};
+		this.setState({
+			option: option
+		})
+	}
 	render() {
 		// 切换标签页回调函数
 		function callback(key) {
 			console.log(key);
 		}
-		// 条形统计图数据源
-		const salesData = [];
-		for (let i = 0; i < 12; i += 1) {
-			salesData.push({
-				x: `${i + 1}月`,
-				y: Math.floor(Math.random() * 1000) + 200,
-			});
-		}
-		// // 折线统计图数据源
-		// var list = this.state.month
-		// if (list.length > 0) {
-		// 	var chartData = []
-		// 	list.forEach((item) => {
-		// 		chartData.push({
-		// 			x: item.day,
-		// 			y1: item.upload_works_num,
-		// 			y2: item.audit_passed_works_num
-		// 		})
-		// 	})
-		// }
-		// console.log(chartData)
-
 		// 表格列的配置
 		const columns = [
 			{
@@ -106,24 +176,101 @@ class index extends React.Component {
 			},
 		];
 		var list = this.state.month
+		var color = ['#3AA0FF', '#4ECB73', '#675bba']
 		var option = {
-            title: {
-                text: 'ECharts 入门示例'
-            },
-            tooltip: {},
-            legend: {
-                data:['销量']
-            },
-            xAxis: {
-                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-            },
-            yAxis: {},
-            series: [{
-                name: '销量',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }]
-        };
+			title: {
+				text: '上传量与通过量统计'
+			},
+			color: color,
+			tooltip: {
+				trigger: 'none',
+				axisPointer: {
+					type: 'cross'
+				}
+			},
+			legend: {
+				data: ['上传量', '通过量']
+			},
+			xAxis:
+			{
+				data: this.state.monthd
+			},
+			yAxis:
+			{
+				name: '人次'
+			},
+			series: [
+				{
+					type: 'bar',
+					smooth: false,//是否平滑曲线显示
+					name: '上传量',
+					data: this.state.shangc,
+					emphasis: {
+						label: {
+							show: true,
+						}
+					}
+				},
+				{
+					type: 'bar',
+					smooth: false,//是否平滑曲线显示
+					name: '通过量',
+					data: this.state.tongg,
+					emphasis: {
+						label: {
+							show: true,
+						}
+					}
+				}
+			]
+		};
+		var option1 = {
+			title: {
+				text: '上传量与通过量统计'
+			},
+			color: color,
+			tooltip: {
+				trigger: 'none',
+				axisPointer: {
+					type: 'cross'
+				}
+			},
+			legend: {
+				data: ['上传量', '通过量']
+			},
+			xAxis:
+			{
+				data: this.state.monthd
+			},
+			yAxis:
+			{
+				name: '人次'
+			},
+			series: [
+				{
+					type: 'line',
+					smooth: false,//是否平滑曲线显示
+					name: '上传量',
+					data: this.state.shangc,
+					emphasis: {
+						label: {
+							show: true,
+						}
+					}
+				},
+				{
+					type: 'line',
+					smooth: false,
+					name: '通过量',
+					data: this.state.tongg,
+					emphasis: {
+						label: {
+							show: true,
+						}
+					}
+				}
+			]
+		};
 		return (
 			<div>
 				<div id={styles.user} className={styles.content}  >
@@ -186,10 +333,37 @@ class index extends React.Component {
 				</div>
 				<div className={styles.count}>
 					<span className={styles.span1}>统计</span><br />
-					<MonthPicker onChange={this.onChange} placeholder="Select month" />
-					<Bar height={200} title="上传量与通过量统计" data={salesData} />
-					<ReactEcharts theme="light" option={option} />
-					{/* <TimelineChart height={200} data={chartData} titleMap={{ y1: '上传量', y2: '通过量' }} /> */}
+					<div>
+						<MonthPicker style={{ top: '2px', }} allowClear={false} defaultValue={moment(new Date(), 'YYYY/MM')} format={'YYYY-MM'} onChange={this.onChange} placeholder="Select month" />
+						<div style={{ top: '2px', float: "right", paddingRight: '2em' }}>
+							{/* <span style={{ border: '0.5px solid #3AA0FF' }}>条形</span> */}
+							<span onClick={() => {
+								this.setOption('bar')
+								this.onChangeSpan()
+								this.onChangeSpan(1)
+							}}
+								style={{
+									border: '0.5px solid #3AA0FF',
+									borderRightStyle: 'none',
+									backgroundColor: this.state.backgroundColor,
+									color: this.state.fontcolor,
+								}}>&nbsp;条形&nbsp;</span>
+							<span onClick={() => {
+								this.setOption('line')
+								this.onChangeSpan(1)
+								this.onChangeSpan()
+							}}
+								style={{
+									border: '0.5px solid #3AA0FF',
+									backgroundColor: this.state.backgroundColor1,
+									color: this.state.fontcolor1
+								}}>&nbsp;折线&nbsp;</span>
+						</div>
+					</div>
+					<div>
+						<ReactEcharts theme="light" style={{ display: !this.state.display ? 'block' : 'none' }} option={option1} />
+						<ReactEcharts theme="light" style={{ display: this.state.display ? 'block' : 'none' }} option={option} />
+					</div>
 				</div>
 			</div >
 		);
