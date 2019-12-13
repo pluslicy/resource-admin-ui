@@ -7,6 +7,8 @@ import {
   EnableOrFreeze,
   editUsersMessage,
   editUsersRoles,
+  downloadS,
+  downloadT,
 } from '@/services/User/user';
 
 const UserModel = {
@@ -44,6 +46,16 @@ const UserModel = {
         payload: response,
       });
     },
+    // 下载模板
+    *downloadTemplate(_,{call,put}){
+      if(_.payload){
+        yield call(downloadS)
+      }
+      else{
+        yield call(downloadT)
+      }
+    },
+
     // 修改用户角色信息
     *editUsersRole(_, { call, put }) {
       const response = yield call(editUsersRoles, _.payload.obj);

@@ -17,7 +17,9 @@ class Catalog extends React.Component {
       value: '',
       moveCenId: '',
       target_id: '',
-      edit:{}
+      edit:{},
+      hasChilds:false,
+      dd:""
     };
   }
 
@@ -198,11 +200,33 @@ class Catalog extends React.Component {
 
   showCatalog(){
 
-  }
- 
-
+  };
+  
   onSelect = (selectedKeys, e) => {
-    // console.log(e,selectedKeys)
+    // console.log(e,selectedKeys.catalogue_parent)
+   
+    if(e.selectedNodes[0].props.dataRef.childs.length>=1){
+      this.setState({hasChilds:true})
+      var bbb= <div
+                  style={{
+                    border: '1px solid #e8e8e8',
+                    width: '200px',
+                    height: '450px',
+                    overflow: 'auto',
+                    marginLeft:'1em',
+                    borderRadius:'7px'
+                  }}
+              >
+              <div style={{border:'1px solid #ffa846',backgroundColor:"#ffa846",color:"#FFFFFF",borderRadius:'7px'}}>
+                <span>二级编目</span>
+                <Button type="link" size='small' style={{color:'#FFFFFF',marginLeft:'8em'}} onClick={this.showCatalog.bind()}>+</Button>
+              </div>
+                <Tree>{this.renderTreeNodes(e.selectedNodes[0].props.dataRef.childs)}</Tree>
+            </div>
+        this.setState({
+          dd:bbb
+        })
+    }
     if (e.selectedNodes[0] != null) {
       console.log(e.selectedNodes[0].props.dataRef)
       let str = e.selectedNodes[0].props.dataRef.catalogue_path;
@@ -222,7 +246,7 @@ class Catalog extends React.Component {
     data.map(item => {
       if (item.childs) {
         return (
-          <TreeNode title={item.catalogue_name} key={item.id} dataRef={item}>
+          <TreeNode  title={item.catalogue_name} key={item.id} dataRef={item}>
             {this.renderTreeNodes(item.childs)}
           </TreeNode>
         );
@@ -235,34 +259,7 @@ class Catalog extends React.Component {
     // const { cities } = this.state;
     return (
       <div className={styles.content}>
-        {/* 左边面板
-        <div className={styles.left}>
-          <img
-            style={{ position: 'absolute', marginLeft: '-0.8em', marginTop: '1em' }}
-            src={require('./u578.png')}
-            alt=""
-          />
-          <div
-            onMouseOver={this.handleMouse}
-            style={{
-              position: 'absolute',
-              width: '89px',
-              height: '24px',
-              backgroundColor: 'rgba(15, 105, 255, 1)',
-              marginTop: '1.2em',
-              marginLeft: '-0.2em',
-              fontSize: '12px',
-              color: '#ffffff',
-              textAlign: 'center',
-              paddingTop: '2px',
-            }}
-          >
-            {this.props.catalog.roles[0].catalogue_name}
-          </div>
-          <div style={{ marginTop: '2.5em', marginLeft: '1.5em' }}>
-            <Tree>{this.renderTreeNodes(this.props.catalog.roles[0].childs)}</Tree>
-          </div>
-        </div> */}
+      
 
         <div className={styles.right}>
           <div className={styles.middle}>操作面板 ｜ 视频库编目</div>
@@ -289,7 +286,7 @@ class Catalog extends React.Component {
             </div>
 
             
-            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '1em', marginLeft:'1em' }}>
+            <div id="container_cata" style={{ display: 'flex', justifyContent: 'space-around', marginTop: '1em', marginLeft:'1em' }}>
               {/* 一级编目div */}
               <div
                 style={{
@@ -303,36 +300,15 @@ class Catalog extends React.Component {
               >
                 <div style={{border:'1px solid #3e82a6',backgroundColor:"#3e82a6",color:"#FFFFFF",borderRadius:'7px'}}>
                   <span>一级编目</span>
-                  <Button type="link" size='small' style={{color:'#FFFFFF',marginLeft:'8em'}} onClick={this.showCatalog.bind()}>+</Button>
+                  <Button type="link" size='small' style={{color:'#FFFFFF',marginLeft:'8em'}} onClick={this.showModalAdd.bind()}>+</Button>
                 </div>
-                {/* <ul>
-                 
-                </ul> */}
-                 <Tree>{this.renderTreeNodes(this.props.catalog.roles[0].childs)}</Tree>
+                <ul>
+                    {}
+                </ul>
+                 <Tree onSelect={this.onSelect} expandedKeys={[]}>{this.renderTreeNodes(this.props.catalog.roles[0].childs)}</Tree>
               </div>
               
-       
-
-              {/* 二级编目div */}
-              <div
-                style={{
-                  border: '1px solid #e8e8e8',
-                  width: '200px',
-                  height: '450px',
-                  overflow: 'auto',
-                  marginLeft:'1em',
-                  borderRadius:'7px'
-                }}
-              >
-                <div style={{border:'1px solid #ffa846',backgroundColor:"#ffa846",color:"#FFFFFF",borderRadius:'7px'}}>
-                  <span>二级编目</span>
-                  <Button type="link" size='small' style={{color:'#FFFFFF',marginLeft:'8em'}} onClick={this.showCatalog.bind()}>+</Button>
-                </div>
-                {/* <ul>
-                 
-                </ul> */}
-                 <Tree>{this.renderTreeNodes(this.props.catalog.roles[0].childs)}</Tree>
-              </div>
+              {this.state.hasChilds!=false?this.state.dd:""}
             </div>
             {/* 增加编目模态框 */}
             <Modal
@@ -421,14 +397,14 @@ class Catalog extends React.Component {
               </div>
             </Modal>
             <div>
-              <Tree
+              {/* <Tree
                 autoExpandParent
                 defaultExpandAll
                 onSelect={this.onSelect}
                 style={{ marginLeft: '3em' }}
               >
                 {this.renderTreeNodes(this.props.catalog.roles)}
-              </Tree>
+              </Tree> */}
             </div>
           </div>
         </div>

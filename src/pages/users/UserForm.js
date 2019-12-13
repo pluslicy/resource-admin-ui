@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Input,Select,Button,Upload,Icon,message} from 'antd';
+import {connect} from 'dva'
 class UserForm extends React.Component {
   constructor(props){
     super(props);
@@ -12,6 +13,22 @@ class UserForm extends React.Component {
     this.setState({
       flag:nextProps.flag
     })
+    var a=document.getElementById('name');
+    console.log(a)
+    if(nextProps.flag){
+      a.href="http://10.0.6.5:16012/media/Template/studenttemplate.xlsx"
+    }else{
+      a.href="http://10.0.6.5:16012/media/Template/teachertemplate.xlsx"
+    }
+  }
+  downloadTemplate=(e)=>{
+    var a=document.getElementById('name');
+    console.log(a.href,"ss")
+    // e.preventDefault();
+    // this.props.dispatch({
+    //   type: 'users/downloadTemplate',
+    //   payload:this.state.flag
+    // });
   }
   
   render() {
@@ -45,10 +62,11 @@ class UserForm extends React.Component {
     return (
       <div>
         <Form className="login-form">
+          {/* {this.state.flag?"学生":"教师"} */}
           <Form.Item>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: '' }],
-            })(<Button type='primary'style={{marginLeft:'32em'}}>下载模板</Button>)}
+            })(<a href="http://10.0.6.5:16012/media/Template/studenttemplate.xlsx" target="_self" id="dd" style={{marginLeft:'32em'}} onClick={this.downloadTemplate}>下载模板</a>)}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator('description')(
@@ -77,6 +95,6 @@ const mapPropsToFields = props => {
   return obj;
 };  
 
-export default Form.create({
+export default connect(state=>state)(Form.create({
   mapPropsToFields,
-})(UserForm);
+})(UserForm));

@@ -314,7 +314,7 @@ class User extends React.Component {
   };
   // 导入模态框 ok
   handleOk = e => {
-    console.log(e);
+    console.log();
     this.setState({
       value: '',
     });
@@ -474,6 +474,26 @@ class User extends React.Component {
     });
   }
 
+  // 下载模板
+  // downloadFile=(e)=>{
+  //   const fileName=rowData.activeDepotName;
+  //   this.props.dispatch({
+  //       type:'users/download',
+  //       payload:{},
+  //       callback:(response)=>{
+  //           //这块是下载的重点
+  //           const blob=new Blob([response]);//创建blob对象
+  //           const aLink=document.createElement('a');//创建a链接
+  //           aLink.style.display='none';
+  //           aLink.href=blob;
+  //           aLink.download=fileName;
+  //           document.body.appendChild(aLink);
+  //           aLink.click();
+  //           document.body.removeChild(aLink);//点击完成后记得删除创建的链接 
+  //       }
+  //   })
+  // }
+
   render() {
     // 添加角色的下拉
     const children = [];
@@ -488,7 +508,7 @@ class User extends React.Component {
     // 导入悬浮按钮
     const text = (
       <span>
-        导入时需要按模板填写,点击<a>下载</a>
+        导入时需要按模板填写,点击<Button type="link" size="small" onClik={this.downloadFile}>下载</Button>
       </span>
     );
 

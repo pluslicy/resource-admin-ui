@@ -41,7 +41,15 @@ export async function editUsersMessage(param) {
     headers: { 'Content-Type': 'application/json' },
   });
 }
+// 教师
+export async function downloadT(param) {
+  return request(baseURL+"/media/Template/teachertemplate.xlsx",{headers:{"Access-Control-Allow-Origin":"*"}})
 
+}
+// 学生
+export async function downloadS(param) {
+  return request(baseURL+"/media/Template/studenttemplate.xlsx",{headers:{"Access-Control-Allow-Origin":"*"}})
+}
 // 修改用户角色配置信息
 export async function editUsersRoles(param) {
   return request(baseURL + '/mp_man_users/set_roles/', {
