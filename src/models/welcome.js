@@ -1,4 +1,4 @@
-import { findAll, findMonth } from '@/services/welcome';
+import { findAll, findMonth ,unauVideolist,unauDoclist,commentlist,} from '@/services/welcome';
 
 export default {
     namespace: 'welcome',
@@ -6,6 +6,7 @@ export default {
         loading: true,
         all: [],
         month: [],
+        daishenhe:[],
     },
     effects: {
         *findAll(_, { call, put }) {
@@ -22,6 +23,27 @@ export default {
                 payload: response,
             });
         },
+        *unauVideolist(_, { call, put }) {
+            const response = yield call(unauVideolist, _.payload);
+            yield put({
+                type: 'reloadDaiShenHe',
+                payload: response,
+            });
+        },
+        *unauDoclist(_, { call, put }) {
+            const response = yield call(unauDoclist, _.payload);
+            yield put({
+                type: 'reloadDaiShenHe',
+                payload: response,
+            });
+        },
+        *commentlist(_, { call, put }) {
+            const response = yield call(commentlist, _.payload);
+            yield put({
+                type: 'reloadDaiShenHe',
+                payload: response,
+            });
+        },
     },
     reducers: {
         reloadAll(state, action) {
@@ -35,6 +57,13 @@ export default {
             return {
                 ...state,
                 month: action.payload,
+                loading: false,
+            };
+        },
+        reloadDaiShenHe(state, action) {
+            return {
+                ...state,
+                daishenhe: action.payload,
                 loading: false,
             };
         },

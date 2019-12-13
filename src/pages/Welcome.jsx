@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './Welcome.less';
-import { Table, Tabs, Button, DatePicker } from 'antd';
+import { Table, Tabs, Button, DatePicker, Pagination, Divider } from 'antd';
 import { connect } from 'dva'
 import $ from 'jquery'
 import ReactEcharts from 'echarts-for-react';
@@ -42,6 +42,7 @@ class index extends React.Component {
 		}
 	}
 	componentWillMount() {
+		this.props.dispatch({ type: 'welcome/unauVideolist' })
 		this.props.dispatch({ type: 'welcome/findAll' }).then(() => {
 			this.setState({
 				all: this.props.welcome.all.data
@@ -60,6 +61,17 @@ class index extends React.Component {
 				this.setOption('bar')
 			})
 		});
+	}
+
+	componentWillReceiveProps(nextProps) {
+		// 该方法当props发生变化时执行，初始化render时不执行
+		if (nextProps !== this.props) {
+			let set = nextProps.welcome.daishenhe
+			if (nextProps !== null && set !== undefined) {
+				this.props = nextProps;
+				return;
+			}
+		}
 	}
 
 	onChange = (date, dateString) => {
@@ -139,40 +151,161 @@ class index extends React.Component {
 			option: option
 		})
 	}
-	render() {
-		// 切换标签页回调函数
-		function callback(key) {
-			console.log(key);
+	// 切换标签页回调函数
+	callback(key) {
+		if (key === '1') {
+			this.props.dispatch({ type: 'welcome/unauVideolist' })
+		} else if (key === '2') {
+			this.props.dispatch({ type: 'welcome/unauDoclist' })
+		} else if (key === '3') {
+			this.props.dispatch({ type: 'welcome/commentlist' })
 		}
+	}
+	render() {
+
 		// 表格列的配置
 		const columns = [
 			{
 				title: '#',
-				// dataIndex: 'grade',
+				dataIndex: 'id',
 			},
 			{
 				title: '名称',
-				// dataIndex: 'clazz',
+				dataIndex: 'vr_name',
 			},
 			{
 				title: '作者',
-				// dataIndex: 'coursename',
+				dataIndex: 'va.user',
 			},
 			{
 				title: '类目',
-				// dataIndex: 'teacher',
+				dataIndex: 'vr_cata_two',
 			},
 			{
 				title: '时间',
-				// dataIndex: 'id',
+				dataIndex: 'vr_created_time',
 			},
 			{
 				title: '查看',
 				// dataIndex: 'id',
+				render: record => {
+					return (
+						<span style={{marginLeft:'0.5em'}}>
+							<a onClick={() => window.location.href = '#/./resource/check/video'}><img src={require('../../images/index/u245.png')} /></a>
+						</span>
+					);
+				},
 			},
 			{
 				title: 'Action',
-				render: record => { },
+				width: 60,
+				render: record => {
+					return (
+						<span>
+							<a onClick={() => window.location.href = '#/./resource/check/video'}><img src={require('../../images/index/u240.png')} /></a><Divider type="vertical" />
+							<a onClick={() => window.location.href = '#/./resource/check/video'}><img src={require('../../images/index/u241.png')} /></a>
+						</span>
+					);
+				},
+			},
+		];
+		const columns1 = [
+			{
+				title: '#',
+				dataIndex: 'id',
+				// fixed: 'left',
+				// width: 50,
+			},
+			{
+				title: '名称',
+				dataIndex: 'dr_name',
+			},
+			{
+				title: '作者',
+				dataIndex: 'da.user',
+				// width: 100,
+			},
+			{
+				title: '类目',
+				dataIndex: 'dr_cata_two',
+				// width: 100,
+			},
+			{
+				title: '时间',
+				dataIndex: 'dr_created_time',
+				// width: 150,
+			},
+			{
+				title: '查看',
+				// dataIndex: 'id',
+				// width: 50,
+				render: record => {
+					return (
+						<span style={{marginLeft:'0.5em'}}>
+							<a onClick={() => window.location.href = '#/./resource/check/video'}><img src={require('../../images/index/u245.png')} /></a>
+						</span>
+					);
+				},
+			},
+			{
+				title: 'Action',
+				// fixed: 'right',
+				width: 60,
+				render: record => {
+					return (
+						<span>
+							<a onClick={() => window.location.href = '#/./resource/check/video'}><img src={require('../../images/index/u240.png')} /></a><Divider type="vertical" />
+							<a onClick={() => window.location.href = '#/./resource/check/video'}><img src={require('../../images/index/u241.png')} /></a>
+						</span>
+					);
+				},
+			},
+		];
+		const columns2 = [
+			{
+				title: '#',
+				dataIndex: 'id',
+			},
+			{
+				title: '评论内容',
+				dataIndex: 'comment_text',
+			},
+			{
+				title: '评论人',
+				dataIndex: 'user',
+			},
+			{
+				title: '评论对象',
+				dataIndex: 'object_info.name',
+			},
+			{
+				title: '时间',
+				dataIndex: 'comment_time',
+				width:147
+			},
+			{
+				title: '查看',
+				render: record => {
+					return (
+						<span>
+							<a onClick={() => window.location.href = '#/./resource/comment/comment'}><img src={require('../../images/index/u245.png')} /></a>
+						</span>
+					);
+				},
+			},
+			{
+				title: 'Action',
+				align: 'center',
+				width: 60,
+				dataIndex: '',
+				render: record => {
+					return (
+						<span>
+							<a onClick={() => window.location.href = '#/./resource/comment/comment'}><img src={require('../../images/index/u240.png')} /></a><Divider type="vertical" />
+							<a onClick={() => window.location.href = '#/./resource/comment/comment'}><img src={require('../../images/index/u241.png')} /></a>
+						</span>
+					);
+				},
 			},
 		];
 		var list = this.state.month
@@ -292,35 +425,41 @@ class index extends React.Component {
 				<div className={styles.audit}>
 					<div>
 						<span className={styles.span1}>待审核</span>
-						<div className={styles.link} onClick={() => window.location.href = 'resource/Check/video'}><a>去审核>></a></div>
+						<div className={styles.link} onClick={() => window.location.href = '#/./resource/check/video'}><a>去审核>></a></div>
 						<br />
 						<hr />
-						<Tabs defaultActiveKey="1" onChange={callback}>
-							<TabPane tab="视频(15)" key="1">
+						<Tabs defaultActiveKey="1" onChange={(key) => this.callback(key)}>
+							<TabPane tab="视频" key="1">
 								<Table
 									bordered
 									rowKey="id"
 									size="small"
 									columns={columns}
-								// dataSource={this.props.create.creates}
+									dataSource={this.props.welcome.daishenhe.results}
+									pagination={{ pageSize: 5 }}
+								// scroll={{ x: 2000 }}
 								/>
 							</TabPane>
-							<TabPane tab="文档(4)" key="2">
+							<TabPane tab="文档" key="2">
 								<Table
 									bordered
 									rowKey="id"
 									size="small"
-									columns={columns}
-								// dataSource={this.props.create.creates}
+									columns={columns1}
+									dataSource={this.props.welcome.daishenhe.results}
+									pagination={{ pageSize: 5 }}
+								// scroll={{ x: 2000 }}
 								/>
 							</TabPane>
-							<TabPane tab="评论(5)" key="3">
+							<TabPane tab="评论" key="3">
 								<Table
 									bordered
 									rowKey="id"
 									size="small"
-									columns={columns}
-								// dataSource={this.props.create.creates}					
+									columns={columns2}
+									dataSource={this.props.welcome.daishenhe.results}
+									pagination={{ pageSize: 5 }}
+								// scroll={{ x: 700 }}
 								/>
 							</TabPane>
 						</Tabs>
