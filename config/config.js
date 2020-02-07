@@ -289,7 +289,7 @@ export default {
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
-      target: 'http://10.0.6.5:16012/',
+      target: 'http://139.224.221.31:11000',
       changeOrigin: false,
       pathRewrite: { '^/api': '' },
     },

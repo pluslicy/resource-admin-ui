@@ -5,7 +5,7 @@ import request from '@/utils/request';
  * @Date: 2019-11-08 16:27:59
  */
 
-var baseURL = 'http://10.0.6.5:16012';
+var baseURL = 'http://139.224.221.31:11000';
 
 export async function findAll() {
   return request(baseURL + '/mp_man_module/get_default_videolist/');

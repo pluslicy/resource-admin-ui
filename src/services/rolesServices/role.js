@@ -3,7 +3,7 @@ import qs from 'qs';
 import Paragraph from 'antd/lib/typography/Paragraph';
 
 /* 封装所有的异步请求 */
-var baseURL = 'http://10.0.6.5:16012';
+var baseURL = 'http://139.224.221.31:11000';
 // 查询所有角色
 export async function queryRole() {
   return request(baseURL + '/mp_man_roles/rolelist/');

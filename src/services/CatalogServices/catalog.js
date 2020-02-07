@@ -2,7 +2,7 @@ import request from '@/utils/request';
 import qs from 'qs';
 
 /* 封装所有的异步请求 */
-var baseURL='http://10.0.6.5:16012'
+var baseURL='http://139.224.221.31:11000'
 // 查询所有编目
 export async function queryCatalog() {
   return request(baseURL+'/mp_man_catalog/catanestlist/');

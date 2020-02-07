@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-var baseURL='http://10.0.6.5:16012'
+var baseURL='http://139.224.221.31:11000'
 export async function findAllComment() {
   return request(baseURL+'/mp_man_comments/commentlist/?comment_type=1');
 }

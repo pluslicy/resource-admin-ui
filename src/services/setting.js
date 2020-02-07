@@ -6,7 +6,7 @@ import request from '@/utils/request';
  * @Date: 2019-11-26 10:06:07
  */
 
-var baseURL = 'http://10.0.6.5:16012';
+var baseURL = 'http://139.224.221.31:11000';
 
 // 获取系统设置
 export async function getSysSetting() {

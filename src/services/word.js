@@ -1,12 +1,12 @@
 import request from '@/utils/request';
 
 export async function findAll() {
-  return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist/?page=1&page_size=1000'); 
+  return request('http://139.224.221.31:11000/mp_audit_res/unau_doclist/?page=1&page_size=1000'); 
 }
 
 
 export async function fetchCheck(param) {
-  return request('http://10.0.6.5:16012/mp_audit_res/audit_doc/', {
+  return request('http://139.224.221.31:11000/mp_audit_res/audit_doc/', {
     method: 'post',
     data: {
 			...param,
@@ -29,7 +29,7 @@ export async function findByCondidtion(dateString) {
 	if (dateString[1] != undefined) {
 		value = dateString[1];
 	}
-	return request('http://10.0.6.5:16012/mp_audit_res/unau_doclist/?search=' + value + '&dr_created_time_start=' + startDate + '&dr_created_time_end=' + endDate);
+	return request('http://139.224.221.31:11000/mp_audit_res/unau_doclist/?search=' + value + '&dr_created_time_start=' + startDate + '&dr_created_time_end=' + endDate);
 }
 
 export async function passWord(ids) {
@@ -37,7 +37,7 @@ export async function passWord(ids) {
 		"ids": ids
 	}
 	console.log(obj)
-	return request('http://10.0.6.5:16012/mp_audit_res/audit_docs/', {
+	return request('http://139.224.221.31:11000/mp_audit_res/audit_docs/', {
 		method: 'post',
 		data: obj,
 		headers: { 'Content-Type': 'application/json' },

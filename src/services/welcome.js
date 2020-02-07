@@ -6,7 +6,7 @@ import request from '@/utils/request';
  * @Date: 2019-12-11 10:21:40
  */
 
-var baseURL = 'http://10.0.6.5:16012';
+var baseURL = 'http://139.224.221.31:11000';
 
 export async function findAll() {
   return request(baseURL + '/mp_man_statistics/statistics_list/');

@@ -6,7 +6,7 @@ import request from '@/utils/request';
  *@Date: 2019-8-08 16:28:57
  */
 
-var baseURL = 'http://10.0.6.5:16012';
+var baseURL = 'http://139.224.221.31:11000';
 
 export async function findAll(param) {
   return request(baseURL + '/mp_audit_res/unau_videolist/',{
