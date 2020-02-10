@@ -100,6 +100,7 @@ export async function PermissionVideo(param) {
 }
 //上传文档资源
 export async function UploadOneOrMore(param) {
+  console.log(param,"aaaaaaaaaaaaaaaaaaaaaaaaaaa")
   return request(baseURL+'/up_man_perres/up_docsupload/', {
     method: 'post',
     data:param,
@@ -139,7 +140,7 @@ export async function UploadAttach(param) {
   formData.append('file', param.file);
   formData.append('token',param.token);
   formData.append('resource_name',param.resource_name);
-  return request('http://10.0.6.5:53001/FileStorageApp/create_resource/', {
+  return request('http://139.224.221.31:16012/FileStorageApp/create_resource/', {
     method: 'post',
     data:formData,
     getResponse: true,
@@ -148,7 +149,7 @@ export async function UploadAttach(param) {
 // 删除附件
 export async function DeleteAttach(param) {
   
-  return request('http://10.0.6.5:53001/FileStorageApp/delete_resource/', {
+  return request('http://139.224.221.31:16012/FileStorageApp/delete_resource/', {
     method: 'post',
     data:{resource_urls:param},
     getResponse: true,

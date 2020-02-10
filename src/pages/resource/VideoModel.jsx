@@ -284,7 +284,7 @@ class VideoModel extends React.Component{
               var b={
                 va:null,
                 catalogue:"",
-                user: 24,
+                user: 5,
                 vr_name:"",
                 vr_url:"",
                 vr_desc:"",
@@ -318,7 +318,7 @@ class VideoModel extends React.Component{
               var b={
                 va:null,
                 catalogue:"",
-                user: 24,
+                user: 5,
                 vr_name:"",
                 vr_url:"",
                 vr_desc:"",
@@ -755,7 +755,7 @@ class VideoModel extends React.Component{
             },
         };
         const props = {
-              action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+              action: 'http://139.224.221.31:16012/FileStorageApp/create_resource/',
               // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
               onChange: this.handleChange2,
               accept:".mp4",
@@ -766,7 +766,7 @@ class VideoModel extends React.Component{
               }
         };
         const props2 = {
-          action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+          action: 'http://139.224.221.31:16012/FileStorageApp/create_resource/',
           // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
           onChange: this.VideoEWAddChange,
           accept:".mp4",

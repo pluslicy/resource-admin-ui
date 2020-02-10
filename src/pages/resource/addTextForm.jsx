@@ -156,7 +156,7 @@ class AddTextForm extends React.Component{
     }
     render(){
         const props = {
-            action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+            action: 'http://139.224.221.31:16012/FileStorageApp/create_resource/',
             // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
             onChange: this.handleChange2,
             accept:".doc,.docx,.mp4",

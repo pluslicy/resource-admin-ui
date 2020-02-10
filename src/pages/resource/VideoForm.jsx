@@ -102,7 +102,7 @@ class VideoForm extends React.Component{
           obj.va_name=values.da_name;
           obj.va_desc=values.da_desc;
           obj.catalogue=parseInt(values.text_js[0]);
-          obj.user=24;
+          obj.user=5;
           obj.va_created_time=this.formatDate(new Date());
           console.log(obj)
           this.props.dispatch({

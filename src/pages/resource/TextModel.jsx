@@ -258,7 +258,7 @@ class TextModel extends React.Component{
             var b={
               da:1,
               catalogue:"",
-              user: 24,
+              user: 5,
               dr_name:"",
               dr_url:"",
               dr_desc:"",
@@ -282,7 +282,7 @@ class TextModel extends React.Component{
             var b={
               da:null,
               catalogue:"",
-              user: 24,
+              user: 5,
               dr_name:"",
               dr_url:"",
               dr_desc:"hhhh",
@@ -293,16 +293,17 @@ class TextModel extends React.Component{
               dr_page:0
             }
            
-            b.da=values.da;b.catalogue=parseInt(values.text_js[values.text_js.length-1]);b.dr_name=item.resource_name;b.dr_url=item.resource_url;
+            b.da=values.da;b.catalogue=values.text_js!=undefined?parseInt(values.text_js[values.text_js.length-1]):parseInt(values.id);b.dr_name=item.resource_name;b.dr_url=item.resource_url;
             b.dr_desc=values.description;b.dr_format=item.resource_type;b.dr_size=item.resource_size;
             if(values.name==true){
               b.dr_permission=0;
             }
+            console.log(values.id)
             saveArr.push(b)
           })
           
         }
-        console.log(saveArr)
+        console.log(saveArr,"ssdsss")
         this.props.dispatch({
           type:"Db/fetchUploadOneOrMore",payload:saveArr
         })
@@ -603,7 +604,7 @@ class TextModel extends React.Component{
         },
         };
         const props = {
-          action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+          action: 'http://139.224.221.31:16012/FileStorageApp/create_resource/',
           // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
           onChange: this.handleChange2,
           accept:".doc,.docx",
@@ -614,7 +615,7 @@ class TextModel extends React.Component{
           }
         };
         const props2 = {
-          action: 'http://10.0.6.5:53001/FileStorageApp/create_resource/',
+          action: 'http://139.224.221.31:16012/FileStorageApp/create_resource/',
           // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
           onChange: this.TextEWAddChange,
           accept:".doc,.docx",
