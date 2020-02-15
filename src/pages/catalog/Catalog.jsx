@@ -15,13 +15,17 @@ class Catalog extends React.Component {
 			id:"",
 			cenid:"",
 			cata_name:"",
-			new_name:"",
+			// new_name:"",
 			value:"",
 			moveCenId:"",
 			target_id:"",
+			edit:{}
 		};
 	}
 		
+	inputEdit=(e)=>{
+		console.log(e.target.value)
+	}
 	// 迁移目录级联选项
 	 onChange2=(value)=> {
 		this.setState({
@@ -54,6 +58,7 @@ class Catalog extends React.Component {
 		})
 		this.setState({
 		  visible: false,
+		  cata_name:"",
 		});
 	};
 	
@@ -81,8 +86,10 @@ class Catalog extends React.Component {
 	
 	handleOkEditName = e => {
 		let edit = {
-		id: this.state.id,
-		catalogue_name: this.state.new_name
+		// id: this.state.id,
+		// catalogue_name: this.state.new_name,
+		id: this.state.edit.id,
+     	catalogue_name: this.state.edit.catalogue_name,
 		}
 	// console.log(this.props.dispatch);
 	this.props.dispatch({
@@ -94,7 +101,8 @@ class Catalog extends React.Component {
 		
 	});
 	this.setState({
-		new_name:""
+		// new_name:""
+		edit:{}
 	})
 	};
 	
@@ -106,9 +114,13 @@ class Catalog extends React.Component {
 	}; 
 	
 	setEditName=(e)=>{
+		var obj=this.state.edit;
+    	obj.catalogue_name=e.target.value;	
 		// console.log(e.target.value)
 		this.setState({
-			new_name:e.target.value
+			// new_name:e.target.value
+			edit: obj
+			
 		})
 	}
 	// 删除目录模态框
@@ -210,6 +222,7 @@ class Catalog extends React.Component {
 			this.setState({
 				id:e.selectedNodes[0].props.dataRef.id,
 				cenid:cenid,
+				edit:e.selectedNodes[0].props.dataRef
 			})
 		}
 		
@@ -273,8 +286,8 @@ class Catalog extends React.Component {
 							onOk={this.handleOkEditName}
 							onCancel={this.handleCancelEditName}
 						>
-								<Input style={{ width: "200px", marginLeft: "2em",display:"none"}} value={this.state.id} />
-								编目名称<Input value={this.state.new_name}  style={{ width: "200px", marginLeft: "2em", }} onChange={this.setEditName} />	
+								<Input style={{ width: "200px", marginLeft: "2em",display:"none"}} onChange={this.state.inputEdit}/>
+								编目名称<Input value={this.state.edit.catalogue_name}  style={{ width: "200px", marginLeft: "2em", }} onChange={this.setEditName} />	
 						</Modal>
 
 						{/* 删除模态框 */}
