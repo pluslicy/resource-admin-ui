@@ -145,12 +145,12 @@ export default {
               icon: 'right',
               component: './module/Setting',
             },
-            {
-              path: '/module/admin',
-              name: 'admin',
-              icon: 'right',
-              component: './module/Admin',
-            },
+            // {
+            //   path: '/module/admin',
+            //   name: 'admin',
+            //   icon: 'right',
+            //   component: './module/Admin',
+            // },
             {
               path: '/module/news',
               name: 'news',
