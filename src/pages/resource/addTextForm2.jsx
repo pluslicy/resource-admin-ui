@@ -72,18 +72,24 @@ class AddTextForm2 extends React.Component{
           }
         }
         uploadBefore(file,fileList){
-            var brr=this.state.UpList;
-            var crr=brr.concat(fileList)
-            this.setState({
-                fileList,
-                file,
-                visible:true,
-                textName:file.name.split(".")[0],
-                suffix:"类型",
-                UpList:crr
-            })
-            var fileList=this.state.fileList;
-            return false;
+            if(file.name.slice(file.name.indexOf('.')+1)!=='pdf'){
+                message.warning('请选择pdf格式的视频')
+                return false;
+            }else{
+                var brr=this.state.UpList;
+                var crr=brr.concat(fileList)
+                this.setState({
+                    fileList,
+                    file,
+                    visible:true,
+                    textName:file.name.split(".")[0],
+                    suffix:"类型",
+                    UpList:crr
+                })
+                var fileList=this.state.fileList;
+                return false;
+            }
+           
           }
         handleChange=(e)=>{
             console.log(e.target.value)
@@ -156,7 +162,7 @@ class AddTextForm2 extends React.Component{
                 // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
                 onChange: this.handleChange2,
                 onRemove:this.removeHandle,
-                accept:".doc,.docx",
+                accept:".pdf",
                 data:{
                     file:this.state.file,
                     token:"dddd",

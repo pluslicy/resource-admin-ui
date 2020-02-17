@@ -83,7 +83,8 @@ const DbModel = {
       });
     },
     //批量删除视频资源
-    *fetchDeleteVideo(_, { call, put }) {
+    *fetchDeleteVideo2(_, { call, put }) {
+      console.log(_.payload.ids,"gggggg")
       const response = yield call(DeleteAllVideo,{ids:_.payload.ids});
       yield put({
         type: 'fetchVideo',payload:_.payload.vq

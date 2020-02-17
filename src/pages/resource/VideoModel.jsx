@@ -84,8 +84,9 @@ class VideoModel extends React.Component{
     }
     //批量删除视频完成
     batchDelete=()=>{
+      console.log(this.state.ids,"aaaaaaaaaaaaaaaaa")
       this.props.dispatch({
-            type:"Db/fetchDeleteVideo",
+            type:"Db/fetchDeleteVideo2",
             payload:{ids:this.state.ids,vq:this.props.vt.vq}
         })
       setTimeout(()=>{
@@ -447,6 +448,7 @@ class VideoModel extends React.Component{
       })
     }
     setBianMu=(value, selectedOptions)=>{
+      console.log(value)
       this.setState({
         catalogue:value[value.length-1]
       })
@@ -781,30 +783,36 @@ class VideoModel extends React.Component{
                     {/* 文件上传组件 */}
                    
                     <Upload  multiple={true} {...props} showUploadList={false}  beforeUpload={(file,fileList)=>{
-                              this.setState({
-                                length:fileList.length
-                              })
-                              if(fileList.length==1){
-                                this.props.dispatch({
-                                  type:'vt/fetchUpdateFlag',payload:"视频"
-                                })
+                              if(file.name.slice(file.name.indexOf('.')+1)!=='mp4'){
+                                message.warning('请选择MP4格式的视频')
+                                return false;
                               }else{
-
-                                this.props.dispatch({
-                                  type:'vt/fetchUpdateFlag',payload:"专辑"
+                                this.setState({
+                                  length:fileList.length
                                 })
-                            }
-                      var b=[];
-                      fileList.forEach((item)=>{
-                          b.push(item.name);
-                      })
-                      this.setState({
-                      filelist:fileList,
-                      file:file,
-                      ok:0,
-                      names:b,
-                      arr:[]
-                      });this.showModal(file,fileList)}}>
+                                if(fileList.length==1){
+                                  this.props.dispatch({
+                                    type:'vt/fetchUpdateFlag',payload:"视频"
+                                  })
+                                }else{
+  
+                                  this.props.dispatch({
+                                    type:'vt/fetchUpdateFlag',payload:"专辑"
+                                  })
+                                    }
+                              var b=[];
+                              fileList.forEach((item)=>{
+                                  b.push(item.name);
+                              })
+                              this.setState({
+                              filelist:fileList,
+                              file:file,
+                              ok:0,
+                              names:b,
+                              arr:[]
+                              });this.showModal(file,fileList)
+                              }
+                            }}>
                     <Button style={{width:"90px",top:"1em",height:"28px",fontSize:"12px",backgroundColor:"rgba(51, 153, 255, 1)",color:"#FFFFFF",borderRadius:"5px",position:"absolute",marginLeft:"89.5%",marginTop:"0em"}} >
                         <Icon type="upload" />上传
                     </Button>
@@ -932,27 +940,34 @@ class VideoModel extends React.Component{
                         <div className={styles.left}>
                         <span style={{fontWeight:700,marginLeft:"30px"}}>您上传的视频:
                         <Upload  {...props2} showUploadList={false} multiple={true} beforeUpload={(file,fileList)=>{
-                               if(this.state.length==0){
-                                this.props.dispatch({
-                                  type:'vt/fetchUpdateFlag',payload:"视频"
-                                })
+                               
+                              if(file.name.slice(file.name.indexOf('.')+1)!=='mp4'){
+                                message.warning('请选择MP4格式的视频')
+                                return false;
                               }else{
-                                this.props.dispatch({
-                                  type:'vt/fetchUpdateFlag',payload:"专辑"
+                                if(this.state.length==0){
+                                  this.props.dispatch({
+                                    type:'vt/fetchUpdateFlag',payload:"视频"
+                                  })
+                                }else{
+                                  this.props.dispatch({
+                                    type:'vt/fetchUpdateFlag',payload:"专辑"
+                                  })
+                                }
+                                var b=[];
+                                fileList.forEach((item)=>{
+                                    b.push(item.name);
+                                })
+                                var a=this.state.names;
+                                var length=this.state.length+fileList.length+1;
+                                var newArr = a.concat(b);
+                                this.setState({
+                                    names:newArr,
+                                    file:file,
+                                    filelist:fileList
                                 })
                               }
-                              var b=[];
-                              fileList.forEach((item)=>{
-                                  b.push(item.name);
-                              })
-                              var a=this.state.names;
-                              var length=this.state.length+fileList.length+1;
-                              var newArr = a.concat(b);
-                              this.setState({
-                                  names:newArr,
-                                  file:file,
-                                  filelist:fileList
-                              })}}>
+                               }}>
                           <Button size="small" style={{marginLeft:"1.3em"}} >
                             添加
                           </Button>
