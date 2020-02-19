@@ -1,4 +1,4 @@
-import {findAllNews,findAllVideos,PermissionVideo} from '@/services/news';
+import {findAllNews,findAllVideos,PermissionVideo,updateNews} from '@/services/news';
 
 const News = {
     namespace:"news",
@@ -39,6 +39,7 @@ const News = {
           payload:response.data,
         })
       },
+      
       //搜索
       *fetchVideoQuery(_, { call, put }) {
         yield put({
@@ -50,6 +51,13 @@ const News = {
         const response = yield call(PermissionVideo,_.payload.params);
         yield put({
           type: 'fetchVideo',payload:_.payload.video
+        });
+      },
+      // 更新资源
+      *updateNews(_, { call, put }) {
+        const response = yield call(updateNews, _.payload);
+        yield put({
+          type: 'findAll',
         });
       },
     },

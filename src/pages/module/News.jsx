@@ -1,15 +1,11 @@
 import React from 'react';
 import styles from './module.less'
 import { connect } from 'dva';
-import {  Upload, Table, Menu, Dropdown, Icon, Modal, Button, Input, Radio, Select, Checkbox } from 'antd';
+import {  Upload, Table, Menu, Dropdown, Icon, Modal, Button, Input, Radio, Select, Checkbox,Tabs  } from 'antd';
+
+import NewsTab from './NewsTab'
 
 const { Search } = Input;
-
-const props = {
-  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  listType: 'picture',
-  // defaultFileList: [...fileList],
-};
 
 
 class News extends React.Component {
@@ -136,7 +132,34 @@ class News extends React.Component {
   }
 
   render() {
-    
+    // const fileList = [
+    //   {
+    //     uid: '-1',
+    //     name: 'xxx.png',
+    //     status: 'done',
+    //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    //     thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    //   },
+    //   {
+    //     uid: '-2',
+    //     name: 'yyy.png',
+    //     status: 'error',
+    //   },
+    // ];
+
+    const props = {
+      // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+      action:"http://139.224.221.31:11000/mp_man_module/update_latestresources/",
+      listType: 'picture',
+      // defaultFileList: [...fileList],
+      data:this.state.imgs,
+    };
+
+    const { TabPane } = Tabs;
+    function callback(key) {
+      console.log(key);
+    }
+
     const rowSelection = {
       type:'radio',
       selectedRowKeys: this.state.id,
@@ -163,7 +186,14 @@ class News extends React.Component {
       { 
         title: '预览图',
         align: 'center',
-        dataIndex: 'img'
+        // dataIndex: 'img',
+        render: (text, record) => {
+          return (
+           <div>
+             <img src={"http://139.224.221.31:11000"+record.img} style={{maxWidth:40,maxHeight:40}} alt=""/>
+           </div>
+          );
+        },
       },
       { title: '作者', align: 'center', dataIndex: 'username' },
       { title: '收藏', align: 'center', dataIndex: 'collect' },
@@ -218,6 +248,8 @@ class News extends React.Component {
               </Button>
             ]}
         >
+          <Tabs defaultActiveKey="1" onChange={callback}>
+            <TabPane tab="视频" key="1">
             <Search
               placeholder="请输入搜索内容"
               onChange={this.setSearch.bind(this)}
@@ -302,6 +334,11 @@ class News extends React.Component {
                 </Button>
               </Upload>
             </div>
+            </TabPane>
+            <TabPane tab="文档" key="2">
+              <NewsTab  treekey={this.state.treekey}></NewsTab>
+            </TabPane>
+          </Tabs>
         </Modal>
         </div>
       </div>
