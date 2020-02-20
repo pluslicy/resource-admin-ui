@@ -25,9 +25,10 @@ class News extends React.Component {
   }
 
   // 更换模态框
-  showModal = () => {
+  showModal(catalogue_id) {
     this.setState({
       visible: true,
+      catalogue_id,
     });
     this.props.dispatch({type: 'news/findAllVideos', payload:{
       page:1,
@@ -130,6 +131,12 @@ class News extends React.Component {
       type:"news/findAllVideos",payload:video
     })
   }
+  beforeUpload = (file, fileList) => {
+    this.setState({
+      file,
+      fileList,
+    });
+  };
 
   render() {
     // const fileList = [
@@ -147,34 +154,64 @@ class News extends React.Component {
     //   },
     // ];
 
+    console.log(this.state.imgs,"pppp")
     const props = {
       // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
       action:"http://139.224.221.31:11000/mp_man_module/update_latestresources/",
       listType: 'picture',
       // defaultFileList: [...fileList],
-      data:this.state.imgs,
+      // data:this.state.imgs,
+      data:{
+        lr_image: this.state.file,
+        object_id: this.state.imgs.id,
+        object_type: "video",
+        show_status: 1,
+        id: this.state.catalogue_id,
+      }
     };
 
     const { TabPane } = Tabs;
     function callback(key) {
+      if(key==1){
+        this.setState({
+          object_type:"video",
+        })
+      }else{
+        this.setState({
+          object_type:"docs",
+        })
+      }
       console.log(key);
     }
 
-    const rowSelection = {
-      type:'radio',
-      selectedRowKeys: this.state.id,
-      columnTitle:"#",
-      onChange: (selectedRowKeys, selectedRows) => {
-              this.setState({
-                id:selectedRowKeys,
-                imgs:selectedRowKeys[0]
-              })
-              console.log(selectedRowKeys,"qqq")
-          },
+    // const rowSelection = {
+    //   // type:'radio',
+    //   selectedRowKeys: this.state.id,
+    //   // columnTitle:"#",
+    //   onChange: (selectedRowKeys, selectedRows) => {
+    //           this.setState({
+    //             id:selectedRowKeys,
+    //             // imgs:selectedRowKeys[0]
+    //           })
+    //           console.log(selectedRowKeys,"www")
+    //       },
 
-      };
-      // console.log(this.props.news.arr,"ww")
-      console.log(this.state.id)
+    //   };
+      const rowSelection1 = {
+        type:'radio',
+        selectedRowKeys: this.state.object_id,
+        columnTitle:"#",
+        onChange: (selectedRowKeys, selectedRows) => {
+                this.setState({
+                  object_id:selectedRowKeys,
+                  imgs:selectedRowKeys[0]
+                })
+                console.log(selectedRowKeys,"qqq")
+            },
+  
+        };
+      // console.log(this.state.object_id)
+      console.log(this.state)
     const columns = [
       {
         title: '#',
@@ -207,7 +244,7 @@ class News extends React.Component {
         render: (text, record) => {
           return (
             <div>
-              <a onClick={this.showModal}>更换</a>
+              <a onClick={this.showModal.bind(this,record.catalogue_id)}>更换</a>
             </div>
           );
         },
@@ -229,7 +266,8 @@ class News extends React.Component {
           <Table
             bordered
             // rowKey="id"
-            rowKey={(record, index) => index}
+            // rowKey={(record, index) => record}
+            // rowSelection={rowSelection}
             size="small"
             columns={columns}
             dataSource={this.props.news.new}   
@@ -291,9 +329,10 @@ class News extends React.Component {
               <br/><br/>
               <Table
                 bordered
-                rowKey={(record, index) => record}
+                // rowKey={record => record.object_id}
+                rowKey={record => record}
                 size="small"
-                rowSelection={rowSelection}
+                rowSelection={rowSelection1}
                 columns={columns1}
                 dataSource={this.props.news.videos.results} 
                 pagination={{
@@ -328,7 +367,10 @@ class News extends React.Component {
               />
                 您选择的是：{this.state.imgs.vr_name}
                 <br/><br/>
-              <Upload {...props}>
+              <Upload 
+                {...props}
+                beforeUpload={this.beforeUpload.bind(this)}
+              >
                 <Button>
                   <Icon type="upload" /> 添加缩略图
                 </Button>
