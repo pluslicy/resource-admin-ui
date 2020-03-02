@@ -666,7 +666,7 @@ class VideoModel extends React.Component{
                     <img style={{marginLeft:"5px"}} src={require('./u492.png')} alt=""/>&nbsp;<span style={{fontSize:"10px"}}>{record.vr_comment_num}</span>
                 </div>
               ]} >
-                <span style={{cursor:"pointer"}}>{text}</span>
+                <span style={{cursor:"pointer"}}>{text.split('.')[0]}</span>
               </Popover>
             },
             {
