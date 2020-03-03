@@ -41,8 +41,8 @@ export async function changeOrderWordrank(value) {
   });
 }
 // 自定义榜单
-export async function findCustomWordlist() {
-  return request(baseURL + '/mp_man_module/get_custom_docslist/');
+export async function findCustomWordlist(value) {
+  return request(baseURL + '/mp_man_module/get_custom_docslist/?' + value);
 }
 // 自定义榜单搜索
 export async function findByName(value) {

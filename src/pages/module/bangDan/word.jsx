@@ -25,15 +25,18 @@ class bangDan extends React.Component {
   // 自定义榜单单选框
   onChange_customer = e => {
     this.props.dispatch({
-      type: 'wordbangdan/findCustomVideolist',
-      payload: this.state.value_permission + e.target.value,
+      type: 'wordbangdan/findCustomWordlist',
+      payload: this.state.value_permission + '&' + e.target.value,
     });
     this.setState({
       value1: e.target.value,
     });
   };
   handleChange = value => {
-    console.log(`selected ${value}`);
+    this.props.dispatch({
+      type: 'wordbangdan/findCustomWordlist',
+      payload: value,
+    });
     this.setState({
       value_permission: value,
     });
@@ -291,11 +294,12 @@ class bangDan extends React.Component {
               <br />
               <span>权限</span>
               <Select
-                defaultValue="permission=0"
+                defaultValue="全部"
                 style={{ width: 120 }}
                 style={{ marginTop: '1em', marginBottom: '1em' }}
                 onChange={this.handleChange}
               >
+                <Option value="">全部</Option>
                 <Option value="permission=0">VIP</Option>
                 <Option value="permission=1">免费</Option>
                 <Option value="permission=2">其它</Option>
