@@ -41,6 +41,9 @@ class News extends React.Component {
     this.setState({
       visible: false,
     });
+    this.props.dispatch({
+      type:"news/findAll"
+    })
   };
   handleCancel = e => {
     this.setState({
@@ -132,11 +135,20 @@ class News extends React.Component {
     })
   }
   beforeUpload = (file, fileList) => {
+
     this.setState({
       file,
       fileList,
     });
+    // this.getChildrenMsg();
+    
   };
+
+//   getChildrenMsg = () => {
+//     this.setState({
+//         imgs: this.refs['children'].state.imgs
+//     })
+// }
 
   render() {
     // const fileList = [
@@ -172,31 +184,18 @@ class News extends React.Component {
 
     const { TabPane } = Tabs;
     function callback(key) {
-      if(key==1){
-        this.setState({
-          object_type:"video",
-        })
-      }else{
-        this.setState({
-          object_type:"docs",
-        })
-      }
+      // if(key==1){
+      //   this.setState({
+      //     object_type:"video",
+      //   })
+      // }else{
+      //   this.setState({
+      //     object_type:"docs",
+      //   })
+      // }
+
       console.log(key);
     }
-
-    // const rowSelection = {
-    //   // type:'radio',
-    //   selectedRowKeys: this.state.id,
-    //   // columnTitle:"#",
-    //   onChange: (selectedRowKeys, selectedRows) => {
-    //           this.setState({
-    //             id:selectedRowKeys,
-    //             // imgs:selectedRowKeys[0]
-    //           })
-    //           console.log(selectedRowKeys,"www")
-    //       },
-
-    //   };
       const rowSelection1 = {
         type:'radio',
         selectedRowKeys: this.state.object_id,
@@ -208,7 +207,6 @@ class News extends React.Component {
                 })
                 console.log(selectedRowKeys,"qqq")
             },
-  
         };
       // console.log(this.state.object_id)
       console.log(this.state)
@@ -255,7 +253,15 @@ class News extends React.Component {
       { title: '作者', align: 'center', dataIndex: 'vr_author' },
       { title: '方向', align: 'center', dataIndex: 'vr_cata_two' },
       { title: '技术', align: 'center', dataIndex: 'vr_cata_one' },
-      { title: '日期', align: 'center', dataIndex: 'vr_created_time' },
+      {
+        title: '日期',
+        dataIndex: 'vr_created_time',
+        render: (text,record) => {
+          var dateee = new Date(text).toJSON();
+          var date = new Date(+new Date(dateee)+8*3600*1000).toISOString().replace(/T/g,' ').replace(/\.[\d]{3}Z/,'');
+          return (date)
+        }
+      },
     ];
 
     console.log(this.props.news.videos,"sss")
@@ -295,6 +301,7 @@ class News extends React.Component {
               onSearch={this.searchName}
               style={{ width: 200 }}
             />
+            {this.state.imgs.id}
             <br />
             <div>
               {/* 权限 */}
@@ -378,7 +385,7 @@ class News extends React.Component {
             </div>
             </TabPane>
             <TabPane tab="文档" key="2">
-              <NewsTab  treekey={this.state.treekey}></NewsTab>
+              <NewsTab  treekey={this.state.treekey} flag={this.state.catalogue_id}></NewsTab>
             </TabPane>
           </Tabs>
         </Modal>

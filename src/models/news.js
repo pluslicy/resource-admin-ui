@@ -77,16 +77,8 @@ const News = {
         };
       },
       reloadVideos(state, action) {
-        // var arr = [];
-        // action.payload.results.forEach((item,index)=>{
-        //   var obj = item;
-        //   obj.filename=item.vr_name;
-        //   delete obj.vr_name;
-        //   arr.push(obj)
-        // })
         return {
           ...state,
-          // arr,
           videos: action.payload,
           count: action.payload.count,
           loading: false,

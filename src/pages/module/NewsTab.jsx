@@ -109,28 +109,29 @@ class News extends React.Component {
     })
   }
 
+  beforeUpload = (file, fileList) => {
+    this.setState({
+      file,
+      fileList,
+    });
+  };
+
   render() {
-    // const fileList = [
-    //   {
-    //     uid: '-1',
-    //     name: 'xxx.png',
-    //     status: 'done',
-    //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    //     thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    //   },
-    //   {
-    //     uid: '-2',
-    //     name: 'yyy.png',
-    //     status: 'error',
-    //   },
-    // ];
 
     const props = {
-      action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-      // action:"http://10.0.6.5:16012/mp_man_module/update_carouselrank/",
+      action:"http://139.224.221.31:11000/mp_man_module/update_latestresources/",
       listType: 'picture',
       // defaultFileList: [...fileList],
+      data:{
+        lr_image: this.state.file,
+        object_id: this.state.imgs.id,
+        object_type: "docs",
+        show_status: 1,
+        id: this.props.flag,
+      }
     };
+    console.log(this.state,"mmmm")
+    
 
     // const { TabPane } = Tabs;
     // function callback(key) {
@@ -139,16 +140,15 @@ class News extends React.Component {
 
     const rowSelection = {
       type:'radio',
-      selectedRowKeys: this.state.id,
+      selectedRowKeys: this.state.object_id,
       columnTitle:"#",
       onChange: (selectedRowKeys, selectedRows) => {
               this.setState({
-                id:selectedRowKeys,
+                object_id:selectedRowKeys,
                 imgs:selectedRowKeys[0]
               })
               console.log(selectedRowKeys,"qqq")
           },
-
       };
 
     const columns = [
@@ -156,13 +156,22 @@ class News extends React.Component {
       { title: '作者', align: 'center', dataIndex: 'dr_author' },
       { title: '方向', align: 'center', dataIndex: 'dr_cata_two' },
       { title: '技术', align: 'center', dataIndex: 'dr_cata_one' },
-      { title: '日期', align: 'center', dataIndex: 'dr_created_time' },
+      {
+        title: '日期',
+        dataIndex: 'dr_created_time',
+        render: (text,record) => {
+          var dateee = new Date(text).toJSON();
+          var date = new Date(+new Date(dateee)+8*3600*1000).toISOString().replace(/T/g,' ').replace(/\.[\d]{3}Z/,'');
+          return (date)
+        }
+      },
     ];
 
     console.log(this.props.newsTab.docslist,"sss")
     return (
       <div className={styles.content1}>
         <div className='btns'>
+          {this.props.flag}
             <Search
               placeholder="请输入搜索内容"
               onChange={this.setSearch.bind(this)}
@@ -170,7 +179,7 @@ class News extends React.Component {
               onSearch={this.searchName}
               style={{ width: 200 , marginTop:-5 }}
             />
-            <br />
+            <br/>
             <div>
               {/* 权限 */}
               <span style={{marginTop:"2em",fontWeight:"700",fontSize:"12px"}}>权限 </span>
@@ -204,8 +213,7 @@ class News extends React.Component {
               <br/><br/>
               <Table
                 bordered
-                // rowKey={(record, index) => record}
-                rowKey="id"
+                rowKey={record => record}
                 size="small"
                 rowSelection={rowSelection}
                 columns={columns}
@@ -242,7 +250,8 @@ class News extends React.Component {
               />
                 您选择的是：{this.state.imgs.dr_name}
                 <br/><br/>
-              <Upload {...props}>
+              <Upload {...props}
+              beforeUpload={this.beforeUpload.bind(this)}>
                 <Button>
                   <Icon type="upload" /> 添加缩略图
                 </Button>

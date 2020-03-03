@@ -22,14 +22,13 @@ const News = {
     effects:{
       //查询文档
       *findAll(_,{call,put}){
-          alert(1)
         const response =yield call (findAllDocs,_.payload);
         console.log(response,"abcd")
         yield put({
           type:'reloadDocslist',
           payload:response.data,
         })
-        console.log(payload,"abc")
+        // console.log(payload,"abc")
       },
       
       //搜索
