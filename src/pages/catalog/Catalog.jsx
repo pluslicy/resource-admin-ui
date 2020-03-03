@@ -131,7 +131,7 @@ class Catalog extends React.Component {
 		});}
 	  };
 	  handleOkRemove = e => {
-		console.log(e);
+		// console.log(e);
 		this.setState({
 		  value:""
 		})

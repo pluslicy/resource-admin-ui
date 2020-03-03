@@ -582,20 +582,20 @@ class User extends React.Component {
           if (record.user_protrait === null) {
             return <img style={{maxWidth:40,maxHeight:40}} src='https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=55176295,1423410453&fm=26&gp=0.jpg' alt=""/>
           } else {
-            return <img src="" alt=""/>;
+            return <img style={{maxWidth:40,maxHeight:40}} src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=55176295,1423410453&fm=26&gp=0.jpg " alt=""/>;
           }
         },
       },
       {
         title: '简介',
         dataIndex: 'user_desc ',
-        // render: (text, record) => {
-        //   if (record.user_desc === null) {
-        //     return "杰普优秀教师"
-        //   } else {
-        //     return ""
-        //   }
-        // },
+        render: (text, record) => {
+          if (record.user_desc === "") {
+            return "杰普认证教师" 
+          } else {
+            return ""
+          }
+        },
       },
       {
         title: '操作',
