@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-/** 
+/**
  * @Description: 模块管理>资源榜单>视频榜单页面
  * @ClassAuthor: rendc
  * @Date: 2019-11-08 16:27:59
@@ -7,8 +7,8 @@ import request from '@/utils/request';
 
 var baseURL = 'http://139.224.221.31:11000';
 
-export async function findAll() {
-  return request(baseURL + '/mp_man_module/get_default_videolist/');
+export async function findAll(value) {
+  return request(baseURL + '/mp_man_module/get_default_videolist/?' + value);
 }
 // 查找自定义视频榜单(5项)
 export async function findCustomVideorank() {
@@ -41,8 +41,8 @@ export async function changeOrderVideorank(value) {
   });
 }
 // 自定义榜单
-export async function findCustomVideolist() {
-  return request(baseURL + '/mp_man_module/get_custom_videolist/');
+export async function findCustomVideolist(value) {
+  return request(baseURL + '/mp_man_module/get_custom_videolist/?' + value);
 }
 // 自定义榜单搜索
 export async function findByName(value) {

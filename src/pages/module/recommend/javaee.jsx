@@ -6,41 +6,52 @@ const { TabPane } = Tabs;
 const { Search } = Input;
 const { Option } = Select;
 
+/**
+ * 教师推荐主页面
+ */
+
 class recommend extends React.Component {
   state = {
     value: 1,
-    activeKey: 0,// 编目id
-    display: 'none'
+    activeKey: 0, // 编目id
+    display: 'none',
   };
 
   componentWillMount() {
     this.props.dispatch({ type: 'recommend/getLevelonecata' }).then(() => {
-      this.props.dispatch({ type: 'recommend/getTeacherrankList', payload: this.props.recommend.roles[0].id });
-      this.setState({ activeKey: this.props.recommend.roles[0].id, })
-    })
+      this.props.dispatch({
+        type: 'recommend/getTeacherrankList',
+        payload: this.props.recommend.roles[0].id,
+      });
+      this.setState({ activeKey: this.props.recommend.roles[0].id });
+    });
   }
 
   onChange = e => {
-    console.log('radio checked', e.target.value);
+    this.props.dispatch({
+      type: 'recommend/getTeacherrankList',
+      payload: this.props.recommend.roles[0].id + '&' + e.target.value,
+    });
     this.setState({
       value: e.target.value,
+      activeKey: this.props.recommend.roles[0].id,
     });
   };
   componentWillReceiveProps(nextProps) {
     // 该方法当props发生变化时执行，初始化render时不执行
     if (nextProps !== this.props) {
-      let set = nextProps.recommend.customTeacherrank
+      let set = nextProps.recommend.customTeacherrank;
       if (nextProps !== null && set !== undefined) {
         this.props = nextProps;
         // 当自定义榜单数量大于 5 时进行提示
         if (this.props.recommend.customTeacherrank.length >= 5) {
           this.setState({
             display: 'inline',
-          })
+          });
         } else {
           this.setState({
             display: 'none',
-          })
+          });
         }
         return;
       }
@@ -49,8 +60,6 @@ class recommend extends React.Component {
 
   // 开启模态框
   showModal = () => {
-    // 此处为假数据
-    // 
     this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
     this.setState({
       visible: true,
@@ -58,14 +67,12 @@ class recommend extends React.Component {
   };
 
   handleOk = e => {
-    console.log(e);
     this.setState({
       visible: false,
     });
   };
 
   handleCancel = e => {
-    console.log(e);
     this.setState({
       visible: false,
     });
@@ -76,19 +83,22 @@ class recommend extends React.Component {
     this.props.dispatch({ type: 'recommend/getTeacherrankList', payload: activeKey });
     this.setState({
       activeKey: activeKey,
-    })
+    });
   }
 
   // 根据名称搜索
   findByName(value) {
     var id = this.state.activeKey;
-    var values = id + '&search=' + value
+    var values = id + '&search=' + value;
     this.props.dispatch({ type: 'recommend/getTeacherrankList', payload: values });
   }
   // 删除自定义榜单
   delrank(id) {
     this.props.dispatch({ type: 'recommend/delrank', payload: id }).then(() => {
-      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
+      this.props.dispatch({
+        type: 'recommend/getCustomTeacherrank',
+        payload: this.state.activeKey,
+      });
     });
   }
 
@@ -126,7 +136,7 @@ class recommend extends React.Component {
       },
       {
         title: '收藏',
-        dataIndex: 'stacollect_numtus',
+        dataIndex: 'collect_num',
       },
       {
         title: '评论',
@@ -136,10 +146,10 @@ class recommend extends React.Component {
         title: '浏览',
         dataIndex: 'times_num',
       },
-      {
-        title: 'Action',
-        render: record => { },
-      },
+      // {
+      //   title: 'Action',
+      //   render: record => { },
+      // },
     ];
     const columns1 = [
       {
@@ -153,64 +163,74 @@ class recommend extends React.Component {
         width: '100px',
       },
       {
-        render: (text, record, index) =>
+        render: (text, record, index) => (
           <a
-            onClick={
-              () => {
-                if (index === 0) {
-                  alert('已经是第一位了哦!')
-                } else {
-                  // 上一行数据的id
-                  var pre_id = this.props.recommend.customTeacherrank[index -= 1].id;
-                  var values = {
-                    "down_id": pre_id, // 下调对象的id
-                    "up_id": record.id // 上调对象的id
-                  }
-                  this.props.dispatch({ type: 'recommend/changeOrderTeacherrank', payload: values }).then(
-                    () => {
-                      // 此处为假数据
-                      // this.state.activeKey
-                      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
-                    }
-                  )
-                }
+            onClick={() => {
+              if (index === 0) {
+                alert('已经是第一位了哦!');
+              } else {
+                // 上一行数据的id
+                var pre_id = this.props.recommend.customTeacherrank[(index -= 1)].id;
+                var values = {
+                  down_id: pre_id, // 下调对象的id
+                  up_id: record.id, // 上调对象的id
+                };
+                this.props
+                  .dispatch({ type: 'recommend/changeOrderTeacherrank', payload: values })
+                  .then(() => {
+                    // 此处为假数据
+                    // this.state.activeKey
+                    this.props.dispatch({
+                      type: 'recommend/getCustomTeacherrank',
+                      payload: this.state.activeKey,
+                    });
+                  });
               }
-            }>↑</a>,
+            }}
+          >
+            ↑
+          </a>
+        ),
       },
       {
-        render: (text, record, index) =>
+        render: (text, record, index) => (
           <a
-            onClick={
-              () => {
-                if (index + 1 === this.props.recommend.customTeacherrank.length) {
-                  alert('已经是最后一位了哦!')
-                } else {
-                  // 下一行数据的id
-                  var next_id = this.props.recommend.customTeacherrank[index += 1].id;
-                  var values = {
-                    "down_id": record.id, // 下调对象的id
-                    "up_id": next_id // 上调对象的id
-                  }
-                  this.props.dispatch({ type: 'recommend/changeOrderTeacherrank', payload: values }).then(
-                    () => {
-                      // 此处为假数据
-                      // this.state.activeKey
-                      this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
-                    }
-                  )
-                }
+            onClick={() => {
+              if (index + 1 === this.props.recommend.customTeacherrank.length) {
+                alert('已经是最后一位了哦!');
+              } else {
+                // 下一行数据的id
+                var next_id = this.props.recommend.customTeacherrank[(index += 1)].id;
+                var values = {
+                  down_id: record.id, // 下调对象的id
+                  up_id: next_id, // 上调对象的id
+                };
+                this.props
+                  .dispatch({ type: 'recommend/changeOrderTeacherrank', payload: values })
+                  .then(() => {
+                    // 此处为假数据
+                    // this.state.activeKey
+                    this.props.dispatch({
+                      type: 'recommend/getCustomTeacherrank',
+                      payload: this.state.activeKey,
+                    });
+                  });
               }
-            }>↓</a>,
+            }}
+          >
+            ↓
+          </a>
+        ),
       },
       {
-        render: (record) => <a onClick={() => this.delrank(record.id)}>×</a>,
+        render: record => <a onClick={() => this.delrank(record.id)}>×</a>,
       },
     ];
     const columns2 = [
-      {
-        title: '#',
-        dataIndex: 'id',
-      },
+      // {
+      //   title: '#',
+      //   dataIndex: 'id',
+      // },
       {
         title: '作者',
         dataIndex: 'user',
@@ -225,7 +245,7 @@ class recommend extends React.Component {
       },
       {
         title: '收藏',
-        dataIndex: 'stacollect_numtus',
+        dataIndex: 'collect_num',
       },
       {
         title: '评论',
@@ -245,11 +265,16 @@ class recommend extends React.Component {
         if (selectedRowKeys.length !== 0) {
           var value = {
             user: selectedRowKeys[0],
-            catalogue: this.state.activeKey
-          }
-          this.props.dispatch({ type: 'recommend/addCustomTeacherrank', payload: value }).then(() => {
-            this.props.dispatch({ type: 'recommend/getCustomTeacherrank', payload: this.state.activeKey });
-          });
+            catalogue: this.state.activeKey,
+          };
+          this.props
+            .dispatch({ type: 'recommend/addCustomTeacherrank', payload: value })
+            .then(() => {
+              this.props.dispatch({
+                type: 'recommend/getCustomTeacherrank',
+                payload: this.state.activeKey,
+              });
+            });
           // 请求完成后置空selectedRowKeys
           selectedRowKeys.length = 0;
         }
@@ -265,10 +290,10 @@ class recommend extends React.Component {
     // 定义一个数组，将数据存入数组
     const elements = [];
     var list = this.props.recommend.roles;
-    list.forEach((item) => {
+    list.forEach(item => {
       elements.push(
         <TabPane tab={item.catalogue_name} key={item.id} style={{ marginBottom: '0.5em' }}>
-          <span>
+          {/* <span>
             当前以
               <Input style={{ width: '3%' }} size="small" defaultValue="1" disabled />
             级编目作为推荐分类
@@ -278,24 +303,25 @@ class recommend extends React.Component {
             <a className="ant-dropdown-link" href="#">
               设置<Icon type="down" />
             </a>
-          </Dropdown>
+          </Dropdown> 
           <br />
+          */}
           <Button onClick={this.showModal} style={{ marginBottom: '1em' }}>
             自定义推荐
-            </Button>
+          </Button>
           <Radio.Group
             style={{ marginBottom: '0.5em', marginLeft: '0.5em' }}
             onChange={this.onChange}
             value={this.state.value}
           >
-            <Radio value={1}>按赞</Radio>
-            <Radio value={2}>按评论</Radio>
-            <Radio value={3}>按收藏</Radio>
-            <Radio value={4}>按浏览</Radio>
+            <Radio value={'byfavor=true'}>按赞</Radio>
+            <Radio value={'bycomment=true'}>按评论</Radio>
+            <Radio value={'bycollection=true'}>按收藏</Radio>
+            <Radio value={'byview=true'}>按浏览</Radio>
           </Radio.Group>
           <span style={{ fontSize: '12px', marginLeft: '1em', color: 'red' }}>
             仅作品数多于5部并且杰普认证的作者才有可能被推荐
-            </span>
+          </span>
           {/* 表格内容 */}
           <div>
             <Table
@@ -313,7 +339,7 @@ class recommend extends React.Component {
             onCancel={this.handleCancel}
             width="1000px"
             height="514px"
-            maskStyle={{ backgroundColor: 'rgba(0,0,0,.05)' }}// 调高遮罩层透明度
+            maskStyle={{ backgroundColor: 'rgba(0,0,0,.05)' }} // 调高遮罩层透明度
           >
             <div style={{ overflow: 'hidden' }}>
               <div style={{ float: 'left' }}>
@@ -329,7 +355,9 @@ class recommend extends React.Component {
                     columns={columns1}
                     dataSource={this.props.recommend.customTeacherrank}
                   />
-                  <span style={{ color: 'red', display: this.state.display }} >不能选择更多了!!!</span>
+                  <span style={{ color: 'red', display: this.state.display }}>
+                    不能选择更多了!!!
+                  </span>
                 </div>
               </div>
               <div style={{ float: 'right' }}>
@@ -339,20 +367,25 @@ class recommend extends React.Component {
                   style={{ width: 200 }}
                 />
                 <br />
-                <Radio style={{ marginTop: '1em', marginBottom: '1em' }}>按热度</Radio>
-                <Table rowSelection={rowSelection} bordered rowKey="id" size="small" columns={columns2} dataSource={this.props.recommend.teacherrankList} />
+                <br />
+                {/* <Radio style={{ marginTop: '1em', marginBottom: '1em' }}>按热度</Radio> */}
+                <Table
+                  rowSelection={rowSelection}
+                  bordered
+                  rowKey="id"
+                  size="small"
+                  columns={columns2}
+                  dataSource={this.props.recommend.teacherrankList}
+                />
               </div>
             </div>
           </Modal>
-        </TabPane>
-      )
-    }
-    )
+        </TabPane>,
+      );
+    });
     return (
       <div style={{ padding: '1em', backgroundColor: '#ffffff', borderRadius: '5px' }}>
-        <Tabs onChange={(activeKey) => this.tabsChanges(activeKey)}>
-          {elements}
-        </Tabs>
+        <Tabs onChange={activeKey => this.tabsChanges(activeKey)}>{elements}</Tabs>
       </div>
     );
   }

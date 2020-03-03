@@ -24,7 +24,7 @@ const menuDataRender = menuList =>
 
 const footerRender = (_, defaultDom) => {
   if (!isAntDesignPro()) {
-    return defaultDom;
+    return React.cloneElement(defaultDom, { links: [], copyright: '杰普软件科技有限公司' });
   }
 
   return (

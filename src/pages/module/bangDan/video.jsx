@@ -8,8 +8,10 @@ const { Option } = Select;
 class bangDan extends React.Component {
   state = {
     value: 1,
+    value1: 1,
     selectedRowKeys: [],
-    display: 'none'
+    display: 'none',
+    value_permission: 'permission=0',
   };
   componentWillMount() {
     this.props.dispatch({ type: 'videobangdan/findAll' });
@@ -17,26 +19,42 @@ class bangDan extends React.Component {
 
   onChange = e => {
     console.log('radio checked', e.target.value);
+    this.props.dispatch({ type: 'videobangdan/findAll', payload: e.target.value });
     this.setState({
       value: e.target.value,
     });
   };
-
+  // 自定义榜单单选框
+  onChange_customer = e => {
+    this.props.dispatch({
+      type: 'videobangdan/findCustomVideolist',
+      payload: this.state.value_permission + e.target.value,
+    });
+    this.setState({
+      value1: e.target.value,
+    });
+  };
+  handleChange = value => {
+    console.log(`selected ${value}`);
+    this.setState({
+      value_permission: value,
+    });
+  };
   componentWillReceiveProps(nextProps) {
     // 该方法当props发生变化时执行，初始化render时不执行
     if (nextProps !== this.props) {
-      let set = nextProps.videobangdan.customVideorank
+      let set = nextProps.videobangdan.customVideorank;
       if (nextProps !== null && set !== undefined) {
         this.props = nextProps;
         // 当自定义榜单数量大于 5 时进行提示
         if (this.props.videobangdan.customVideorank.length >= 5) {
           this.setState({
             display: 'inline',
-          })
+          });
         } else {
           this.setState({
             display: 'none',
-          })
+          });
         }
         return;
       }
@@ -76,10 +94,10 @@ class bangDan extends React.Component {
   render() {
     // 视频列表表格列的配置描述
     const columns = [
-      {
-        title: '#',
-        dataIndex: 'id',
-      },
+      // {
+      //   title: '#',
+      //   dataIndex: 'id',
+      // },
       {
         title: '名称',
         dataIndex: 'vr_name',
@@ -130,45 +148,49 @@ class bangDan extends React.Component {
         width: '100px',
       },
       {
-        render: (text, record, index) =>
+        render: (text, record, index) => (
           <a
-            onClick={
-              () => {
-                if (index === 0) {
-                  alert('已经是第一位了哦!')
-                } else {
-                  // 上一行数据的id
-                  var pre_id = this.props.videobangdan.customVideorank[index -= 1].id;
-                  var values = {
-                    "down_id": pre_id, // 下调对象的id
-                    "up_id": record.id // 上调对象的id
-                  }
-                  this.props.dispatch({ type: 'videobangdan/changeOrderVideorank', payload: values })
-                }
+            onClick={() => {
+              if (index === 0) {
+                alert('已经是第一位了哦!');
+              } else {
+                // 上一行数据的id
+                var pre_id = this.props.videobangdan.customVideorank[(index -= 1)].id;
+                var values = {
+                  down_id: pre_id, // 下调对象的id
+                  up_id: record.id, // 上调对象的id
+                };
+                this.props.dispatch({ type: 'videobangdan/changeOrderVideorank', payload: values });
               }
-            }>↑</a>,
+            }}
+          >
+            ↑
+          </a>
+        ),
       },
       {
-        render: (text, record, index) =>
+        render: (text, record, index) => (
           <a
-            onClick={
-              () => {
-                if (index + 1 === this.props.videobangdan.customVideorank.length) {
-                  alert('已经是最后一位了哦!')
-                } else {
-                  // 下一行数据的id
-                  var next_id = this.props.videobangdan.customVideorank[index += 1].id;
-                  var values = {
-                    "down_id": record.id, // 下调对象的id
-                    "up_id": next_id // 上调对象的id
-                  }
-                  this.props.dispatch({ type: 'videobangdan/changeOrderVideorank', payload: values })
-                }
+            onClick={() => {
+              if (index + 1 === this.props.videobangdan.customVideorank.length) {
+                alert('已经是最后一位了哦!');
+              } else {
+                // 下一行数据的id
+                var next_id = this.props.videobangdan.customVideorank[(index += 1)].id;
+                var values = {
+                  down_id: record.id, // 下调对象的id
+                  up_id: next_id, // 上调对象的id
+                };
+                this.props.dispatch({ type: 'videobangdan/changeOrderVideorank', payload: values });
               }
-            }>↓</a>,
+            }}
+          >
+            ↓
+          </a>
+        ),
       },
       {
-        render: (record) => <a onClick={() => this.delrank(record.id)}>×</a>,
+        render: record => <a onClick={() => this.delrank(record.id)}>×</a>,
       },
     ];
     // 自定义榜单中视频列表表格列的配置描述
@@ -209,9 +231,9 @@ class bangDan extends React.Component {
         if (selectedRowKeys.length !== 0) {
           var value = {
             object_type: 'video', // 此处有bug,默认为视频类型,未考虑专辑
-            object_id: selectedRowKeys[0]
-          }
-          this.props.dispatch({ type: 'videobangdan/addCustomVideorank', payload: value })
+            object_id: selectedRowKeys[0],
+          };
+          this.props.dispatch({ type: 'videobangdan/addCustomVideorank', payload: value });
           // 请求完成后置空selectedRowKeys
           selectedRowKeys.length = 0;
         }
@@ -235,10 +257,10 @@ class bangDan extends React.Component {
               onChange={this.onChange}
               value={this.state.value}
             >
-              <Radio value={1}>按赞</Radio>
-              <Radio value={2}>按评论</Radio>
-              <Radio value={3}>按收藏</Radio>
-              <Radio value={4}>按浏览</Radio>
+              <Radio value={'byfavor=true'}>按赞</Radio>
+              <Radio value={'bycomment=true'}>按评论</Radio>
+              <Radio value={'bycollection=true'}>按收藏</Radio>
+              <Radio value={'byhot=true'}>按浏览</Radio>
             </Radio.Group>
             {/* 表格内容 */}
             <div>
@@ -248,7 +270,7 @@ class bangDan extends React.Component {
                 size="small"
                 columns={columns}
                 dataSource={this.props.videobangdan.videos.results}
-              // scroll={{ x: 1300 }}
+                // scroll={{ x: 1300 }}
               />
             </div>
             <Modal
@@ -278,7 +300,9 @@ class bangDan extends React.Component {
                       dataSource={this.props.videobangdan.customVideorank}
                       scroll={{ x: 300 }}
                     />
-                    <span style={{ color: 'red', display: this.state.display }} >不能选择更多了!!!</span>
+                    <span style={{ color: 'red', display: this.state.display }}>
+                      不能选择更多了!!!
+                    </span>
                   </div>
                 </div>
                 <div style={{ float: 'right' }}>
@@ -290,16 +314,30 @@ class bangDan extends React.Component {
                   <br />
                   <span>权限</span>
                   <Select
-                    defaultValue="全部"
+                    defaultValue="permission=0"
                     style={{ width: 120 }}
                     style={{ marginTop: '1em', marginBottom: '1em' }}
-                  />
-                  <span>格式</span>
+                    onChange={this.handleChange}
+                  >
+                    <Option value="permission=0">VIP</Option>
+                    <Option value="permission=1">免费</Option>
+                    <Option value="permission=2">其它</Option>
+                  </Select>
+                  {/* <span>格式</span>
                   <Select defaultValue="专辑" style={{ width: 120 }} />
                   <span>状态</span>
-                  <Select defaultValue="全部" style={{ width: 120 }} />
-                  <Radio>按时间</Radio>
-                  <Radio>按热度</Radio>
+                  <Select defaultValue="全部" style={{ width: 120 }} /> */}
+                  <Radio.Group
+                    style={{ marginBottom: '1em', marginLeft: '0.5em' }}
+                    onChange={this.onChange_customer}
+                    value={this.state.value1}
+                  >
+                    <Radio value={'bytime=true'}>按时间</Radio>
+                    <Radio value={'byhot=true'}>按热度</Radio>
+                    <Radio value={'byfavor=true'}>按赞</Radio>
+                    <Radio value={'bycomment=true'}>按评论</Radio>
+                    <Radio value={'bycollect=true'}>按收藏</Radio>
+                  </Radio.Group>
                   <Table
                     rowSelection={rowSelection}
                     bordered

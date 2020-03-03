@@ -7,8 +7,8 @@ import request from '@/utils/request';
 
 var baseURL = 'http://139.224.221.31:11000';
 
-export async function findAll() {
-  return request(baseURL + '/mp_man_module/get_default_docslist/');
+export async function findAll(value) {
+  return request(baseURL + '/mp_man_module/get_default_docslist/?' + value);
 }
 // 查找自定义文档榜单(5项)
 export async function findCustomWordrank() {
