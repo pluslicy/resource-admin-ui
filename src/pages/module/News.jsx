@@ -144,35 +144,10 @@ class News extends React.Component {
     
   };
 
-//   getChildrenMsg = () => {
-//     this.setState({
-//         imgs: this.refs['children'].state.imgs
-//     })
-// }
-
   render() {
-    // const fileList = [
-    //   {
-    //     uid: '-1',
-    //     name: 'xxx.png',
-    //     status: 'done',
-    //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    //     thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    //   },
-    //   {
-    //     uid: '-2',
-    //     name: 'yyy.png',
-    //     status: 'error',
-    //   },
-    // ];
-
-    console.log(this.state.imgs,"pppp")
     const props = {
-      // action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
       action:"http://139.224.221.31:11000/mp_man_module/update_latestresources/",
       listType: 'picture',
-      // defaultFileList: [...fileList],
-      // data:this.state.imgs,
       data:{
         lr_image: this.state.file,
         object_id: this.state.imgs.id,
@@ -237,8 +212,8 @@ class News extends React.Component {
       {
         title: 'Action',
         align: 'center',
-        fixed: 'right',
-        width: 100,
+        // fixed: 'right',
+        // width: 100,
         render: (text, record) => {
           return (
             <div>

@@ -19,7 +19,6 @@ class News extends React.Component {
 
    // 在渲染前调用
 	componentWillMount() {
-        console.log(this.props.newsTab.docslist,"qwe")
         this.props.dispatch({type: 'newsTab/findAll'})
         
     }

@@ -101,6 +101,10 @@ class Check extends React.Component {
     this.setState({
       visible: false,
     });
+    // 停止视频播放
+		var myVideo = document.getElementById('videoId');
+		myVideo.currentTime = 0;
+		myVideo.pause();
   };
   handleOk = e => {
     console.log(e);
@@ -250,7 +254,7 @@ class Check extends React.Component {
               onOk={this.handleOk}
               onCancel={this.handleCancel}
             >
-              <video width="850px" height="500px" controls>
+              <video id="videoId" width="850px" height="500px" controls>
 						    <source src={this.state.pathurl} />
 					    </video>
                   <Comment
