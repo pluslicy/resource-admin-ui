@@ -664,7 +664,7 @@ class TextModel extends React.Component{
                     <Icon type="upload" />上传
                 </Button>
                 </Upload>
-                <RangePicker  onChange={this.onChange2} style={{width:"220px"}} defaultValue={[moment('2018/12/11', dateFormat), moment('2018/12/12', dateFormat)]}
+                <RangePicker  onChange={this.onChange2} style={{width:"220px"}} 
                     format={dateFormat} />
 
                     <Search
