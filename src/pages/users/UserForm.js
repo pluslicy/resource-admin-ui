@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Input,Select,Button,Upload,Icon,message} from 'antd';
 import {connect} from 'dva'
+var baseURL = 'http://139.224.221.31:11000';
 class UserForm extends React.Component {
   constructor(props){
     super(props);
@@ -16,9 +17,9 @@ class UserForm extends React.Component {
     var a=document.getElementById('name');
     console.log(a)
     if(nextProps.flag){
-      a.href="http://10.0.6.5:16012/media/Template/studenttemplate.xlsx"
+      a.href= baseURL+"/media/Template/studenttemplate.xlsx"
     }else{
-      a.href="http://10.0.6.5:16012/media/Template/teachertemplate.xlsx"
+      a.href= baseURL+"/media/Template/teachertemplate.xlsx"
     }
   }
   downloadTemplate=(e)=>{
@@ -37,7 +38,7 @@ class UserForm extends React.Component {
     // 上传
     const props = {
       name: 'file',
-      action: this.state.flag!=false?'http://10.0.6.5:16012/mp_man_users/import_studentuser/':"http://10.0.6.5:16012/mp_man_users/import_teacheruser/",
+      action: this.state.flag!=false?'http://139.224.221.31:11000/mp_man_users/import_studentuser/':"http://139.224.221.31:11000/mp_man_users/import_teacheruser/",
       headers: {
         authorization: 'authorization-text',
       },
@@ -66,7 +67,7 @@ class UserForm extends React.Component {
           <Form.Item>
             {getFieldDecorator('name', {
               rules: [{ required: true, message: '' }],
-            })(<a href="http://10.0.6.5:16012/media/Template/studenttemplate.xlsx" target="_self" id="dd" style={{marginLeft:'32em'}} onClick={this.downloadTemplate}>下载模板</a>)}
+            })(<a href="http://139.224.221.31:11000/media/Template/studenttemplate.xlsx" target="_self" id="dd" style={{marginLeft:'32em'}} onClick={this.downloadTemplate}>下载模板</a>)}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator('description')(

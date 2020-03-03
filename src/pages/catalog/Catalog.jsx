@@ -331,7 +331,7 @@ class Catalog extends React.Component {
 
 						<div>
 						<Tree autoExpandParent 
-							  defaultExpandAll
+							//   defaultExpandAll
 							  onSelect={this.onSelect} 
 							  style={{marginLeft:"3em"}}
 							

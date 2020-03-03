@@ -21,7 +21,7 @@ export async function DeleteAllUsers(param) {
     method: 'post',
     data: param,
     headers: { 'Content-Type': 'application/json' },
-    getResponse: true,
+    // getResponse: true,
   });
 }
 // 添加用户

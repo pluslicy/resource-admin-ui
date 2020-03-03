@@ -508,7 +508,8 @@ class User extends React.Component {
     // 导入悬浮按钮
     const text = (
       <span>
-        导入时需要按模板填写,点击<Button type="link" size="small" onClik={this.downloadFile}>下载</Button>
+        导入时需要按模板填写
+        {/* ,点击<Button type="link" size="small" onClik={this.downloadFile}>下载</Button> */}
       </span>
     );
 
@@ -547,6 +548,7 @@ class User extends React.Component {
       {
         title: '角色',
         dataIndex: 'groups',
+        // width:'20%',
         render: (text, record) => {
           // console.log(record)
           var str = ' ';
@@ -558,8 +560,8 @@ class User extends React.Component {
           // console.log('str', str);
           return (
             <div>
-              <Input style={{ width: '100px' }} size="small" disabled={true} value={str} />
-
+              <Input style={{ width: '100px' }} size="small"  value={str} />
+{/* disabled={true} */}
               <Icon
                 type="plus"
                 style={{ color: 'skyblue', marginLeft: '5px' }}
@@ -576,10 +578,24 @@ class User extends React.Component {
       {
         title: '头像',
         dataIndex: 'user_protrait',
+        render: (text, record) => {
+          if (record.user_protrait === null) {
+            return <img style={{maxWidth:40,maxHeight:40}} src='https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=55176295,1423410453&fm=26&gp=0.jpg' alt=""/>
+          } else {
+            return <img src="" alt=""/>;
+          }
+        },
       },
       {
         title: '简介',
         dataIndex: 'user_desc ',
+        // render: (text, record) => {
+        //   if (record.user_desc === null) {
+        //     return "杰普优秀教师"
+        //   } else {
+        //     return ""
+        //   }
+        // },
       },
       {
         title: '操作',
