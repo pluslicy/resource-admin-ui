@@ -266,10 +266,12 @@ class User extends React.Component {
     );
   };
   handleCancelModal = e => {
+    const { form } = this.formRef.props;
     console.log(e);
     this.setState({
       visible: false,
     });
+    form.resetFields();
   };
   // 导入的单选按钮
   onChange = e => {

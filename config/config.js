@@ -169,6 +169,12 @@ export default {
               icon: 'right',
               component: './module/Lunbo',
             },
+            {
+              path: '/module/free',
+              name: 'free',
+              icon: 'right',
+              component: './module/free',
+            }
           ],
         },
         // 角色管理

@@ -68,6 +68,7 @@ export default {
   'menu.module.news': '最新状态',
   'menu.module.authentication': '认证审核',
   'menu.module.lunbo': '轮播设置',
+  'menu.module.free': '免费资源',
   'menu.roles': '角色权限',
   'menu.roles.privilege': '权限管理',
   'menu.roles.role': '角色管理',
